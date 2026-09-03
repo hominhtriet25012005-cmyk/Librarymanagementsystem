@@ -74,4 +74,34 @@ public class BookMapper {
 
         return book;
     }
+
+    public void updateEntityFromDTO(BookDTO dto, Book existingBook) throws BookException {
+        if (dto == null || existingBook == null) {
+            return;
+        }
+
+        if (dto.getGenreId() != null) {
+            Genre genre = genreRepository.findById(dto.getGenreId())
+                    .orElseThrow(() -> new BookException(
+                            "Genre with ID " + dto.getGenreId() + " not found"));
+            existingBook.setGenre(genre);
+        }
+
+        // Keep the existing ID and ISBN when updating a book.
+        existingBook.setTitle(dto.getTitle());
+        existingBook.setAuthor(dto.getAuthor());
+        existingBook.setPublisher(dto.getPublisher());
+        existingBook.setPublishedDate(dto.getPublicationDate());
+        existingBook.setLanguage(dto.getLanguage());
+        existingBook.setPages(dto.getPages());
+        existingBook.setDescription(dto.getDescription());
+        existingBook.setTotalCopies(dto.getTotalCopies());
+        existingBook.setAvailableCopies(dto.getAvailableCopies());
+        existingBook.setPrice(dto.getPrice());
+        existingBook.setCoverImageUrl(dto.getCoverImageUrl());
+
+        if (dto.getActive() != null) {
+            existingBook.setActive(dto.getActive());
+        }
+    }
 }
