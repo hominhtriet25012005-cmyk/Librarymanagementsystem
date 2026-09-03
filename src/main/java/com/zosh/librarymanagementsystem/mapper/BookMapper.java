@@ -4,7 +4,7 @@ import com.zosh.librarymanagementsystem.exception.BookException;
 import com.zosh.librarymanagementsystem.modal.Book;
 import com.zosh.librarymanagementsystem.modal.Genre;
 import com.zosh.librarymanagementsystem.repository.GenreRepository;
-import com.zosh.payload.dto.BookDTO;
+import com.zosh.librarymanagementsystem.payload.dto.BookDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -62,7 +62,7 @@ public class BookMapper {
         }
 
         book.setPublisher(dto.getPublisher());
-        book.setPublicationDate(dto.getPublicationDate());
+        book.setPublishedDate(dto.getPublicationDate());
         book.setLanguage(dto.getLanguage());
         book.setPages(dto.getPages());
         book.setDescription(dto.getDescription());

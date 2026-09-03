@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -57,6 +58,8 @@ public class BookDTO {
     @Min(value = 0, message = "Available copies cannot be negative")
     @NotNull(message = "Available copies is mandatory")
     private Integer availableCopies;
+
+    private BigDecimal price;
 
     @Size(max = 500, message = "Cover image URL must not exceed 500 characters")
     private String coverImageUrl;

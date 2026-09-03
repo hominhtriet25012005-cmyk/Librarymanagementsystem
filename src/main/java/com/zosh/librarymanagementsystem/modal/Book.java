@@ -41,6 +41,8 @@ public class Book {
 
     public String language;
 
+    private Integer pages;
+
     private  String description;
 
     @Column(nullable = false)
