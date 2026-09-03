@@ -1,0 +1,11 @@
+POST http://localhost:8083/api/genres/create
+Content-Type: application/json
+
+{
+  "code": "Fiction",
+  "name": "Fiction",
+  "description": "Suspense & investigation stories",
+  "displayOrder": 1,
+  "active": true,
+  "parentGenreId": null
+}

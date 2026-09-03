@@ -1,0 +1,36 @@
+import React from 'react'
+import { Box, Toolbar } from "@mui/material";
+
+const drawerWidth = 240;
+const UserLayout = () => {
+  return (
+    <Box sx={{ display: "flex",
+        minHeight: "100vh", bgcolor:"white"
+     }}>
+      {/* app baar */}
+
+      {/* profile menu */}
+
+      {/* user sidebar */}
+      <UserSidebar />
+
+      {/* main content */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          minHeight: "100vh",
+          p: 2,
+        }}
+      >
+        <Toolbar/>
+        <Box>
+          <Outlet/>
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+export default UserLayout
