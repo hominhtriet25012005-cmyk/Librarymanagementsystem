@@ -47,13 +47,13 @@ public class BookMapper {
             return null;
         }
 
+        //ISBN should not be updated
         Book book = new Book();
-        book.setId(dto.getId());
         book.setIsbn(dto.getIsbn());
         book.setTitle(dto.getTitle());
         book.setAuthor(dto.getAuthor());
 
-        // Map genre - fetch from database using genreId
+        // Update genre if provided
         if (dto.getGenreId() != null) {
             Genre genre = genreRepository.findById(dto.getGenreId())
                     .orElseThrow(() -> new BookException(

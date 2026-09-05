@@ -1,7 +1,8 @@
 import React from 'react'
-import { tabs } from '@mui/material';
+import { tabs } from './tabs';
+import { loans } from './loans';
+import LoanCard from './LoanCard';
 import { Box, Card, Tab, Tabs } from '@mui/material';
-import { BorderBottom, BoderClear } from '@mui/material';
 
 
 const MyLoans = () => {

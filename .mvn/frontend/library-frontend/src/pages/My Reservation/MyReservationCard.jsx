@@ -1,14 +1,16 @@
-import { CalendarMonth, HourglassBottom } from "@mui/icons-material";
 import React from "react";
 import {
     AccessAlarm,
-    CaledarMonth,
+    Book,
+    CalendarMonth,
     CheckCircle,
     Close,
-    HourglassBottom
+    HourglassBottom,
+    Notifications
 }
     from "@mui/icons-material";
-import { getReservationCard } from "./getStatusColor";
+import { Divider } from "@mui/material";
+import { getStatusColor } from "./getStatusColor";
 
 const MyReservationCard = ({ reservation }) => {
 
@@ -19,7 +21,7 @@ const MyReservationCard = ({ reservation }) => {
         const iconClass = "w-5 h-5";
         const icons = {
             PENDING: <HourglassBottom className={iconClass} />,
-            AVAILABLE: <CalendarIcon className={iconClass} />,
+            AVAILABLE: <CalendarMonth className={iconClass} />,
             FULFILLED: <CheckCircle className={iconClass} />,
             CANCELLED: <Close className={iconClass} />,
             EXPIRED: <AccessAlarm className={iconClass} />,

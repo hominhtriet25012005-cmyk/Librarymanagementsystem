@@ -12,7 +12,7 @@ const BookCard = ({ book }) => {
             {/* Book Cover */}
             <div className="relative h-64 bg-gradient-to-br from-indigo-100 to-purple-100 overflow-hidden">
                 <img
-                    src={"https://cdn.pixabay.com/photo/2019/01/30/08/30/book-3964050_1280.jpg" || book.coverImageUrl}
+                    src={book.coverImageUrl || "https://cdn.pixabay.com/photo/2019/01/30/08/30/book-3964050_1280.jpg"}
                     alt={book.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />

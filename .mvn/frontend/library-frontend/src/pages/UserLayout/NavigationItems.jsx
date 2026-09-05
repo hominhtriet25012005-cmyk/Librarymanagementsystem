@@ -1,5 +1,4 @@
 import {
-    Menu as MenuIcon,
     Dashboard as DashboardIcon,
     MenuBook as MenuBookIcon,
     EventNote as EventNoteIcon,
@@ -7,10 +6,6 @@ import {
     Favorite as FavoriteIcon,
     Person as PersonIcon,
     Settings as SettingsIcon,
-    Logout as LogoutIcon,
-    Notifications as NotificationsIcon,
-    Search as SearchIcon,
-    ChevronLeft as ChevronLeftIcon,
     Receipt as ReceiptIcon,
 } from "@mui/icons-material";
 

@@ -26,6 +26,7 @@ public class GenreDTO {
     private String description;
 
     @Min(value = 0, message = "display order cannot be negative")
+    @Builder.Default
     private Integer displayOrder=0;
 
     private Boolean active;

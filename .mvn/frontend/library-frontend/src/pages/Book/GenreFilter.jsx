@@ -3,6 +3,7 @@ import {
     RadioButtonChecked as RadioButtonCheckedIcon,
     RadioButtonUnchecked as RadioButtonUncheckedIcon,
 } from "@mui/icons-material";
+import { FormControl, FormControlLabel, Radio, RadioGroup } from "@mui/material";
 
 const GenreFilter = ({ genres = [], selectedGenreId, onGenreSelect }) => {
     return (
@@ -42,9 +43,9 @@ const GenreFilter = ({ genres = [], selectedGenreId, onGenreSelect }) => {
                 <FormControl>
                     <RadioGroup
                         aria-labelledby="demo-radio-buttons-group-label"
-                        defaultValue="female"
+                        value={selectedGenreId ?? ""}
                         name="radio-buttons-group"
-                        onChange={onGenreSele}
+                        onChange={(event) => onGenreSelect(Number(event.target.value))}
                     >
                         {genres.map((genre) => (
                             <FormControlLabel

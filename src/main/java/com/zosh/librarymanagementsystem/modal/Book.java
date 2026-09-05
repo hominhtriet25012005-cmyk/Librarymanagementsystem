@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "books")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -43,7 +44,8 @@ public class Book {
 
     private Integer pages;
 
-    private  String description;
+    @Column(length = 2000)
+    private String description;
 
     @Column(nullable = false)
     private Integer totalCopies;
@@ -53,9 +55,11 @@ public class Book {
 
     private BigDecimal price;
 
+    @Column(length = 500)
     private String coverImageUrl;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active=true;
 
 

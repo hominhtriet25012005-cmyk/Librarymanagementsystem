@@ -1,8 +1,21 @@
-import { MenuBook } from '@mui/icons-material';
-import { Box, Card, CardContent, Divider } from '@mui/material'
+import {
+    AssignmentReturn,
+    Autorenew,
+    CalendarToday,
+    MenuBook,
+    Numbers,
+    Payment,
+    Person
+} from '@mui/icons-material';
+import { Box, Button, Card, CardContent, Divider, Typography } from '@mui/material'
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
-const LoanCard = ({ loan }) => {
+const LoanCard = ({ loan, onRenew = () => {}, onPayFine = () => {}, onReturn = () => {} }) => {
+    const navigate = useNavigate();
+    const canRenew = () => loan.status === 'CHECKED_OUT'
+        && !loan.returnDate
+        && loan.renewalCount < loan.maxRenewals;
     return (
         <Card>
             <CardContent sx={{ p: 3 }}>
@@ -135,7 +148,7 @@ const LoanCard = ({ loan }) => {
                         <Button
                             size="small"
                             variant="contained"
-                            startIcon={<AutorenewIcon />}
+                            startIcon={<Autorenew />}
                             onClick={() => onRenew(loan.id)}
                             sx={{
                                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -158,7 +171,7 @@ const LoanCard = ({ loan }) => {
                             size="small"
                             variant="contained"
                             color="error"
-                            startIcon={<PaymentIcon />}
+                            startIcon={<Payment />}
                             onClick={() => onPayFine(loan)}
                             sx={{
                                 textTransform: 'none',
@@ -178,7 +191,7 @@ const LoanCard = ({ loan }) => {
                             size="small"
                             variant="outlined"
                             color="success"
-                            startIcon={<AssignmentReturnIcon />}
+                            startIcon={<AssignmentReturn />}
                             onClick={() => onReturn(loan.id)}
                             sx={{
                                 textTransform: 'none',

@@ -5,6 +5,7 @@ import com.zosh.librarymanagementsystem.mapper.GenreMapper;
 import com.zosh.librarymanagementsystem.modal.Genre;
 import com.zosh.librarymanagementsystem.payload.dto.GenreDTO;
 import com.zosh.librarymanagementsystem.repository.GenreRepository;
+import com.zosh.librarymanagementsystem.repository.BookRepository;
 import com.zosh.librarymanagementsystem.service.GenreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ public class GenreServiceImpl implements GenreService {
 
     private final GenreRepository genreRepository;
     private final GenreMapper genreMapper;
+    private final BookRepository bookRepository;
 
     @Override
     public GenreDTO createGenre(GenreDTO genreDTO) {
@@ -46,7 +48,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public GenreDTO upGenreDto(Long genreId, GenreDTO genreDTO) throws GenreException {
+    public GenreDTO updateGenre(Long genreId, GenreDTO genreDTO) throws GenreException {
         Genre existingGenre= genreRepository.findById(genreId).orElseThrow(
                 () -> new GenreException("genre not found")
         );
@@ -96,7 +98,7 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public long getBookCountByGenre(Long genreId) {
-        return 0;
+        return bookRepository.countByGenreIdAndActiveTrue(genreId);
     }
 
 }

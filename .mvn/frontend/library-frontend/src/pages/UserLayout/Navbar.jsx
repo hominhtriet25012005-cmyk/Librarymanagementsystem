@@ -1,11 +1,12 @@
-import { AppBar, IconButton, Toolbar } from '@mui/material';
+import { AppBar, Avatar, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 import React from 'react';
 import { navigationItems } from './NavigationItems';
 import { isActive } from './util';
 import { useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import { Notifications } from './NotificationBell';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import ContrastIcon from '@mui/icons-material/Contrast';
 
 const drawerWidth = 280;
 const user = {
@@ -49,7 +50,9 @@ const Navbar = ({ handleDrawerToggle }) => {
                     </IconButton>
                 </Tooltip>
 
-                <Notifications />
+                <Tooltip title="Notifications">
+                    <IconButton><NotificationsIcon /></IconButton>
+                </Tooltip>
 
                 <Box sx={{ ml: 2 }}>
                     <ContrastIcon />

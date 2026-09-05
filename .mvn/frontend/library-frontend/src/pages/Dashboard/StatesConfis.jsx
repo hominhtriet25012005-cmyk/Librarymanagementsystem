@@ -22,7 +22,8 @@ export const statsConfig = ({ myLoans, reservations, stats }) => [
     icon: <EventAvailableIcon sx={{ fontSize: 32, color: "#9333EA" }} />,
     bgColor: "bg-purple-100",
     textColor: "text-purple-600",
-
+  },
+  {
     id: "read",
     title: "Books Read",
     subtitle: "This year",
@@ -30,11 +31,12 @@ export const statsConfig = ({ myLoans, reservations, stats }) => [
     icon: <HistoryIcon sx={{ fontSize: 32, color: "#10B981" }} />,
     bgColor: "bg-green-100",
     textColor: "text-green-600",
-
+  },
+  {
     id: "steaks",
     title: "Day Steaks",
     subtitle: "Kepp it going",
-    value: stats.readingSteaks,
+    value: stats.readingStreak,
     icon: <TrendingUpIcon sx={{ fontSize: 32, color: "#F59E0B" }} />,
     bgColor: "bg-orange-100",
     textColor: "text-orange-600",

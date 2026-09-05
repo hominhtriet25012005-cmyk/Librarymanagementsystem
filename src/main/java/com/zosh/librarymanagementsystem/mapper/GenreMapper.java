@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Component
@@ -27,8 +26,8 @@ public class GenreMapper {
                 .description(savedGenre.getDescription())
                 .displayOrder(savedGenre.getDisplayOrder())
                 .active(savedGenre.getActive())
-                .createdAt(savedGenre.getCreatedAT())
-                .updatedAt(savedGenre.getUpdatedAT())
+                .createdAt(savedGenre.getCreatedAt())
+                .updatedAt(savedGenre.getUpdatedAt())
                 .build();
 
         if (savedGenre.getParentGenre()!=null) {
@@ -38,8 +37,8 @@ public class GenreMapper {
 
         if (savedGenre.getSubGenres()!=null && !savedGenre.getSubGenres().isEmpty()) {
             dto.setSubGenre(savedGenre.getSubGenres().stream()
-                    .filter(subGenre -> subGenre.getActive())
-                    .map(subGenre ->toDTO(subGenre)).collect(Collectors.toList()));
+                    .filter(subGenre -> Boolean.TRUE.equals(subGenre.getActive()))
+                    .map(this::toDTO).collect(Collectors.toList()));
 
         }
 
@@ -67,7 +66,7 @@ public class GenreMapper {
                     .ifPresent(genre::setParentGenre);
         }
 
-        return null;
+        return genre;
     }
 
     public void updateEntityFromDTO(GenreDTO dto, Genre existingGenre) {
@@ -78,7 +77,7 @@ public class GenreMapper {
         existingGenre.setCode(dto.getCode());
         existingGenre.setName(dto.getName());
         existingGenre.setDescription(dto.getDescription());
-        existingGenre.getDisplayOrder(dto.getDisplayOrder() != null ? dto.getDisplayOrder() : 0);
+        existingGenre.setDisplayOrder(dto.getDisplayOrder() != null ? dto.getDisplayOrder() : 0);
         if (dto.getActive()!=null) {
             existingGenre.setActive(dto.getActive());
         }

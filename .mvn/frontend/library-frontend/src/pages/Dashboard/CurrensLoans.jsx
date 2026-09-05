@@ -23,9 +23,9 @@ const CurrentLoans = () => {
         <div className='space-y-4'>
             {/* List of current loans will go here */}
 
-            {[1,1,1,1].map((item, index) => <CurrentLoanCard 
-
-            key={index}/>)}
+            {[1, 2, 3, 4].map((item) => (
+                <CurrentLoanCard loan={{ ...loan, id: item }} key={item} />
+            ))}
         </div>
 
     </div>

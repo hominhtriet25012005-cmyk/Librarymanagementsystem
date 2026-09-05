@@ -1,13 +1,12 @@
-import { AccessAlarm, CalendarToday } from '@mui/icons-material';
+import { AccessAlarm, Book, CalendarToday } from '@mui/icons-material';
 import React from 'react';
 import { tabs } from "./tabs";
 import { myReservation } from "./reservation";
-import Reservation from "../Dashboard/Reservation";
 import MyReservationCard from "./MyReservationCard";
 
 const MyReservation = () => {
     const state = { total: 6, active: 2, available: 1 };
-    const [activeTab, setActiveTab] = React.useState("0");
+    const [activeTab, setActiveTab] = React.useState(0);
 
     return (
         <div className='min-h-screen py-8'>
@@ -91,10 +90,11 @@ const MyReservation = () => {
                         (<button
                             onClick={() => setActiveTab(index)}
                             key={index}
-                            className={`flex-1 px-6 py-4 font-semibold text-base flex items-center
-                                ? "text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50"
-                                : "text-gray-600 hover:bg-gray-50"
-                                }`}>
+                            className={`flex-1 px-6 py-4 font-semibold text-base flex items-center ${
+                                activeTab === index
+                                    ? "text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50"
+                                    : "text-gray-600 hover:bg-gray-50"
+                            }`}>
                             {tab.icon}
                             {tab.label}
                         </button>
@@ -108,7 +108,7 @@ const MyReservation = () => {
                 {/* Content - Reservation List */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {myReservation.map((reservation) => (
-                        <MyReservationReservation key={reservation.id} reservation={reservation} />
+                        <MyReservationCard key={reservation.id} reservation={reservation} />
                     ))}
                 </div>
             </div>

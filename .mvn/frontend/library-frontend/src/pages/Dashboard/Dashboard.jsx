@@ -2,6 +2,12 @@ import React from 'react';
 import StatesCard from './StatesCard';
 import { AutoAwesome } from "@mui/icons-material";
 import LinearProgress from "@mui/material/LinearProgress";
+import { Box, Tab, Tabs } from "@mui/material";
+import { statsConfig } from "./StatesConfis";
+import CurrentLoans from "./CurrensLoans";
+import Reservation from "./Reservation";
+import ReadingHistory from "./ReadingHisoty";
+import Recommandation from "./Recommandation";
 
 // Lưu ý: Đảm bảo bạn đã import hàm statsConfig từ file tương ứng
 // import { statsConfig } from './utils/statsConfig'; 

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
@@ -17,19 +16,18 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     boolean existsByIsbn(String isbn);
 
     @Query("select b from Book b where " +
-            ":searchTerm is null OR " +
-            "lower(b.title) like lower(concat ('%', :searchTerm, '%'))" +
-            "lower(b.author) like lower(concat ('%', :searchTerm, '%'))" +
-            "lower(b.title) like lower(concat ('%', :searchTerm, '%'))" +
-            "(:genreId is null or b.genre.id=:genreId) AND " +
-            "(:availableOnly == false Or b.availableCopies>0 ) AND " +
-             "b.active=true"
-
-    )
+            "(:searchTerm is null or :searchTerm = '' or " +
+            "lower(b.title) like lower(concat('%', :searchTerm, '%')) or " +
+            "lower(b.author) like lower(concat('%', :searchTerm, '%')) or " +
+            "lower(b.isbn) like lower(concat('%', :searchTerm, '%'))) and " +
+            "(:genreId is null or b.genre.id = :genreId) and " +
+            "(:availableOnly = false or b.availableCopies > 0) and " +
+            "(:activeOnly = false or b.active = true)")
     Page<Book> searchBooksWithFilters(
             @Param("searchTerm") String searchTerm,
             @Param("genreId") Long genreId,
             @Param("availableOnly") boolean availableOnly,
+            @Param("activeOnly") boolean activeOnly,
             Pageable pageable
     );
 
@@ -37,4 +35,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("select count(b) from Book b where b.availableCopies>0 and b.active=true ")
     long countAvailableBooks();
+
+    long countByGenreIdAndActiveTrue(Long genreId);
 }

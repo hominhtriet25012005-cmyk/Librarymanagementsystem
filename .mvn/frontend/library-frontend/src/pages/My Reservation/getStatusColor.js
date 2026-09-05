@@ -24,18 +24,6 @@ export const getStatusColor = (status) => {
             border: "border-red-200",
             gradient: "from-red-100 to-red-200",
         },
-        FULFILLED: {
-            bg: "bg-blue-50",
-            text: "text-blue-800",
-            border: "border-blue-200",
-            gradient: "from-blue-100 to-blue-200",
-        },
-        CANCELLED: {
-            bg: "bg-red-50",
-            text: "text-red-800",
-            border: "border-red-200",
-            gradient: "from-red-100 to-red-200",
-        },
         EXPIRED: {
             bg: "bg-gray-50",
             text: "text-gray-800",

@@ -2,17 +2,19 @@ import React from 'react';
 import {
     Avatar,
     Box,
+    Divider,
     List,
     ListItem,
     ListItemButton,
     Tooltip,
     Typography,
-    alpha,
-    navigationItems
+    alpha
 } from "@mui/material";
-import { MenuBook, Dashboard } from "@mui/icons-material";
+import { Logout, MenuBook } from "@mui/icons-material";
 import { ListItemIcon } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { navigationItems, secondaryItems } from "./NavigationItems";
+import { isActive } from "./util";
 
 
 
@@ -106,8 +108,8 @@ const SidebarDrawer = () => {
 
             {/* Main Navigation Items */}
             <List>
-                {secondaryItems.map((item, index) => {
-                    const active = isActive(item.path);
+                {navigationItems.map((item, index) => {
+                    const active = isActive(item.path, location);
                     return (
                         <ListItem key={index}>
                             <Tooltip title={item.description} placement="right">

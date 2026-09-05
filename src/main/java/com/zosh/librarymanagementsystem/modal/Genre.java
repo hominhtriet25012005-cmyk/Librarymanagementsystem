@@ -8,12 +8,12 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "genres")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,10 +22,11 @@ import java.util.List;
 public class Genre {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "Genre Code is Mandatory")
+    @Column(nullable = false, unique = true, length = 50)
     private String code;
 
     @NotBlank(message = "genre name is mandatory")
@@ -35,26 +36,28 @@ public class Genre {
     private String description;
 
     @Min(value = 0, message = "display order cannot be negative")
+    @Builder.Default
     private Integer displayOrder=0;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active=true;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_genre_id")
     private Genre parentGenre;
 
-    @OneToMany
-    private List<Genre> subGenres=new ArrayList<Genre>();
+    @OneToMany(mappedBy = "parentGenre")
+    @Builder.Default
+    private List<Genre> subGenres=new ArrayList<>();
 
 //    @OneToMany(mappedBy = "genre", cascade = CascadeType.PERSIST)
 //    private List<Book> books=new ArrayList<Book>();
 
     @CreationTimestamp
-    private LocalDateTime createdAT;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    private LocalDateTime updatedAT;
+    private LocalDateTime updatedAt;
 
-    public void getDisplayOrder(@Min(value = 0, message = "display order cannot be negative") Integer displayOrder) {
-    }
 }

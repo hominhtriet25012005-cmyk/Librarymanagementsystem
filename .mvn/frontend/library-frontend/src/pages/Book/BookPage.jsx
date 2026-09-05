@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import GenreFilter from './GenreFilter';
+import BookCard from './BookCard';
 import { TextField, InputAdornment, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { Sort, Search } from '@mui/icons-material';
 
@@ -202,10 +203,7 @@ const BookPage = () => {
     const [sortBy, setSortBy] = React.useState('createdAt');
     const [sortDirection, setSortDirection] = React.useState('DESC');
 
-    const handleGenreSelect = (event) => {
-        const genreId = event.target.value;
-        setSelectedGenreId(genreId);
-    };
+    const handleGenreSelect = (genreId) => setSelectedGenreId(genreId);
 
     console.log("Selected Genre ID:", selectedGenreId);
 
@@ -249,7 +247,11 @@ const BookPage = () => {
 
 
                             {/* Genre Filter */}
-                            <GenreFilter onGenreSelect={handleGenreSelect} genres={genres} />
+                            <GenreFilter
+                                onGenreSelect={handleGenreSelect}
+                                genres={genres}
+                                selectedGenreId={selectedGenreId}
+                            />
 
                             {/* Availability Filter */}
                             <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
@@ -290,12 +292,12 @@ const BookPage = () => {
                                     InputProps={{
                                         startAdornment: (
                                             <InputAdornment position="start">
-                                                <SearchIcon className="text-gray-400" />
+                                                <Search className="text-gray-400" />
                                             </InputAdornment>
                                         ),
                                         endAdornment: (
                                             <InputAdornment position="start">
-                                                <SearchIcon className="text-gray-400" />
+                                                <Search className="text-gray-400" />
                                             </InputAdornment>
                                         ),
 
