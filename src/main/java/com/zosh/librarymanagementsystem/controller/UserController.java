@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<UserDTO> getUserProfile() throws Exception {
+    public ResponseEntity<UserDTO> getUserProfile() {
         return ResponseEntity.ok(
                 com.zosh.librarymanagementsystem.mapper.UserMapper.toDTO(
                         userService.getCurrentUser()

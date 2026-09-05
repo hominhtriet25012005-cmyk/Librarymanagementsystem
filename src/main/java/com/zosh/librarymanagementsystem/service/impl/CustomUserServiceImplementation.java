@@ -27,7 +27,7 @@ public class CustomUserServiceImplementation implements UserDetailsService {
         User user = userRepository.findByEmail(username);
 
         if (user == null) {
-            throw new UsernameNotFoundException("User not found with email: " + username);
+            throw new UsernameNotFoundException("Không tìm thấy người dùng có email: " + username);
         }
 
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().toString());

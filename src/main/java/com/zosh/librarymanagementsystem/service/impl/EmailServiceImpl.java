@@ -28,9 +28,9 @@ public class EmailServiceImpl implements EmailService {
             javaMailSender.send(mimeMessage);
 
         } catch (MessagingException e) {
-            throw new MailSendException("Failed to prepare email", e);
+            throw new MailSendException("Không thể chuẩn bị nội dung email", e);
         } catch (MailException e) {
-            throw new MailSendException("Failed to send email", e);
+            throw new MailSendException("Không thể gửi email", e);
         }
     }
 }

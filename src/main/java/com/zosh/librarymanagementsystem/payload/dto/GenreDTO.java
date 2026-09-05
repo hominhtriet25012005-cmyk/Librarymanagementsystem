@@ -16,16 +16,16 @@ import java.util.List;
 public class GenreDTO {
     private Long id;
 
-    @NotBlank(message = "Genre Code is Mandatory")
+    @NotBlank(message = "Mã thể loại là bắt buộc")
     private String code;
 
-    @NotBlank(message = "genre name is mandatory")
+    @NotBlank(message = "Tên thể loại là bắt buộc")
     private String name;
 
-    @Size(max = 500,message = "description must not exceed 500 characters")
+    @Size(max = 500,message = "Mô tả không được vượt quá 500 ký tự")
     private String description;
 
-    @Min(value = 0, message = "display order cannot be negative")
+    @Min(value = 0, message = "Thứ tự hiển thị không được âm")
     @Builder.Default
     private Integer displayOrder=0;
 

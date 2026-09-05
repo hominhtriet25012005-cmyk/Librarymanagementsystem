@@ -27,7 +27,7 @@ public class GlobalException {
         String message = e.getBindingResult().getFieldErrors().stream()
                 .findFirst()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .orElse("Request validation failed");
+                .orElse("Dữ liệu gửi lên không hợp lệ");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse(message, false));
     }

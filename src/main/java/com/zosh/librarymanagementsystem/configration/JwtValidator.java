@@ -30,7 +30,7 @@ public class JwtValidator extends OncePerRequestFilter {
 
         String jwt = request.getHeader(JwtConstant.JWT_HEADER);
 
-        // Bearer mfewkufhewuyygehw
+        // Chỉ xử lý header đúng dạng: Authorization: Bearer <token>.
         if (jwt != null && jwt.startsWith("Bearer ")) {
             jwt=jwt.substring(7);
 
@@ -49,7 +49,7 @@ public class JwtValidator extends OncePerRequestFilter {
 
             } catch (Exception e) {
                 SecurityContextHolder.clearContext();
-                response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid JWT token");
+                response.sendError(HttpStatus.UNAUTHORIZED.value(), "JWT không hợp lệ hoặc đã hết hạn");
                 return;
             }
         }

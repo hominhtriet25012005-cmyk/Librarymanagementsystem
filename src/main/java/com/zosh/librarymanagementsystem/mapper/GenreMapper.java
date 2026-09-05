@@ -1,5 +1,6 @@
 package com.zosh.librarymanagementsystem.mapper;
 
+import com.zosh.librarymanagementsystem.exception.GenreException;
 import com.zosh.librarymanagementsystem.modal.Genre;
 import com.zosh.librarymanagementsystem.payload.dto.GenreDTO;
 import com.zosh.librarymanagementsystem.repository.GenreRepository;
@@ -62,8 +63,10 @@ public class GenreMapper {
                 .build();
 
         if (genreDTO.getParentGenreId() != null) {
-            genreRepository.findById(genreDTO.getParentGenreId())
-                    .ifPresent(genre::setParentGenre);
+            Genre parent = genreRepository.findById(genreDTO.getParentGenreId())
+                    .orElseThrow(() -> new GenreException(
+                            "Không tìm thấy thể loại cha có ID " + genreDTO.getParentGenreId()));
+            genre.setParentGenre(parent);
         }
 
         return genre;
@@ -82,12 +85,16 @@ public class GenreMapper {
             existingGenre.setActive(dto.getActive());
         }
         if (dto.getParentGenreId()!=null) {
-            genreRepository.findById(dto.getParentGenreId())
-                    .ifPresent(existingGenre::setParentGenre);
+            Genre parent = genreRepository.findById(dto.getParentGenreId())
+                    .orElseThrow(() -> new GenreException(
+                            "Không tìm thấy thể loại cha có ID " + dto.getParentGenreId()));
+            existingGenre.setParentGenre(parent);
+        } else {
+            existingGenre.setParentGenre(null);
         }
     }
 
     public List<GenreDTO> toDTOList(List<Genre> genreList) {
-        return genreList.stream().map(genre -> toDTO(genre)).collect(Collectors.toList());
+        return genreList.stream().map(this::toDTO).collect(Collectors.toList());
     }
 }

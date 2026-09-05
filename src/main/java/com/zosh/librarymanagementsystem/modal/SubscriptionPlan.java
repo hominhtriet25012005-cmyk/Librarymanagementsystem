@@ -35,18 +35,18 @@ public class SubscriptionPlan {
     private Integer durationDays;
 
     @Column(nullable = false)
-    @Positive(message = "Price must be positive")
+    @Positive(message = "Giá gói phải lớn hơn 0")
     private Long price;
 
     @Builder.Default
     private String currency="INR";
 
     @Column(nullable = false)
-    @Positive(message = "Max books must be positive")
+    @Positive(message = "Số sách tối đa phải lớn hơn 0")
     private Integer maxBooksAllowed;
 
     @Column(nullable = false)
-    @Positive(message = "Max days must be positive")
+    @Positive(message = "Số ngày mượn tối đa phải lớn hơn 0")
     private Integer maxDaysPerBook;
 
     @Builder.Default

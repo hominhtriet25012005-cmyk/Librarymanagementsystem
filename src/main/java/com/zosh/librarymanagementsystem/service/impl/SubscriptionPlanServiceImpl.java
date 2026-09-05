@@ -23,10 +23,10 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     private final UserService userService;
 
     @Override
-    public SubscriptionPlanDTO createSubscriptionPlan(SubscriptionPlanDTO planDTO) throws Exception {
+    public SubscriptionPlanDTO createSubscriptionPlan(SubscriptionPlanDTO planDTO) {
 
         if (planRepository.existsByPlanCode(planDTO.getPlanCode())) {
-            throw new SubscriptionException("Plan code already exists");
+            throw new SubscriptionException("Mã gói thành viên đã tồn tại");
         }
         SubscriptionPlan plan =planMapper.toEntity(planDTO);
 
@@ -38,9 +38,9 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     }
 
     @Override
-    public SubscriptionPlanDTO updateSubscriptionPlan(Long planId, SubscriptionPlanDTO planDTO) throws Exception {
+    public SubscriptionPlanDTO updateSubscriptionPlan(Long planId, SubscriptionPlanDTO planDTO) {
         SubscriptionPlan existingPlan = planRepository.findById(planId).orElseThrow(
-                () -> new SubscriptionException("Subscription plan not found")
+                () -> new SubscriptionException("Không tìm thấy gói thành viên")
         );
         planMapper.updateEntity(existingPlan, planDTO);
         User currentUser = userService.getCurrentUser();
@@ -51,9 +51,9 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     }
 
     @Override
-    public void deleteSubscriptionPlan(Long planId) throws Exception {
+    public void deleteSubscriptionPlan(Long planId) {
         SubscriptionPlan existingPlan = planRepository.findById(planId).orElseThrow(
-                () -> new SubscriptionException("Subscription plan not found")
+                () -> new SubscriptionException("Không tìm thấy gói thành viên")
         );
         existingPlan.setIsActive(false);
         planRepository.save(existingPlan);

@@ -29,31 +29,29 @@ public class SubscriptionImpl implements SubscriptionService {
     private final UserService userService;
 
     @Override
-    public SubscriptionDTO subscribe(SubscriptionDTO subscriptionDTO) throws Exception {
+    public SubscriptionDTO subscribe(SubscriptionDTO subscriptionDTO) {
         User user = userService.getCurrentUser();
 
         SubscriptionPlan plan = subscriptionPlanRepository
                 .findById(subscriptionDTO.getPlanId()).orElseThrow(
-                        () -> new SubscriptionException("Subscription plan not found")
+                        () -> new SubscriptionException("Không tìm thấy gói thành viên")
                 );
 
         if (!Boolean.TRUE.equals(plan.getIsActive())) {
-            throw new SubscriptionException("Subscription plan is inactive");
+            throw new SubscriptionException("Gói thành viên đang ngừng hoạt động");
         }
 
         subscriptionRepository.findActiveSubscriptionByUserId(user.getId(), LocalDate.now())
                 .ifPresent(active -> {
-                    throw new SubscriptionException("User already has an active subscription");
+                    throw new SubscriptionException("Người dùng đã có một gói thành viên đang hoạt động");
                 });
-
-//  Optional<Sub>
 
         Subscription subscription = subscriptionMapper.toEntity(subscriptionDTO, plan, user);
         subscription.initializeFromPlan();
         subscription.setIsActive(false);
         Subscription saveSubscription = subscriptionRepository.save(subscription);
 
-//  create payment (todo)
+        // Thanh toán sẽ được nối vào bước này khi làm module payment.
         return subscriptionMapper.toDTO(saveSubscription);
     }
 
@@ -62,7 +60,7 @@ public class SubscriptionImpl implements SubscriptionService {
         Long resolvedUserId = userService.getCurrentUser().getId();
         Subscription subscription = subscriptionRepository
                 .findActiveSubscriptionByUserId(resolvedUserId, LocalDate.now())
-                .orElseThrow(() -> new SubscriptionException("no active subscription found!"));
+                .orElseThrow(() -> new SubscriptionException("Không tìm thấy gói thành viên đang hoạt động"));
         return subscriptionMapper.toDTO(subscription);
     }
 
@@ -70,22 +68,23 @@ public class SubscriptionImpl implements SubscriptionService {
     public SubscriptionDTO cancelSubscription(Long subscriptionId, String reason) {
         Subscription subscription = subscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new SubscriptionException(
-                        "Subscription not found with ID: " + subscriptionId));
+                        "Không tìm thấy đăng ký có ID " + subscriptionId));
 
         User currentUser = userService.getCurrentUser();
         boolean isAdmin = currentUser.getRole() == UserRole.ROLE_ADMIN;
         if (!isAdmin && !subscription.getUser().getId().equals(currentUser.getId())) {
-            throw new SubscriptionException("You cannot cancel another user's subscription");
+            throw new SubscriptionException("Bạn không thể hủy gói thành viên của người dùng khác");
         }
 
         if (!Boolean.TRUE.equals(subscription.getIsActive())) {
-            throw new SubscriptionException("Subscription is already inactive");
+            throw new SubscriptionException("Gói thành viên này đã ngừng hoạt động");
         }
 
-        // Mark as cancelled
+        // Lưu trạng thái và lý do hủy để quản trị viên có thể tra cứu.
         subscription.setIsActive(false);
         subscription.setCancelledAt(LocalDateTime.now());
-        subscription.setCancellationReason(reason != null ? reason : "Cancelled by user");
+        subscription.setCancellationReason(
+                reason != null && !reason.isBlank() ? reason.trim() : "Người dùng hủy");
 
         subscription = subscriptionRepository.save(subscription);
 
@@ -97,10 +96,10 @@ public class SubscriptionImpl implements SubscriptionService {
 
         Subscription subscription = subscriptionRepository.findById(subscriptionId)
                 .orElseThrow(
-                        () -> new SubscriptionException("subscription not found by id")
+                        () -> new SubscriptionException("Không tìm thấy đăng ký có ID " + subscriptionId)
                 );
 
-        // verify payment (todo)
+        // paymentId sẽ được xác minh khi module thanh toán được triển khai.
 
         subscription.setIsActive(true);
         subscription.setStartDate(LocalDate.now());
@@ -116,7 +115,7 @@ public class SubscriptionImpl implements SubscriptionService {
     }
 
     @Override
-    public void deactivateExpiredSubscriptions() throws Exception {
+    public void deactivateExpiredSubscriptions() {
         List<Subscription> expiredSubscriptions = subscriptionRepository
                 .findExpiredActiveSubscriptions(LocalDate.now());
 

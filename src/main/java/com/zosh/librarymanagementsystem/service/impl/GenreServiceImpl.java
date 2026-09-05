@@ -8,7 +8,6 @@ import com.zosh.librarymanagementsystem.repository.GenreRepository;
 import com.zosh.librarymanagementsystem.repository.BookRepository;
 import com.zosh.librarymanagementsystem.service.GenreService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +24,9 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public GenreDTO createGenre(GenreDTO genreDTO) {
+        if (genreRepository.existsByCode(genreDTO.getCode())) {
+            throw new GenreException("Mã thể loại " + genreDTO.getCode() + " đã tồn tại");
+        }
 
         Genre genre= genreMapper.toEntity(genreDTO);
         Genre savedGenre = genreRepository.save(genre);
@@ -42,7 +44,7 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public GenreDTO getGenreById(Long genreId) throws GenreException {
         Genre genre= genreRepository.findById(genreId).orElseThrow(
-                () -> new GenreException("genre not found")
+                () -> new GenreException("Không tìm thấy thể loại")
         );
         return genreMapper.toDTO(genre);
     }
@@ -50,8 +52,15 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public GenreDTO updateGenre(Long genreId, GenreDTO genreDTO) throws GenreException {
         Genre existingGenre= genreRepository.findById(genreId).orElseThrow(
-                () -> new GenreException("genre not found")
+                () -> new GenreException("Không tìm thấy thể loại")
         );
+
+        if (genreRepository.existsByCodeAndIdNot(genreDTO.getCode(), genreId)) {
+            throw new GenreException("Mã thể loại " + genreDTO.getCode() + " đã tồn tại");
+        }
+        if (genreId.equals(genreDTO.getParentGenreId())) {
+            throw new GenreException("Một thể loại không thể là thể loại cha của chính nó");
+        }
 
         genreMapper.updateEntityFromDTO(genreDTO, existingGenre);
 
@@ -63,7 +72,7 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public void deleteGenre(Long genreId) throws GenreException {
         Genre existingGenre= genreRepository.findById(genreId).orElseThrow(
-                () -> new GenreException("genre not found")
+                () -> new GenreException("Không tìm thấy thể loại")
         );
         existingGenre.setActive(false);
         genreRepository.save(existingGenre);
@@ -72,7 +81,7 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public void hardDeleteGenre(Long genreId) throws GenreException {
         Genre existingGenre= genreRepository.findById(genreId).orElseThrow(
-                () -> new GenreException("genre not found")
+                () -> new GenreException("Không tìm thấy thể loại")
         );
         genreRepository.delete(existingGenre);
     }

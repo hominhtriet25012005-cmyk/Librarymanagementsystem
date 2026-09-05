@@ -17,30 +17,30 @@ public class SubscriptionPlanDTO {
 
     private Long id;
 
-    @NotBlank(message = "Plan code is mandatory")
+    @NotBlank(message = "Mã gói thành viên là bắt buộc")
     private String planCode;
 
-    @NotBlank(message = "Plan name is mandatory")
+    @NotBlank(message = "Tên gói thành viên là bắt buộc")
     private String name;
 
     private String description;
 
-    @NotNull(message = "Duration is mandatory")
-    @Positive(message = "Duration must be positive")
+    @NotNull(message = "Thời hạn gói là bắt buộc")
+    @Positive(message = "Thời hạn gói phải lớn hơn 0")
     private Integer durationDays;
 
-    @NotNull(message = "Price is mandatory")
-    @Positive(message = "Price must be positive")
+    @NotNull(message = "Giá gói là bắt buộc")
+    @Positive(message = "Giá gói phải lớn hơn 0")
     private Long price;
 
     private String currency;
 
-    @NotNull(message = "Max books allowed is mandatory")
-    @Positive(message = "Max books must be positive")
+    @NotNull(message = "Số sách tối đa là bắt buộc")
+    @Positive(message = "Số sách tối đa phải lớn hơn 0")
     private Integer maxBooksAllowed;
 
-    @NotNull(message = "Max days per book is mandatory")
-    @Positive(message = "Max days must be positive")
+    @NotNull(message = "Số ngày mượn tối đa là bắt buộc")
+    @Positive(message = "Số ngày mượn tối đa phải lớn hơn 0")
     private Integer maxDaysPerBook;
 
     private Integer displayOrder;

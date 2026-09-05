@@ -9,7 +9,6 @@ import com.zosh.librarymanagementsystem.payload.response.PageResponse;
 import com.zosh.librarymanagementsystem.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,7 +58,7 @@ public class BookController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteBook(@PathVariable Long id) throws BookException {
         bookService.deleteBook(id);
-        return ResponseEntity.ok(new ApiResponse("Book deleted successfully", true));
+        return ResponseEntity.ok(new ApiResponse("Đã ẩn sách thành công", true));
     }
 
     /**
@@ -69,11 +68,12 @@ public class BookController {
     @DeleteMapping({"/{id}/permanent", "/{id}/permaent"})
     public ResponseEntity<ApiResponse> hardDeleteBook(@PathVariable Long id) throws BookException {
         bookService.hardDeleteBook(id);
-        return ResponseEntity.ok(new ApiResponse("Book permanently deleted", true));
+        return ResponseEntity.ok(new ApiResponse("Đã xóa vĩnh viễn sách", true));
     }
 
     @GetMapping
     public  ResponseEntity<PageResponse<BookDTO>> searchBooks(
+            @RequestParam(required = false) String searchTerm,
             @RequestParam(required = false) Long genreId,
             @RequestParam(required = false, defaultValue = "false") Boolean availableOnly,
             @RequestParam(defaultValue = "true") boolean activeOnly,
@@ -83,8 +83,9 @@ public class BookController {
             @RequestParam(defaultValue = "DESC") String sortDirection) {
 
 
-        // Build search request from query parameters
+        // Gom các query parameter thành một đối tượng để dùng chung logic tìm kiếm.
         BookSearchRequest searchRequest = new BookSearchRequest();
+        searchRequest.setSearchTerm(searchTerm);
         searchRequest.setGenreId(genreId);
         searchRequest.setAvailableOnly(availableOnly);
         searchRequest.setActiveOnly(activeOnly);

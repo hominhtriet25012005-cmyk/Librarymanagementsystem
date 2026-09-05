@@ -25,17 +25,17 @@ public class Genre {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Genre Code is Mandatory")
+    @NotBlank(message = "Mã thể loại là bắt buộc")
     @Column(nullable = false, unique = true, length = 50)
     private String code;
 
-    @NotBlank(message = "genre name is mandatory")
+    @NotBlank(message = "Tên thể loại là bắt buộc")
     private String name;
 
-    @Size(max = 500,message = "description must not exceed 500 characters")
+    @Size(max = 500,message = "Mô tả không được vượt quá 500 ký tự")
     private String description;
 
-    @Min(value = 0, message = "display order cannot be negative")
+    @Min(value = 0, message = "Thứ tự hiển thị không được âm")
     @Builder.Default
     private Integer displayOrder=0;
 
@@ -50,9 +50,6 @@ public class Genre {
     @OneToMany(mappedBy = "parentGenre")
     @Builder.Default
     private List<Genre> subGenres=new ArrayList<>();
-
-//    @OneToMany(mappedBy = "genre", cascade = CascadeType.PERSIST)
-//    private List<Book> books=new ArrayList<Book>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;

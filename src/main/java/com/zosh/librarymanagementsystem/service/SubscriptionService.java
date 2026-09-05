@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface SubscriptionService {
 
-    SubscriptionDTO subscribe(SubscriptionDTO subscriptionDTO) throws Exception;
+    SubscriptionDTO subscribe(SubscriptionDTO subscriptionDTO);
 
     SubscriptionDTO getUsersActiveSubscription();
 
@@ -17,5 +17,5 @@ public interface SubscriptionService {
 
     List<SubscriptionDTO> getAllSubscriptions(Pageable pageable);
 
-    void  deactivateExpiredSubscriptions() throws Exception;
+    void deactivateExpiredSubscriptions();
 }

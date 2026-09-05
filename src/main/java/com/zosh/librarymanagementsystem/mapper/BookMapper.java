@@ -47,17 +47,17 @@ public class BookMapper {
             return null;
         }
 
-        //ISBN should not be updated
+        // ISBN chỉ được gán khi tạo mới, không thay đổi khi cập nhật sách.
         Book book = new Book();
         book.setIsbn(dto.getIsbn());
         book.setTitle(dto.getTitle());
         book.setAuthor(dto.getAuthor());
 
-        // Update genre if provided
+        // Kiểm tra thể loại tồn tại trước khi gắn vào sách.
         if (dto.getGenreId() != null) {
             Genre genre = genreRepository.findById(dto.getGenreId())
                     .orElseThrow(() -> new BookException(
-                            "Genre with ID " + dto.getGenreId() + " not found"));
+                            "Không tìm thấy thể loại có ID " + dto.getGenreId()));
             book.setGenre(genre);
         }
 
@@ -83,11 +83,11 @@ public class BookMapper {
         if (dto.getGenreId() != null) {
             Genre genre = genreRepository.findById(dto.getGenreId())
                     .orElseThrow(() -> new BookException(
-                            "Genre with ID " + dto.getGenreId() + " not found"));
+                            "Không tìm thấy thể loại có ID " + dto.getGenreId()));
             existingBook.setGenre(genre);
         }
 
-        // Keep the existing ID and ISBN when updating a book.
+        // Giữ nguyên ID và ISBN hiện tại khi cập nhật sách.
         existingBook.setTitle(dto.getTitle());
         existingBook.setAuthor(dto.getAuthor());
         existingBook.setPublisher(dto.getPublisher());

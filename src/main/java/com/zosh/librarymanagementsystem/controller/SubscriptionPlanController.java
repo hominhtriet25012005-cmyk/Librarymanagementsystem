@@ -26,7 +26,7 @@ public class SubscriptionPlanController {
     @PostMapping("/admin/create")
     public ResponseEntity<?> createSubscriptionPlan(
             @Valid @RequestBody SubscriptionPlanDTO subscriptionPlanDTO
-    ) throws Exception {
+    ) {
         SubscriptionPlanDTO plans = subscriptionPlanService.createSubscriptionPlan(
                 subscriptionPlanDTO
         );
@@ -35,9 +35,9 @@ public class SubscriptionPlanController {
 
     @PutMapping("/admin/{id}")
     public ResponseEntity<?> updateSubscriptionPlan(
-            @RequestBody SubscriptionPlanDTO subscriptionPlanDTO,
+            @Valid @RequestBody SubscriptionPlanDTO subscriptionPlanDTO,
             @PathVariable long id
-    ) throws Exception {
+    ) {
         SubscriptionPlanDTO plans = subscriptionPlanService.updateSubscriptionPlan(
                 id, subscriptionPlanDTO
         );
@@ -47,9 +47,9 @@ public class SubscriptionPlanController {
     @DeleteMapping("/admin/{id}")
     public ResponseEntity<?> deleteSubscriptionPlan(
             @PathVariable long id
-    ) throws Exception {
+    ) {
         subscriptionPlanService.deleteSubscriptionPlan(id);
-        ApiResponse res = new ApiResponse("plan deleted successfully", true);
+        ApiResponse res = new ApiResponse("Đã ẩn gói thành viên", true);
         return ResponseEntity.ok(res);
     }
 }

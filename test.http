@@ -1,11 +1,203 @@
-POST http://localhost:8083/api/genres/create
-Content-Type: application/json
+### CẤU HÌNH LOCAL
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+### 1. Kiểm tra backend đã chạy
+GET {{baseUrl}}/
+
+### 2. Đăng ký tài khoản bạn đọc
+# @name signup
+POST {{baseUrl}}/auth/signup
+Content-Type: {{contentType}}
 
 {
-  "code": "Fiction",
-  "name": "Fiction",
-  "description": "Suspense & investigation stories",
+  "email": "bandoc@example.com",
+  "password": "matkhau123",
+  "fullName": "Bạn Đọc Local",
+  "phone": "0900000000"
+}
+
+> {% client.global.set("userToken", response.body.jwt); %}
+
+### 3. Đăng nhập lại bằng tài khoản bạn đọc
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "bandoc@example.com",
+  "password": "matkhau123"
+}
+
+> {% client.global.set("userToken", response.body.jwt); %}
+
+### 4. Đăng nhập quản trị viên local
+# Thông tin mặc định có thể đổi trong application.properties.
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "admin@gmail.com",
+  "password": "admin123"
+}
+
+> {% client.global.set("adminToken", response.body.jwt); %}
+
+### 5. Tạo thể loại (ADMIN)
+# @name createGenre
+POST {{baseUrl}}/api/genres/create
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+{
+  "code": "VAN-HOC-VIET-NAM",
+  "name": "Văn học Việt Nam",
+  "description": "Tác phẩm văn học Việt Nam",
   "displayOrder": 1,
   "active": true,
   "parentGenreId": null
+}
+
+> {% client.global.set("genreId", response.body.id); %}
+
+### 6. Xem danh sách thể loại
+GET {{baseUrl}}/api/genres
+Authorization: Bearer {{userToken}}
+
+### 7. Tạo sách (ADMIN)
+# @name createBook
+POST {{baseUrl}}/api/books/admin
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+{
+  "isbn": "978-604-2-00001-1",
+  "title": "Dế Mèn phiêu lưu ký",
+  "author": "Tô Hoài",
+  "genreId": {{genreId}},
+  "publisher": "Kim Đồng",
+  "publicationDate": "2024-01-01",
+  "language": "vi",
+  "pages": 200,
+  "description": "Dữ liệu thử nghiệm cho backend local",
+  "totalCopies": 10,
+  "availableCopies": 10,
+  "price": 85000,
+  "coverImageUrl": "https://example.com/de-men.jpg"
+}
+
+> {% client.global.set("bookId", response.body.id); %}
+
+### 8. Xem chi tiết sách
+GET {{baseUrl}}/api/books/{{bookId}}
+Authorization: Bearer {{userToken}}
+
+### 9. Tìm sách theo từ khóa và thể loại
+GET {{baseUrl}}/api/books?searchTerm=D%E1%BA%BF%20M%C3%A8n&genreId={{genreId}}&availableOnly=true&activeOnly=true&page=0&size=20&sortBy=createdAt&sortDirection=DESC
+Authorization: Bearer {{userToken}}
+
+### 10. Tìm kiếm nâng cao bằng JSON
+POST {{baseUrl}}/api/books/search
+Content-Type: {{contentType}}
+Authorization: Bearer {{userToken}}
+
+{
+  "searchTerm": "Tô Hoài",
+  "genreId": {{genreId}},
+  "availableOnly": true,
+  "activeOnly": true,
+  "page": 0,
+  "size": 20,
+  "sortBy": "title",
+  "sortDirection": "ASC"
+}
+
+### 11. Thống kê sách
+GET {{baseUrl}}/api/books/stats
+Authorization: Bearer {{userToken}}
+
+### 12. Cập nhật sách (ADMIN)
+PUT {{baseUrl}}/api/books/{{bookId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+{
+  "isbn": "978-604-2-00001-1",
+  "title": "Dế Mèn phiêu lưu ký - Bản cập nhật",
+  "author": "Tô Hoài",
+  "genreId": {{genreId}},
+  "publisher": "Kim Đồng",
+  "publicationDate": "2024-01-01",
+  "language": "vi",
+  "pages": 210,
+  "description": "Đã cập nhật bằng test.http",
+  "totalCopies": 10,
+  "availableCopies": 9,
+  "price": 90000,
+  "active": true
+}
+
+### 13. Tạo gói thành viên (ADMIN)
+# @name createPlan
+POST {{baseUrl}}/api/subscription-plan/admin/create
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+{
+  "planCode": "BASIC-30",
+  "name": "Cơ bản 30 ngày",
+  "description": "Gói dùng để kiểm thử local",
+  "durationDays": 30,
+  "price": 50000,
+  "currency": "VND",
+  "maxBooksAllowed": 3,
+  "maxDaysPerBook": 14,
+  "displayOrder": 1,
+  "isActive": true,
+  "isFeatured": false
+}
+
+> {% client.global.set("planId", response.body.id); %}
+
+### 14. Xem các gói thành viên
+GET {{baseUrl}}/api/subscription-plan
+Authorization: Bearer {{userToken}}
+
+### 15. Đăng ký gói bằng tài khoản bạn đọc
+# @name subscribe
+POST {{baseUrl}}/api/subscriptions/subscribe
+Content-Type: {{contentType}}
+Authorization: Bearer {{userToken}}
+
+{
+  "planId": {{planId}},
+  "autoRenew": false,
+  "notes": "Đăng ký thử trên máy local"
+}
+
+> {% client.global.set("subscriptionId", response.body.id); %}
+
+### 16. Kích hoạt đăng ký sau thanh toán giả lập (ADMIN)
+POST {{baseUrl}}/api/subscriptions/admin/activate/{{subscriptionId}}?paymentId=1
+Authorization: Bearer {{adminToken}}
+
+### 17. Xem gói đang hoạt động của bạn đọc
+GET {{baseUrl}}/api/subscriptions/user/active
+Authorization: Bearer {{userToken}}
+
+### 18. Xem danh sách đăng ký có phân trang (ADMIN)
+GET {{baseUrl}}/api/subscriptions/admin?page=0&size=10
+Authorization: Bearer {{adminToken}}
+
+### 19. Hủy đăng ký
+POST {{baseUrl}}/api/subscriptions/cancel/{{subscriptionId}}?reason=Kiem-thu-huy-goi
+Authorization: Bearer {{userToken}}
+
+### 20. Quên mật khẩu
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": "bandoc@example.com"
 }

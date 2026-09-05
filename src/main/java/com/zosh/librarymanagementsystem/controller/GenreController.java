@@ -53,7 +53,7 @@ public class GenreController {
             @PathVariable("genreId") Long genreId
     ) throws GenreException {
         genreService.deleteGenre(genreId);
-        ApiResponse response= new ApiResponse("genre deleted - soft delete", true);
+        ApiResponse response= new ApiResponse("Đã ẩn thể loại", true);
         return ResponseEntity.ok(response);
     }
 
@@ -62,7 +62,7 @@ public class GenreController {
             @PathVariable("genreId") Long genreId
     ) throws GenreException {
         genreService.hardDeleteGenre(genreId);
-        ApiResponse response= new ApiResponse("genre deleted - hard delete", true);
+        ApiResponse response= new ApiResponse("Đã xóa vĩnh viễn thể loại", true);
         return ResponseEntity.ok(response);
     }
 

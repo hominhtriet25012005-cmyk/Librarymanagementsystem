@@ -5,6 +5,7 @@ import com.zosh.librarymanagementsystem.modal.User;
 import com.zosh.librarymanagementsystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -15,24 +16,35 @@ public class DataInitializationComponent implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${library.admin.initialize:true}")
+    private boolean initializeAdmin;
+
+    @Value("${library.admin.email:admin@gmail.com}")
+    private String adminEmail;
+
+    @Value("${library.admin.password:admin123}")
+    private String adminPassword;
+
+    @Value("${library.admin.full-name:Library Admin}")
+    private String adminFullName;
+
     @Override
     public void run(String... args) {
-        initializeAdminUser();
+        if (initializeAdmin) {
+            initializeAdminUser();
+        }
     }
 
     private void  initializeAdminUser() {
-         String adminEmail = "admin@gmail.com";
-         String adminPassword = "admin123";
-
          if (userRepository.findByEmail(adminEmail)==null) {
              User user = User.builder()
                      .password(passwordEncoder.encode(adminPassword))
                      .email(adminEmail)
-                     .fullName("Code With Zosh")
+                     .fullName(adminFullName)
                      .role(UserRole.ROLE_ADMIN)
                      .build();
 
-             User admin = userRepository.save(user);
+             userRepository.save(user);
          }
     }
 

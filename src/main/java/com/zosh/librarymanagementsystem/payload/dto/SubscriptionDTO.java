@@ -17,7 +17,7 @@ public class SubscriptionDTO {
 
     private Long userId;
 
-    @NotNull(message = "Plan ID is mandatory")
+    @NotNull(message = "ID gói thành viên là bắt buộc")
     private Long planId;
 
     private String userName;

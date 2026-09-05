@@ -40,7 +40,7 @@ public class Book {
 
     private LocalDate publishedDate;
 
-    public String language;
+    private String language;
 
     private Integer pages;
 
@@ -71,7 +71,7 @@ public class Book {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @AssertTrue(message = "Available copies cannot exceed total copies")
+    @AssertTrue(message = "Số bản có sẵn không được vượt quá tổng số bản")
     public boolean isAvailableCopiesValid() {
         if (totalCopies==null || availableCopies==null) {
             return true;

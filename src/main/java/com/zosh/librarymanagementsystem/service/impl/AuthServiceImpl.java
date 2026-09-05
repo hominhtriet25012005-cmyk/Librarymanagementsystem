@@ -14,6 +14,7 @@ import com.zosh.librarymanagementsystem.service.AuthService;
 import com.zosh.librarymanagementsystem.service.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,6 +38,9 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final EmailService emailService;
 
+    @Value("${app.frontend-url:http://localhost:5173}")
+    private String frontendUrl;
+
     @Override
     public AuthResponse login(String username, String password) throws UserException {
         Authentication authentication = authenticate(username, password);
@@ -53,8 +57,8 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         AuthResponse response = new AuthResponse();
-        response.setTitle("Login success");
-        response.setMessage("Welcome Back " + username);
+        response.setTitle("Đăng nhập thành công");
+        response.setMessage("Chào mừng bạn quay lại, " + username);
         response.setJwt(token);
         response.setUser(UserMapper.toDTO(user));
 
@@ -66,10 +70,10 @@ public class AuthServiceImpl implements AuthService {
         try {
             userDetails = customUserServiceImplementation.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
-            throw new UserException("user not found with email - " + username);
+            throw new UserException("Không tìm thấy người dùng có email: " + username);
         }
         if(!passwordEncoder.matches(password,userDetails.getPassword())) {
-            throw new UserException("password not match");
+            throw new UserException("Mật khẩu không đúng");
         }
         return new UsernamePasswordAuthenticationToken(username,
                 null, userDetails.getAuthorities());
@@ -80,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(req.getEmail());
 
         if (user!=null) {
-            throw new UserException("email id already registered");
+            throw new UserException("Email này đã được đăng ký");
         }
         User createdUser = new User();
         createdUser.setEmail(req.getEmail());
@@ -100,7 +104,7 @@ public class AuthServiceImpl implements AuthService {
 
         AuthResponse response = new AuthResponse();
         response.setJwt(jwt);
-        response.setTitle("Welcome " + createdUser.getFullName());
+        response.setTitle("Chào mừng " + createdUser.getFullName());
         response.setUser(UserMapper.toDTO(savedUser));
         return response;
     }
@@ -108,11 +112,10 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void createPasswordResetToken(String email) throws UserException {
 
-        String frontendUrl = "http://localhost:5173";
         User user =userRepository.findByEmail(email);
 
         if (user == null) {
-            throw new UserException("user not found with given email");
+            throw new UserException("Không tìm thấy người dùng với email đã nhập");
         }
 
         String token = UUID.randomUUID().toString();
@@ -125,8 +128,8 @@ public class AuthServiceImpl implements AuthService {
 
         passwordResetTokenRepository.save(resetToken);
         String resetLink = frontendUrl + "/reset-password?token=" + token;
-        String subject = "Password Reset Token";
-        String body = "You requested to reset your password. Use this link (valid 5 minutes): "
+        String subject = "Đặt lại mật khẩu thư viện";
+        String body = "Bạn vừa yêu cầu đặt lại mật khẩu. Đường dẫn này có hiệu lực trong 5 phút: "
                 + resetLink;
         emailService.sendEmail(user.getEmail(), subject, body);
     }
@@ -135,12 +138,12 @@ public class AuthServiceImpl implements AuthService {
     public void resetPassword(String token, String newPassword) throws UserException {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
                 .orElseThrow(
-                        () -> new UserException("token not valid")
+                        () -> new UserException("Token đặt lại mật khẩu không hợp lệ")
                 );
 
         if (resetToken.isExpired()) {
             passwordResetTokenRepository.delete(resetToken);
-            throw new UserException("token expired");
+            throw new UserException("Token đặt lại mật khẩu đã hết hạn");
         }
 
         User user = resetToken.getUser();

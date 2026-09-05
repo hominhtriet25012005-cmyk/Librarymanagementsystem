@@ -82,7 +82,8 @@ Schema này khớp tên bảng/cột, khóa ngoại, enum và kiểu dữ liệu
 
 ## Kiểm tra đã chạy
 
-- `mvn test`: thành công, 1 test, 0 failure, 0 error. Test dùng H2 memory riêng và đã khởi tạo đủ 6 repository, entity mapping, controller mapping, security beans và JPQL.
+- `mvn test`: thành công, 11 test, 0 failure, 0 error. Test dùng H2 memory riêng; đã kiểm tra Spring context, 6 repository, entity/controller/security mapping, JPQL và các nghiệp vụ chính của Book, Auth, Subscription.
+- Kiểm thử API local: `test.http` đã thống nhất cổng `5000` và có luồng 20 bước từ đăng ký, đăng nhập, tạo thể loại/sách đến đăng ký gói thành viên.
 - `npm run lint`: thành công, không còn warning.
 - `npm run build`: thành công. Bundle JS khoảng 569 kB và Vite chỉ cảnh báo nên tách chunk để tối ưu tải trang.
 - `git diff --check`: dùng để kiểm tra lỗi whitespace trước khi chốt.

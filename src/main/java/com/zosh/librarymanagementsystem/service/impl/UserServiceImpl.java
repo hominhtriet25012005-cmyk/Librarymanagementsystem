@@ -22,12 +22,12 @@ public class UserServiceImpl  implements UserService {
     @Override
     public User getCurrentUser() {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            throw new UserException("Authentication is required");
+            throw new UserException("Bạn cần đăng nhập để thực hiện thao tác này");
         }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email);
         if (user==null) {
-            throw new UserException("User not found with email: " + email);
+            throw new UserException("Không tìm thấy người dùng có email: " + email);
         }
         return user;
     }

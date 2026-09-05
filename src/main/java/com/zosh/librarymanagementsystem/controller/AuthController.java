@@ -25,7 +25,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> signupHandler (
-            @RequestBody  UserDTO req
+            @Valid @RequestBody UserDTO req
             ) throws UserException {
         AuthResponse res = authService.signup(req);
         return ResponseEntity.ok(res);
@@ -41,24 +41,24 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse> forgotPassword(
-            @RequestBody ForgotPasswordRequest request
+            @Valid @RequestBody ForgotPasswordRequest request
     ) throws  UserException {
         authService.createPasswordResetToken(request.getEmail());
 
         ApiResponse res = new ApiResponse(
-                "A Reset link was sent to your email.", true
+                "Đã gửi đường dẫn đặt lại mật khẩu đến email của bạn.", true
         );
         return ResponseEntity.ok(res);
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse> resetPassword(
-            @RequestBody ResetPasswordRequest request
+            @Valid @RequestBody ResetPasswordRequest request
     ) throws UserException {
         authService.resetPassword(request.getToken(), request.getPassword());
 
         ApiResponse res = new ApiResponse(
-                "Password reset successful", true
+                "Đặt lại mật khẩu thành công", true
         );
         return ResponseEntity.ok(res);
     }

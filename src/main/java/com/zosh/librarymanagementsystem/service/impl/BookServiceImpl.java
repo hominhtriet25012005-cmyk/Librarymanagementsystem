@@ -30,12 +30,9 @@ public class BookServiceImpl implements BookService {
     public BookDTO createBook(BookDTO bookDTO) throws BookException {
 
         if (bookRepository.existsByIsbn(bookDTO.getIsbn())) {
-            throw new BookException("book with ISBN " + bookDTO.getIsbn() + " already exists");
+            throw new BookException("Sách có ISBN " + bookDTO.getIsbn() + " đã tồn tại");
         }
         Book book = bookMapper.toEntity(bookDTO);
-
-// total - 10
-// available - 11
 
         validateAvailableCopies(book);
         Book saveBook= bookRepository.save(book);
@@ -58,21 +55,21 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDTO getBookById(Long bookId) throws BookException {
         Book book=bookRepository.findById(bookId)
-                .orElseThrow(()-> new BookException("book not found!"));
+                .orElseThrow(()-> new BookException("Không tìm thấy sách"));
         return bookMapper.toDTO(book);
     }
 
     @Override
     public BookDTO getBookByISBN(String isbn) throws BookException {
         Book book=bookRepository.findByIsbn(isbn)
-                .orElseThrow(()-> new BookException("book not found!"));
+                .orElseThrow(()-> new BookException("Không tìm thấy sách"));
         return bookMapper.toDTO(book);
     }
 
     @Override
     public BookDTO updateBook(Long bookId, BookDTO bookDTO) throws BookException {
         Book existingBook=bookRepository.findById(bookId).orElseThrow(
-                ()-> new BookException("book not found!")
+                ()-> new BookException("Không tìm thấy sách")
         );
         bookMapper.updateEntityFromDTO(bookDTO,existingBook);
         validateAvailableCopies(existingBook);
@@ -83,7 +80,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteBook(Long bookId) throws BookException {
         Book existingBook=bookRepository.findById(bookId).orElseThrow(
-                ()-> new BookException("book not found!")
+                ()-> new BookException("Không tìm thấy sách")
         );
         existingBook.setActive(false);
         bookRepository.save(existingBook);
@@ -92,19 +89,23 @@ public class BookServiceImpl implements BookService {
     @Override
     public void hardDeleteBook(Long bookId) throws BookException {
         Book existingBook=bookRepository.findById(bookId).orElseThrow(
-                ()-> new BookException("book not found!")
+                ()-> new BookException("Không tìm thấy sách")
         );
         bookRepository.delete(existingBook);
     }
 
     @Override
     public PageResponse<BookDTO> searchBooksWithFilters(BookSearchRequest searchRequest) {
+        if (searchRequest == null) {
+            searchRequest = new BookSearchRequest();
+        }
+
         Pageable pageable= createPageable(searchRequest.getPage(),
                 searchRequest.getSize(),
                 searchRequest.getSortBy(),
                 searchRequest.getSortDirection());
         Page<Book> bookPage = bookRepository.searchBooksWithFilters(
-                searchRequest.getSearchTerm(),
+                normalizeSearchTerm(searchRequest.getSearchTerm()),
                 searchRequest.getGenreId(),
                 Boolean.TRUE.equals(searchRequest.getAvailableOnly()),
                 !Boolean.FALSE.equals(searchRequest.getActiveOnly()),
@@ -123,7 +124,11 @@ public class BookServiceImpl implements BookService {
         return bookRepository.countAvailableBooks();
     }
 
-    private Pageable createPageable(int page, int size,String sortBy, String sortDirection) {
+    private Pageable createPageable(Integer page, Integer size, String sortBy, String sortDirection) {
+        page = page == null ? 0 : page;
+        size = size == null ? 20 : size;
+        sortBy = sortBy == null ? "createdAt" : sortBy;
+        sortDirection = sortDirection == null ? "DESC" : sortDirection;
         page = Math.max(page, 0);
         size=Math.min(size, 100);
         size=Math.max(size, 1);
@@ -138,6 +143,13 @@ public class BookServiceImpl implements BookService {
         Sort sort = sortDirection.equalsIgnoreCase("ASC")
                 ?Sort.by(sortBy).ascending():Sort.by(sortBy).descending();
         return PageRequest.of(page, size, sort);
+    }
+
+    private String normalizeSearchTerm(String searchTerm) {
+        if (searchTerm == null || searchTerm.isBlank()) {
+            return null;
+        }
+        return searchTerm.trim();
     }
 
     private  PageResponse<BookDTO> convertToPageResponse(Page<Book> books) {
@@ -159,7 +171,7 @@ public class BookServiceImpl implements BookService {
 
     private void validateAvailableCopies(Book book) throws BookException {
         if (!book.isAvailableCopiesValid()) {
-            throw new BookException("Available copies cannot exceed total copies");
+            throw new BookException("Số bản có sẵn không được vượt quá tổng số bản");
         }
     }
 }

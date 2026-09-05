@@ -24,7 +24,7 @@ public class SubscriptionController {
     @PostMapping("/subscribe")
     public ResponseEntity<?> subscribe(
             @Valid @RequestBody SubscriptionDTO subscription
-            ) throws Exception {
+            ) {
         SubscriptionDTO dto = subscriptionService.subscribe(subscription);
         return ResponseEntity.ok(dto);
     }
@@ -36,19 +36,21 @@ public class SubscriptionController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/admin/")
-    public ResponseEntity<?> getAllSubscriptions() {
-        int page = 0;
-        int size = 10;
+    @GetMapping({"/admin", "/admin/"})
+    public ResponseEntity<?> getAllSubscriptions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        page = Math.max(page, 0);
+        size = Math.max(1, Math.min(size, 100));
         Pageable pageable = PageRequest.of(page,size);
         List<SubscriptionDTO> dtoList = subscriptionService.getAllSubscriptions(pageable);
         return ResponseEntity.ok(dtoList);
     }
 
     @PostMapping("/admin/deactivate-expired")
-    public ResponseEntity<?> deactivateExpiredSubscriptions() throws Exception {
+    public ResponseEntity<?> deactivateExpiredSubscriptions() {
         subscriptionService.deactivateExpiredSubscriptions();
-        ApiResponse res = new ApiResponse("task done!", true);
+        ApiResponse res = new ApiResponse("Đã vô hiệu hóa các gói hết hạn", true);
         return ResponseEntity.ok(res);
     }
 
