@@ -2,6 +2,7 @@ import {
     Dashboard as DashboardIcon,
     MenuBook as MenuBookIcon,
     EventNote as EventNoteIcon,
+    EventAvailable as EventAvailableIcon,
     CardMembership as CardMembershipIcon,
     Favorite as FavoriteIcon,
     Person as PersonIcon,
@@ -13,12 +14,12 @@ import React from "react";
 
 export const secondaryItems = [
     {
-        title: 'Profile',
+        title: 'Hồ sơ',
         path: '/profile',
         icon: <PersonIcon />,
     },
     {
-        title: 'Settings',
+        title: 'Cài đặt',
         path: '/settings',
         icon: <SettingsIcon />,
     },
@@ -26,42 +27,49 @@ export const secondaryItems = [
 
 export const navigationItems = [
     {
-        title: 'Dashboard',
+        title: 'Tổng quan',
         path: '/',
         icon: <DashboardIcon />,
-        description: 'Overview & Stats',
+        description: 'Tổng quan và thống kê',
     },
     {
-        title: 'Browse Books',
+        title: 'Kho sách',
         path: '/books',
         icon: <MenuBookIcon />,
-        description: 'Explore Library',
+        description: 'Tra cứu sách trong thư viện',
     },
     {
-        title: 'My Loans',
-        path: '/loans',
+        title: 'Sách đang mượn',
+        path: '/my-loans',
         icon: <EventNoteIcon />,
-        description: 'Active & History',
-        badge: 'reservation',
+        description: 'Đang mượn và lịch sử',
+        badge: 'loans',
     },
     {
-        title: 'My Fines',
+        title: 'Đặt trước',
+        path: '/my-reservations',
+        icon: <EventAvailableIcon />,
+        description: 'Theo dõi hàng chờ đặt sách',
+        badge: 'reservations',
+    },
+    {
+        title: 'Tiền phạt',
         path: '/my-fines',
         icon: <ReceiptIcon />,
-        description: 'Pending & Paid',
+        description: 'Chưa trả và đã thanh toán',
         badge: 'fines',
     },
     {
-        title: 'Subscriptions',
+        title: 'Gói thành viên',
         path: '/subscriptions',
         icon: <CardMembershipIcon />,
-        description: 'Manage Plans',
+        description: 'Quản lý gói đang sử dụng',
         badge: 'subscription',
     },
     {
-        title: 'Wishlist',
+        title: 'Yêu thích',
         path: '/wishlist',
         icon: <FavoriteIcon />,
-        description: 'Saved Books',
+        description: 'Các sách đã lưu',
     },
 ];

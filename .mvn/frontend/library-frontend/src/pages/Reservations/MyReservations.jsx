@@ -4,7 +4,7 @@ import { tabs } from "./tabs";
 import { myReservation } from "./reservation";
 import MyReservationCard from "./MyReservationCard";
 
-const MyReservation = () => {
+const MyReservations = () => {
     const state = { total: 6, active: 2, available: 1 };
     const [activeTab, setActiveTab] = React.useState(0);
 
@@ -17,12 +17,12 @@ const MyReservation = () => {
                     <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center space-x-3">
                         <span className="text-5xl">📑</span>
                         <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                            My Reservation
+                            Sách đã đặt trước
                         </span>
                     </h1>
 
                     <p className="text-lg text-gray-600">
-                        Manage and track your book reservations
+                        Theo dõi trạng thái và thứ tự chờ của các yêu cầu đặt sách
                     </p>
                 </div>
 
@@ -116,4 +116,4 @@ const MyReservation = () => {
     )
 }
 
-export default MyReservation
+export default MyReservations

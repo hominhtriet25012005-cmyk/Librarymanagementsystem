@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     Avatar,
     Box,
@@ -15,10 +14,11 @@ import { ListItemIcon } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { navigationItems, secondaryItems } from "./NavigationItems";
 import { isActive } from "./util";
+import { authApi } from "../../api";
 
 
 
-const SidebarDrawer = () => {
+const SidebarDrawer = ({ onNavigate }) => {
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -27,10 +27,13 @@ const SidebarDrawer = () => {
 
     const handleNavigation = (path) => {
         navigate(path);
+        onNavigate?.();
     };
 
     const handleLogout = () => {
-        console.log("Logout");
+        authApi.logout();
+        navigate("/");
+        onNavigate?.();
     }
     return (
         <Box
@@ -101,7 +104,7 @@ const SidebarDrawer = () => {
                             textTransform: "uppercase",
                         }}
                     >
-                        Library Hub
+                        Thư viện trực tuyến
                     </Typography>
                 </Box>
             </Box>
@@ -245,10 +248,10 @@ const SidebarDrawer = () => {
                             <Logout />
                         </ListItemIcon>
 
-                        Logout
+                        Đăng xuất
                     </ListItemButton>
 
-                    <p className="pt-4 text-xs text-gray-600">@ 2026 ZoshBook. All rights reserved.</p>
+                    <p className="pt-4 text-xs text-gray-600">© 2026 ZoshBook.</p>
                 </Box>
             </List>
         </Box>

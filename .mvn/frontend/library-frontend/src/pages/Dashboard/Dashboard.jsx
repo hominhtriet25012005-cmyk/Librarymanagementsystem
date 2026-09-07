@@ -1,13 +1,13 @@
 import React from 'react';
-import StatesCard from './StatesCard';
+import StatsCard from './StatsCard';
 import { AutoAwesome } from "@mui/icons-material";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Box, Tab, Tabs } from "@mui/material";
-import { statsConfig } from "./StatesConfis";
-import CurrentLoans from "./CurrensLoans";
+import { statsConfig } from "./StatsConfig";
+import CurrentLoans from "./CurrentLoans";
 import Reservation from "./Reservation";
-import ReadingHistory from "./ReadingHisoty";
-import Recommandation from "./Recommandation";
+import ReadingHistory from "./ReadingHistory";
+import Recommendation from "./Recommendation";
 
 // Lưu ý: Đảm bảo bạn đã import hàm statsConfig từ file tương ứng
 // import { statsConfig } from './utils/statsConfig'; 
@@ -45,7 +45,7 @@ const Dashboard = () => {
         {/* State cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stateData.map((item, index) => (
-            <StatesCard
+            <StatsCard
               bgColor={item.bgColor}
               textColor={item.textColor}
               icon={item.icon}
@@ -111,7 +111,7 @@ const Dashboard = () => {
           {activeTab === 2 && <ReadingHistory />}
 
           {/* Recommendations Tab */}
-          {activeTab === 3 && <Recommandation />}
+            {activeTab === 3 && <Recommendation />}
         </div>
       </div>
     </div>

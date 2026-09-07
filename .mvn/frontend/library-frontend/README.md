@@ -1,16 +1,59 @@
-# React + Vite
+# Library Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Frontend React + Vite cho hệ thống quản lý thư viện. Theo quy tắc của repository, mã nguồn frontend được giữ tại:
 
-Currently, two official plugins are available:
+```text
+D:\Codex\Library-Management-System\.mvn\frontend\library-frontend
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Chạy trên máy local
 
-## React Compiler
+Backend cần chạy tại `http://localhost:8080` và frontend mặc định chạy tại `http://localhost:5173`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```powershell
+cd D:\Codex\Library-Management-System\.mvn\frontend\library-frontend
+Copy-Item .env.example .env
+npm install
+npm run dev
+```
 
-## Expanding the Oxlint configuration
+Nội dung `.env`:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```dotenv
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+## Kiểm tra mã nguồn
+
+```powershell
+npm run lint
+npm run build
+```
+
+## Cấu trúc chính
+
+```text
+src/
+├── api/                  # Axios client và các hàm gọi backend
+├── components/common/    # Component dùng chung
+├── layouts/UserLayout/   # Bố cục, thanh điều hướng và sidebar
+└── pages/                # Các màn hình theo module nghiệp vụ
+```
+
+`src/api/httpClient.js` đảm nhiệm:
+
+- Đọc địa chỉ backend từ `VITE_API_BASE_URL`.
+- Tự gắn JWT vào header `Authorization`.
+- Xóa phiên đăng nhập khi backend trả về HTTP 401.
+- Chuẩn hóa thông báo lỗi để giao diện hiển thị bằng tiếng Việt.
+
+Trang Kho sách đã dùng API thật `/api/books` và `/api/genres`. Loans, Reservations, Dashboard vẫn còn dữ liệu mẫu và sẽ được thay lần lượt trong các giai đoạn tiếp theo.
+
+## Các giai đoạn tiếp theo
+
+1. Hoàn thiện đăng ký, đăng nhập, quên và đặt lại mật khẩu.
+2. Hoàn thiện chi tiết sách, mượn sách và đặt trước.
+3. Kết nối Loans, Reservations, Wishlist, Reviews và Fines.
+4. Kết nối Subscription và Razorpay.
+5. Xây dựng giao diện quản trị.
+6. Bổ sung kiểm thử giao diện và kiểm thử luồng nghiệp vụ.

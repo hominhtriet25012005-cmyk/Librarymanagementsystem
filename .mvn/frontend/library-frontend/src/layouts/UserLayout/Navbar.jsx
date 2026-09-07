@@ -1,5 +1,4 @@
 import { AppBar, Avatar, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
-import React from 'react';
 import { navigationItems } from './NavigationItems';
 import { isActive } from './util';
 import { useLocation } from 'react-router-dom';
@@ -8,11 +7,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ContrastIcon from '@mui/icons-material/Contrast';
 
-const drawerWidth = 280;
-const user = {
-    fullName: "John Doe",
-    profilePicture: "https://example.com/profile.jpg",
-};
+const drawerWidth = 240;
+const user = { fullName: "Bạn đọc", profilePicture: null };
 const Navbar = ({ handleDrawerToggle }) => {
     const location = useLocation();
     return (
@@ -41,16 +37,16 @@ const Navbar = ({ handleDrawerToggle }) => {
                     sx={{ flexGrow: 1, fontWeight: 600 }}
                 >
                     {navigationItems.find((item) => isActive(item.path, location))?.title ||
-                        "Dashboard"}
+                        "Tổng quan"}
                 </Typography>
 
-                <Tooltip title="Search">
+                <Tooltip title="Tìm kiếm">
                     <IconButton>
                         <SearchIcon />
                     </IconButton>
                 </Tooltip>
 
-                <Tooltip title="Notifications">
+                <Tooltip title="Thông báo">
                     <IconButton><NotificationsIcon /></IconButton>
                 </Tooltip>
 
@@ -58,7 +54,7 @@ const Navbar = ({ handleDrawerToggle }) => {
                     <ContrastIcon />
                 </Box>
 
-                <Tooltip title="Account">
+                <Tooltip title="Tài khoản">
                     <IconButton sx={{ ml: 1 }}>
                         <Avatar src={user?.profilePicture} sx={{ width: 36, height: 36 }}>
                             {user?.fullName?.charAt(0)}

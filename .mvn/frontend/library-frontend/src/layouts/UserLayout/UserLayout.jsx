@@ -1,20 +1,21 @@
-import React from 'react'
 import { Box, Toolbar } from "@mui/material";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
+import Navbar from "./Navbar";
 import UserSidebar from "./UserSidebar";
 
 const drawerWidth = 240;
 const UserLayout = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <Box sx={{ display: "flex",
         minHeight: "100vh", bgcolor:"white"
      }}>
-      {/* app baar */}
-
-      {/* profile menu */}
+      <Navbar handleDrawerToggle={() => setMobileOpen((open) => !open)} />
 
       {/* user sidebar */}
-      <UserSidebar />
+      <UserSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
       {/* main content */}
       <Box

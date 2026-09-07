@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@mui/material'
 import React from 'react'
 
-const StatesCard = ({
+const StatsCard = ({
     bgColor,
     icon,
     value,
@@ -25,4 +25,4 @@ const StatesCard = ({
     )
 }
 
-export default StatesCard
+export default StatsCard

@@ -10,14 +10,14 @@ const GenreFilter = ({ genres = [], selectedGenreId, onGenreSelect }) => {
         <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
             {/* Header */}
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-                <h3 className="text-lg font-bold text-gray-900">Genres</h3>
+                <h3 className="text-lg font-bold text-gray-900">Thể loại</h3>
                 {selectedGenreId && (
                     <button
                         type="button"
                         onClick={() => onGenreSelect(null)}
                         className="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
                     >
-                        Clear
+                        Xóa lọc
                     </button>
                 )}
             </div>
@@ -35,7 +35,7 @@ const GenreFilter = ({ genres = [], selectedGenreId, onGenreSelect }) => {
                 ) : (
                     <RadioButtonUncheckedIcon sx={{ fontSize: 16 }} />
                 )}
-                <span className="text-sm">All Genres</span>
+                <span className="text-sm">Tất cả thể loại</span>
             </div>
             
             {/* Genre List */}
