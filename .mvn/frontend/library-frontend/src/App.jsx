@@ -9,6 +9,7 @@ import ProfilePage from "./pages/Profile/ProfilePage";
 
 const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
 const BookPage = lazy(() => import("./pages/Books/BookPage"));
+const BookDetail = lazy(() => import("./pages/Books/BookDetail"));
 const MyLoans = lazy(() => import("./pages/Loans/MyLoans"));
 const MyReservations = lazy(() => import("./pages/Reservations/MyReservations"));
 
@@ -23,7 +24,7 @@ export default function App() {
       <Route path="reset-password" element={<AuthPage key="reset" mode="reset" />} />
       <Route element={<UserLayout />}>
         <Route path="books" element={<BookPage />} />
-        <Route path="books/:id" element={<ModulePlaceholder title="Chi tiết sách" />} />
+        <Route path="books/:id" element={<BookDetail />} />
         <Route element={<ProtectedRoute />}>
           <Route index element={<Dashboard />} />
           <Route path="my-loans" element={<MyLoans />} />

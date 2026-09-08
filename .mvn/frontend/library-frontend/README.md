@@ -50,12 +50,14 @@ src/
 - Xóa phiên đăng nhập khi backend trả về HTTP 401.
 - Chuẩn hóa thông báo lỗi để giao diện hiển thị bằng tiếng Việt.
 
-Trang Kho sách đã dùng API thật `/api/books` và `/api/genres`. Loans, Reservations, Dashboard vẫn còn dữ liệu mẫu và sẽ được thay lần lượt trong các giai đoạn tiếp theo.
+Kho sách và Chi tiết sách đã dùng API thật. Từ `/books`, chọn **Xem chi tiết** để mượn sách hoặc đặt trước bằng tài khoản đang đăng nhập. Trang chi tiết đọc các phiếu và gói thành viên thật để kiểm tra điều kiện, rồi hiển thị mã phiếu khi thao tác thành công.
+
+Các trang danh sách **Sách tôi đã mượn**, **Sách đã đặt trước** và **Tổng quan** vẫn hiển thị dữ liệu minh họa có thông báo. Phiếu mới chưa xuất hiện trên các trang này; phần danh sách sẽ được kết nối trong giai đoạn 3.
 
 ## Các giai đoạn tiếp theo
 
 1. Đã hoàn thiện tài khoản và Việt hóa giao diện. Xem [hướng dẫn giai đoạn 1](docs/AUTHENTICATION-VI.md).
-2. Hoàn thiện chi tiết sách, mượn sách và đặt trước.
+2. Đã hoàn thiện chi tiết sách, mượn sách và đặt trước. Xem [hướng dẫn giai đoạn 2](docs/BOOKS-VI.md).
 3. Kết nối Loans, Reservations, Wishlist, Reviews và Fines.
 4. Kết nối Subscription và Razorpay.
 5. Xây dựng giao diện quản trị.

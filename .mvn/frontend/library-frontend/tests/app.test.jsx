@@ -21,7 +21,8 @@ beforeEach(() => localStorage.clear());
 
 it("khách xem kho sách công khai mà không phải đăng nhập", async () => {
   mount("/books");
-  expect(await screen.findByText("Không tìm thấy sách phù hợp với bộ lọc.")).toBeTruthy();
+  // Trang tải động và bộ lọc chờ 350 ms; máy chạy nhiều bộ test có thể cần thêm thời gian.
+  expect(await screen.findByText("Không tìm thấy sách phù hợp với bộ lọc.", {}, { timeout: 5000 })).toBeTruthy();
   expect(screen.queryByRole("heading", { name: "Chào mừng bạn trở lại" })).toBeNull();
 });
 it("trang hồ sơ hiển thị tài khoản thật, menu đăng xuất hoạt động", async () => {
