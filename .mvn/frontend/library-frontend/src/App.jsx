@@ -1,36 +1,45 @@
 import "./App.css";
 import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import UserLayout from "./layouts/UserLayout/UserLayout";
 import ModulePlaceholder from "./components/common/ModulePlaceholder";
+import { AdminRoute, ForbiddenPage, GuestRoute, ProtectedRoute } from "./auth/RouteGuards";
+import AuthPage from "./pages/Auth/AuthPage";
+import ProfilePage from "./pages/Profile/ProfilePage";
 
 const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
 const BookPage = lazy(() => import("./pages/Books/BookPage"));
 const MyLoans = lazy(() => import("./pages/Loans/MyLoans"));
 const MyReservations = lazy(() => import("./pages/Reservations/MyReservations"));
 
-function App() {
-  return (
-    <Suspense fallback={<div className="p-8 text-center text-slate-600">Đang tải giao diện...</div>}>
-      <Routes>
-        {/* Các route dành cho bạn đọc. */}
-        <Route element={<UserLayout />}>
+export default function App() {
+  return <Suspense fallback={<div role="status" className="p-8 text-center">Đang tải giao diện...</div>}>
+    <Routes>
+      <Route element={<GuestRoute />}>
+        <Route path="login" element={<AuthPage key="login" mode="login" />} />
+        <Route path="signup" element={<AuthPage key="signup" mode="signup" />} />
+      </Route>
+      <Route path="forgot-password" element={<AuthPage key="forgot" mode="forgot" />} />
+      <Route path="reset-password" element={<AuthPage key="reset" mode="reset" />} />
+      <Route element={<UserLayout />}>
+        <Route path="books" element={<BookPage />} />
+        <Route path="books/:id" element={<ModulePlaceholder title="Chi tiết sách" />} />
+        <Route element={<ProtectedRoute />}>
           <Route index element={<Dashboard />} />
-          <Route path="books" element={<BookPage />} />
           <Route path="my-loans" element={<MyLoans />} />
           <Route path="my-reservations" element={<MyReservations />} />
           <Route path="my-fines" element={<ModulePlaceholder title="Tiền phạt của tôi" />} />
           <Route path="subscriptions" element={<ModulePlaceholder title="Gói thành viên" />} />
           <Route path="wishlist" element={<ModulePlaceholder title="Danh sách yêu thích" />} />
-          <Route path="profile" element={<ModulePlaceholder title="Hồ sơ cá nhân" />} />
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="settings" element={<ModulePlaceholder title="Cài đặt" />} />
+          <Route path="forbidden" element={<ForbiddenPage />} />
+          <Route element={<AdminRoute />}>
+            <Route path="admin" element={<ModulePlaceholder title="Khu vực quản trị" />} />
+          </Route>
         </Route>
-
-        {/* Đường dẫn không tồn tại sẽ quay về trang chủ. */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Suspense>
-  );
+        <Route path="*" element={<ModulePlaceholder title="Không tìm thấy trang" description="Đường dẫn không tồn tại. Hãy chọn một mục trong thanh điều hướng." />} />
+      </Route>
+    </Routes>
+  </Suspense>;
 }
-
-export default App

@@ -2,7 +2,7 @@ import React from 'react'
 
 const Reservation = () => {
   return (
-    <div>Reservation</div>
+    <div className="p-6">Theo dõi sách đã đặt trong mục Đặt trước.</div>
   )
 }
 

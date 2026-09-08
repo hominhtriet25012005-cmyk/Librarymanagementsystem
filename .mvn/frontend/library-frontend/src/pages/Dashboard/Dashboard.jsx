@@ -30,15 +30,15 @@ const Dashboard = () => {
       <div className='px-4 sm:px-6 lg:px-8 mx-auto'>
 
         {/* Header */}
-        <div className='mb-8 animate-fade-in-up'>
+        <div className='mb-8 animate-fade-in-up'><p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">Bản xem trước: số liệu đọc sách bên dưới là dữ liệu minh họa.</p>
           <h1 className='text-4xl font-bold text-indigo-500 mb-2'>
-            My {" "}
+            Trang {" "}
             <span className='bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent'>
-              Dashboard
+              tổng quan
             </span>
           </h1>
           <p className="text-lg text-gray-600">
-            Track your reading journey and manage your library
+            Theo dõi hành trình đọc và quản lý sách của bạn
           </p>
         </div>
 
@@ -62,10 +62,10 @@ const Dashboard = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-xl font-bold text-gray-900 mb-1">
-                2025 Reading Goal
+                Mục tiêu đọc sách
               </h3>
               <p className="text-gray-600">
-                {250} of 30 books read
+                Đã đọc 9 trong 30 cuốn sách
               </p>
             </div>
 
@@ -87,17 +87,16 @@ const Dashboard = () => {
               },
             }}
           />
-          <p className="text-sm text-gray-600 mt-2">70%</p>
+          <p className="text-sm text-gray-600 mt-2">30%</p>
         </div>
         {/* tab section */}
         <div className=" bg-white rounded-2xl shadow-2xl overflow-hidden">
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Tabs value={activeTab} onChange={handleTabChange} aria-label="basic tabs
-        example">
-              <Tab label="Current Loans" />
-              <Tab label="Reservations" />
-              <Tab label="Reading History" />
-              <Tab label="Recommendations" />
+            <Tabs value={activeTab} onChange={handleTabChange} aria-label="Thông tin đọc sách" variant="scrollable" scrollButtons="auto">
+              <Tab label="Đang mượn" />
+              <Tab label="Đặt trước" />
+              <Tab label="Lịch sử đọc" />
+              <Tab label="Gợi ý sách" />
             </Tabs>
           </Box>
 

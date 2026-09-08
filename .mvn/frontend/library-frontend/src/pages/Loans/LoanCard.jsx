@@ -8,10 +8,10 @@ import {
     Person
 } from '@mui/icons-material';
 import { Box, Button, Card, CardContent, Divider, Typography } from '@mui/material'
-import React from 'react'
+import { formatDate, formatMoney } from "../../utils/locale";
 import { useNavigate } from 'react-router-dom';
 
-const LoanCard = ({ loan, onRenew = () => {}, onPayFine = () => {}, onReturn = () => {} }) => {
+const LoanCard = ({ loan, onRenew, onPayFine, onReturn }) => {
     const navigate = useNavigate();
     const canRenew = () => loan.status === 'CHECKED_OUT'
         && !loan.returnDate
@@ -77,45 +77,45 @@ const LoanCard = ({ loan, onRenew = () => {}, onPayFine = () => {}, onReturn = (
 
                         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2, mb: 2 }}>
 
-                            {/* Checkout Date */}
+                            {/* Ngày mượn */}
                             <Box>
                                 <Typography
                                     variant="caption"
                                     sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
-                                    Checkout Date
+                                    Ngày mượn
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                     <CalendarToday sx={{ fontSize: 14, color: '#667eea' }} />
                                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                        {loan.checkoutDate}
+                                        {formatDate(loan.checkoutDate)}
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            {/* Due Date */}
+                            {/* Hạn trả */}
                             <Box>
                                 <Typography
                                     variant="caption"
                                     sx={{ color: "text.secondary", display: "block", mb: 0.5 }}
                                 >
-                                    Due Date
+                                    Hạn trả
                                 </Typography>
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                                     <CalendarToday sx={{ fontSize: 14, color: "#667eea" }} />
                                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                        {loan.dueDate}
+                                        {formatDate(loan.dueDate)}
                                     </Typography>
                                 </Box>
                             </Box>
 
                             {loan.returnDate && <Box>
                                 <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
-                                    Return Date
+                                    Ngày trả
                                 </Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                     <AssignmentReturn sx={{ fontSize: 14, color: '#10B981' }} />
                                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                        {loan.returnDate}
+                                        {formatDate(loan.returnDate)}
                                     </Typography>
                                 </Box></Box>}
                         </Box>
@@ -141,7 +141,7 @@ const LoanCard = ({ loan, onRenew = () => {}, onPayFine = () => {}, onReturn = (
                             },
                         }}
                     >
-                        View Book Details
+                        Xem thông tin sách
                     </Button>
 
                     {canRenew() && (
@@ -149,7 +149,8 @@ const LoanCard = ({ loan, onRenew = () => {}, onPayFine = () => {}, onReturn = (
                             size="small"
                             variant="contained"
                             startIcon={<Autorenew />}
-                            onClick={() => onRenew(loan.id)}
+                            disabled={!onRenew}
+                            onClick={() => onRenew?.(loan.id)}
                             sx={{
                                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                 textTransform: 'none',
@@ -162,7 +163,7 @@ const LoanCard = ({ loan, onRenew = () => {}, onPayFine = () => {}, onReturn = (
                                 transition: 'all 0.3s',
                             }}
                         >
-                            Renew Book
+                            Gia hạn sách
                         </Button>
                     )}
 
@@ -172,7 +173,8 @@ const LoanCard = ({ loan, onRenew = () => {}, onPayFine = () => {}, onReturn = (
                             variant="contained"
                             color="error"
                             startIcon={<Payment />}
-                            onClick={() => onPayFine(loan)}
+                            disabled={!onPayFine}
+                            onClick={() => onPayFine?.(loan)}
                             sx={{
                                 textTransform: 'none',
                                 fontWeight: 600,
@@ -182,7 +184,7 @@ const LoanCard = ({ loan, onRenew = () => {}, onPayFine = () => {}, onReturn = (
                                 transition: 'all 0.3s',
                             }}
                         >
-                            Pay Fine ₹{loan.fineAmount.toFixed(2)}
+                            Thanh toán phạt {formatMoney(loan.fineAmount)}
                         </Button>
                     )}
 
@@ -192,7 +194,8 @@ const LoanCard = ({ loan, onRenew = () => {}, onPayFine = () => {}, onReturn = (
                             variant="outlined"
                             color="success"
                             startIcon={<AssignmentReturn />}
-                            onClick={() => onReturn(loan.id)}
+                            disabled={!onReturn}
+                            onClick={() => onReturn?.(loan.id)}
                             sx={{
                                 textTransform: 'none',
                                 fontWeight: 600,
@@ -202,7 +205,7 @@ const LoanCard = ({ loan, onRenew = () => {}, onPayFine = () => {}, onReturn = (
                                 transition: 'all 0.3s',
                             }}
                         >
-                            Return Book
+                            Trả sách
                         </Button>
                     )}
                 </Box>

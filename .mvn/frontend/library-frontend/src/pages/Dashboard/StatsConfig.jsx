@@ -7,8 +7,8 @@ import { LibraryBooks } from "@mui/icons-material"
 export const statsConfig = ({ myLoans, reservations, stats }) => [
   {
     id: "loans",
-    title: "Current Loans",
-    subtitle: "Books you're reading",
+    title: "Đang mượn",
+    subtitle: "Sách bạn đang đọc",
     value: myLoans.length,
     icon: <LibraryBooks sx={{ fontSize: 32, color: "#4F46E5" }} />,
     bgColor: "bg-indigo-100",
@@ -16,8 +16,8 @@ export const statsConfig = ({ myLoans, reservations, stats }) => [
   },
   {
     id: "reservations",
-    title: "Reservations",
-    subtitle: "Books on hold",
+    title: "Đặt trước",
+    subtitle: "Sách trong hàng chờ",
     value: reservations?.length || 0,
     icon: <EventAvailableIcon sx={{ fontSize: 32, color: "#9333EA" }} />,
     bgColor: "bg-purple-100",
@@ -25,8 +25,8 @@ export const statsConfig = ({ myLoans, reservations, stats }) => [
   },
   {
     id: "read",
-    title: "Books Read",
-    subtitle: "This year",
+    title: "Sách đã đọc",
+    subtitle: "Trong năm nay",
     value: myLoans.length,
     icon: <HistoryIcon sx={{ fontSize: 32, color: "#10B981" }} />,
     bgColor: "bg-green-100",
@@ -34,8 +34,8 @@ export const statsConfig = ({ myLoans, reservations, stats }) => [
   },
   {
     id: "steaks",
-    title: "Day Steaks",
-    subtitle: "Kepp it going",
+    title: "Chuỗi ngày đọc",
+    subtitle: "Tiếp tục duy trì nhé",
     value: stats.readingStreak,
     icon: <TrendingUpIcon sx={{ fontSize: 32, color: "#F59E0B" }} />,
     bgColor: "bg-orange-100",

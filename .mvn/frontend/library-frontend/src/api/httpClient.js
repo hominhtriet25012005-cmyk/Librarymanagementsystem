@@ -1,84 +1,44 @@
 import axios from "axios";
+import { getAccessToken, invalidateToken, isTokenExpired } from "../auth/session";
+export { ACCESS_TOKEN_KEY, getAccessToken, setAccessToken } from "../auth/session";
 
-const DEFAULT_API_URL = "http://localhost:8080";
-export const ACCESS_TOKEN_KEY = "library_access_token";
-
-const baseURL = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_URL).replace(/\/$/, "");
-
-/**
- * Axios client dùng chung cho toàn bộ frontend.
- * Mọi service chỉ khai báo đường dẫn tương đối, ví dụ: /api/books.
- */
 const httpClient = axios.create({
-  baseURL,
+  baseURL: (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, ""),
   timeout: 15000,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
-export const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY);
-
-export const setAccessToken = (token) => {
-  if (token) {
-    localStorage.setItem(ACCESS_TOKEN_KEY, token);
-  } else {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-  }
-};
-
+// Các API đăng nhập/khôi phục mật khẩu không gửi JWT cũ.
 httpClient.interceptors.request.use((config) => {
-  const token = getAccessToken();
-
-  if (token) {
+  const token = config.skipAuth ? null : getAccessToken();
+  if (token && isTokenExpired(token)) invalidateToken(token);
+  else if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    config.sessionToken = token;
   }
-
   return config;
 });
 
 httpClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 && getAccessToken()) {
-      setAccessToken(null);
-      window.dispatchEvent(new CustomEvent("auth:unauthorized"));
-    }
-
+    if (error.response?.status === 401) invalidateToken(error.config?.sessionToken);
     return Promise.reject(error);
   },
 );
 
-/** Chuyển lỗi Axios/backend thành câu thông báo có thể hiển thị cho người dùng. */
-export const getApiErrorMessage = (error, fallback = "Không thể kết nối đến máy chủ") => {
-  const data = error.response?.data;
-
-  if (typeof data === "string" && data.trim()) {
-    return data;
+export function getApiErrorMessage(error, fallback = "Không thể hoàn tất yêu cầu. Vui lòng thử lại.") {
+  if (error?.userMessage) return error.userMessage;
+  if (error?.code === "ECONNABORTED") return "Máy chủ phản hồi quá lâu. Vui lòng thử lại.";
+  if (!error?.response) return "Không thể kết nối máy chủ. Vui lòng kiểm tra kết nối và thử lại.";
+  const status = error.response.status;
+  if (status >= 500) return "Hệ thống tạm thời gặp sự cố. Vui lòng thử lại sau.";
+  if (status === 401) return "Phiên đăng nhập không còn hợp lệ. Vui lòng đăng nhập lại.";
+  if (status === 403) return "Bạn không có quyền thực hiện thao tác này.";
+  const message = error.response.data?.message;
+  // Loại bỏ tên trường kỹ thuật đứng trước thông báo kiểm tra dữ liệu.
+  if (typeof message === "string" && /[À-ỹ]/.test(message)) {
+    return message.replace(/^(email|password|fullName|phone|token):\s*/i, "");
   }
-
-  if (data?.message) {
-    return data.message;
-  }
-
-  if (data && typeof data === "object") {
-    const validationMessage = Object.values(data).find(
-      (value) => typeof value === "string" && value.trim(),
-    );
-    if (validationMessage) {
-      return validationMessage;
-    }
-  }
-
-  if (error.code === "ECONNABORTED") {
-    return "Máy chủ phản hồi quá lâu. Vui lòng thử lại.";
-  }
-
-  if (!error.response) {
-    return "Không kết nối được backend tại địa chỉ đã cấu hình.";
-  }
-
   return fallback;
-};
-
+}
 export default httpClient;

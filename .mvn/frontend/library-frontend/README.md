@@ -27,6 +27,7 @@ VITE_API_BASE_URL=http://localhost:8080
 
 ```powershell
 npm run lint
+npm test
 npm run build
 ```
 
@@ -35,6 +36,8 @@ npm run build
 ```text
 src/
 ├── api/                  # Axios client và các hàm gọi backend
+├── auth/                 # Quản lý phiên và phân quyền route
+├── utils/                # Định dạng ngày tháng, tiền và trạng thái
 ├── components/common/    # Component dùng chung
 ├── layouts/UserLayout/   # Bố cục, thanh điều hướng và sidebar
 └── pages/                # Các màn hình theo module nghiệp vụ
@@ -51,7 +54,7 @@ Trang Kho sách đã dùng API thật `/api/books` và `/api/genres`. Loans, Res
 
 ## Các giai đoạn tiếp theo
 
-1. Hoàn thiện đăng ký, đăng nhập, quên và đặt lại mật khẩu.
+1. Đã hoàn thiện tài khoản và Việt hóa giao diện. Xem [hướng dẫn giai đoạn 1](docs/AUTHENTICATION-VI.md).
 2. Hoàn thiện chi tiết sách, mượn sách và đặt trước.
 3. Kết nối Loans, Reservations, Wishlist, Reviews và Fines.
 4. Kết nối Subscription và Razorpay.

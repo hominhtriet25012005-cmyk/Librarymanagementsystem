@@ -1,4 +1,4 @@
-import React from "react";
+import { formatDate, statusLabel } from "../../utils/locale";
 import {
     AccessAlarm,
     Book,
@@ -15,7 +15,7 @@ import { getStatusColor } from "./getStatusColor";
 const MyReservationCard = ({ reservation }) => {
 
     const statusColors = getStatusColor(reservation.status);
-    //    const timeRemaining=getTimeRemaining(reservation.expiresAt);
+    //    const timeRemaining=getTimeRemaining(reservation.availableUntil);
 
     const getStatusIcon = (status) => {
         const iconClass = "w-5 h-5";
@@ -37,7 +37,7 @@ const MyReservationCard = ({ reservation }) => {
                 <div className="flex items-center gap-2">
                     <span>{getStatusIcon(reservation.status)}</span>
                     <span className={` ${getStatusColor(reservation.status).text} font-bold text-sm uppercase
-                        tracking-wider`}>{reservation.status}</span>
+                        tracking-wider`}>{statusLabel(reservation.status)}</span>
                 </div>
 
 
@@ -54,7 +54,7 @@ const MyReservationCard = ({ reservation }) => {
 
                         </div>
                         <div>
-                            <p>Book Id</p>
+                            <p>Mã sách</p>
                             <h3>#{reservation.bookId}</h3>
                         </div>
 
@@ -73,10 +73,10 @@ const MyReservationCard = ({ reservation }) => {
                         <AccessAlarm className="w-4 h-4 text-gray-400 mt-0.5" />
                         <div>
                             <p className="text-xs font-semibold text-gray-500 uppercase">
-                                Reserved
+                                Ngày đặt
                             </p>
                             <p className="text-sm font-semibold text-gray-700">
-                                {reservation.reservedAt}
+                                {formatDate(reservation.reservedAt)}
                             </p>
                         </div>
                     </div>
@@ -86,25 +86,25 @@ const MyReservationCard = ({ reservation }) => {
                             <CalendarMonth className="w-4 h-4 text-green-500 mt-0.5" />
                             <div>
                                 <p className="text-xs font-semibold text-green-600 uppercase">
-                                    Available
+                                    Sẵn sàng từ
                                 </p>
                                 <p className="text-sm font-semibold text-green-700">
-                                    {reservation.availableAt}
+                                    {formatDate(reservation.availableAt)}
                                 </p>
                             </div>
                         </div>
                     )}
 
 
-                    {reservation.expiresAt && (
+                    {reservation.availableUntil && (
                         <div className="flex items-start gap-2">
                             <Notifications className="w-4 h-4 text-red-500 mt-0.5" />
                             <div>
                                 <p className="text-xs font-semibold text-red-600 uppercase">
-                                    Expires
+                                    Hạn nhận
                                 </p>
                                 <p className="text-sm font-semibold text-red-700">
-                                    {reservation.expiresAt}
+                                    {formatDate(reservation.availableUntil)}
                                 </p>
                             </div>
                         </div>
@@ -116,10 +116,10 @@ const MyReservationCard = ({ reservation }) => {
                             <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5" />
                             <div>
                                 <p className="text-xs font-semibold text-blue-600 uppercase">
-                                    Fulfilled
+                                    Đã nhận
                                 </p>
                                 <p className="text-sm font-semibold text-blue-700">
-                                    {reservation.fulfilledAt}
+                                    {formatDate(reservation.fulfilledAt)}
                                 </p>
                             </div>
                         </div>

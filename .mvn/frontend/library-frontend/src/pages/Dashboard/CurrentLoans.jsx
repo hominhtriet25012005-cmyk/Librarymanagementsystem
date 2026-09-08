@@ -6,7 +6,7 @@ const loan = {
     bookCoverImage: "https://images-na.ssl-images-amazon.com/images/I/81af+MCATTL.jpg",
     bookAuthor: "F. Scott Fitzgerald",
     dueDate: "2023-12-01",
-    status: "active",
+    status: "CHECKED_OUT",
     remainingDays: 5,
     overdueDays: 0
 
@@ -17,7 +17,7 @@ const CurrentLoans = () => {
     <div className='p-6'>
 
         <h3 className='text-2xl font-bold text-gray-900 mb-6'>
-            Books You're Currently Reading
+            Sách bạn đang đọc
         </h3>
 
         <div className='space-y-4'>

@@ -17,24 +17,24 @@ const MyLoans = () => {
                     {/* header */}
                     <div className="mb-8">
                         <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center space-x-3">
-                            <span className="text-5xl">📚</span>
+                            <span aria-hidden="true" className="text-5xl">📚</span>
                             <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                                My Borrowed Books
+                                Sách tôi đã mượn
                             </span>
                         </h1>
 
                         <p className="text-lg text-gray-600">
-                            Manage your book loans, track due dates, and renew books
+                            Quản lý phiếu mượn, theo dõi hạn trả và gia hạn sách
                         </p>
                     </div>
 
-                    {/* tabs */}
+                    <p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">Danh sách minh họa. Thao tác mượn và trả sẽ có ở giai đoạn tiếp theo.</p>
 
                     <Card className="mb-6">
                         <Box sx={{
-                            BorderBottom: 1, BoderColor: 'divider'
+                            borderBottom: 1, borderColor: 'divider'
                         }}>
-                            <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)} aria-label="Loans Tabs">
+                            <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)} aria-label="Trạng thái phiếu mượn" variant="scrollable" scrollButtons="auto">
                                 {tabs.map((tab) => <Tab key={tab.label} label={tab.label} />)}
                             </Tabs>
                         </Box>
@@ -43,7 +43,7 @@ const MyLoans = () => {
                     {/* loan list */}
                     <div className="space-y-4">
 
-                        {loans.map((loan) => <LoanCard key={loan.id} loan={loan} />)}
+                        {loans.filter((loan) => !tabs[activeTab].value || loan.status === tabs[activeTab].value).map((loan) => <LoanCard key={loan.id} loan={loan} />)}
 
 
 

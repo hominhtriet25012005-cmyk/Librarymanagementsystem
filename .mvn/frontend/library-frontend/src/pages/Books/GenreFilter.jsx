@@ -42,7 +42,7 @@ const GenreFilter = ({ genres = [], selectedGenreId, onGenreSelect }) => {
             <div className="space-y-1 pl-5 max-h-96 overflow-y-auto custom-scrollbar">
                 <FormControl>
                     <RadioGroup
-                        aria-labelledby="demo-radio-buttons-group-label"
+                        aria-label="Lọc theo thể loại"
                         value={selectedGenreId ?? ""}
                         name="radio-buttons-group"
                         onChange={(event) => onGenreSelect(Number(event.target.value))}
