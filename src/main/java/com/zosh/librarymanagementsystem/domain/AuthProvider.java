@@ -1,6 +1,6 @@
 package com.zosh.librarymanagementsystem.domain;
 
-public enum Authprovider {
+public enum AuthProvider {
     LOCAL,
     GOOGLE
 

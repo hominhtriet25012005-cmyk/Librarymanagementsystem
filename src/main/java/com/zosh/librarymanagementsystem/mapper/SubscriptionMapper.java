@@ -15,9 +15,7 @@ import java.util.stream.Collectors;
 @Component
 public class SubscriptionMapper {
 
-    /**
-     * Convert Subscription entity to DTO
-     */
+    /** Chuyển đăng ký thành viên từ entity sang DTO. */
     public SubscriptionDTO toDTO(Subscription subscription) {
         if (subscription == null) {
             return null;
@@ -26,14 +24,14 @@ public class SubscriptionMapper {
         SubscriptionDTO dto = new SubscriptionDTO();
         dto.setId(subscription.getId());
 
-        // User information
+        // Thông tin người dùng.
         if (subscription.getUser() != null) {
             dto.setUserId(subscription.getUser().getId());
             dto.setUserName(subscription.getUser().getFullName());
             dto.setUserEmail(subscription.getUser().getEmail());
         }
 
-        // Plan information
+        // Thông tin gói thành viên.
         if (subscription.getPlan() != null) {
             dto.setPlanId(subscription.getPlan().getId());
         }
@@ -43,7 +41,7 @@ public class SubscriptionMapper {
         dto.setPrice(subscription.getPrice());
         dto.setCurrency(subscription.getCurrency());
         if (subscription.getPrice() != null) {
-            dto.setPriceInMajorUnits(subscription.getPrice() / 100.0);
+            dto.setPriceInMajorUnits(subscription.getPrice().doubleValue());
         }
         dto.setStartDate(subscription.getStartDate());
         dto.setEndDate(subscription.getEndDate());
@@ -63,9 +61,7 @@ public class SubscriptionMapper {
         return dto;
     }
 
-    /**
-     * Convert DTO of subscriptions to entity
-     */
+    /** Tạo entity đăng ký từ DTO, gói thành viên và người dùng. */
     public Subscription toEntity(SubscriptionDTO dto,
                                  SubscriptionPlan plan,
                                  User user) throws SubscriptionException {
@@ -83,9 +79,7 @@ public class SubscriptionMapper {
         return  subscription;
     }
 
-    /**
-     * Convert list of subscriptions to DTOs
-     */
+    /** Chuyển danh sách entity đăng ký sang danh sách DTO. */
     public List<SubscriptionDTO> toDTOList(List<Subscription> subscriptions) {
         if (subscriptions == null) {
             return null;

@@ -1,66 +1,49 @@
-# Kiểm kê Library Management System
+# Báo cáo rà soát Backend Library Management System
 
-Ngày kiểm kê: 05/09/2026. Mốc hướng dẫn hiện tại: **Subscription Module Documentation (Entity + Controller)**.
+Ngày cập nhật: **07/09/2026**. Phạm vi của đợt sửa này chỉ gồm backend và database; frontend sẽ được xử lý ở giai đoạn sau.
 
-## Mốc an toàn
+Tài liệu đối chiếu chính: [Production-Grade Library Management System Java Full Stack](https://watery-lunaria-74f.notion.site/Production-Grade-Library-Management-System-Java-Full-Stack-282e63b763e0804c9d51ca592c5e58d4) và video của Code With Zosh.
 
-- Nhánh Git hiện tại: `fix/book-mapper`.
-- Tag nền ban đầu: `baseline-2026-09-03`.
-- Bản sao toàn bộ mã trước đợt sửa: `D:\Codex\backups\library-before-full-repair-20260905-223649.zip`.
-- Không chạy ứng dụng với MySQL thật và không sửa trực tiếp dữ liệu MySQL trong đợt kiểm kê này.
+## 1. Các module backend hiện có
 
-## Những phần đã có
+- Xác thực: đăng ký, đăng nhập, BCrypt, JWT, quên mật khẩu và đặt lại mật khẩu qua email.
+- Người dùng: hồ sơ cá nhân, danh sách người dùng dành cho quản trị viên.
+- Thể loại: CRUD, thể loại cha/con, sắp xếp và thống kê.
+- Sách: CRUD, tạo hàng loạt, tìm kiếm, lọc, phân trang, thống kê và kiểm soát tồn kho.
+- Gói thành viên và đăng ký thành viên: tạo gói, đăng ký, thanh toán, kích hoạt, hủy và vô hiệu hóa gói hết hạn.
+- Mượn/trả: kiểm tra gói, hạn mức, sách quá hạn, gia hạn, trả/mất/hỏng, cập nhật tồn kho và thống kê.
+- Đặt chỗ: hàng chờ, thông báo khi có sách, nhận sách, hủy và hết hạn sau 48 giờ.
+- Tiền phạt: tạo phạt, phạt quá hạn tự động, miễn phạt, thanh toán một phần/toàn bộ.
+- Thanh toán: tạo Payment Link Razorpay, xác minh giao dịch, chống dùng lại mã thanh toán và phát sự kiện nghiệp vụ.
+- Đánh giá sách: chỉ người đã mượn và trả sách mới được đánh giá; mỗi người một đánh giá cho mỗi sách.
+- Danh sách yêu thích: thêm, xóa và phân trang danh sách của người dùng.
+- Phân quyền: các thao tác quản trị được giới hạn cho `ROLE_ADMIN`; dữ liệu cá nhân chỉ chủ sở hữu được thao tác.
 
-### Backend
+## 2. Các nhóm lỗi đã sửa
 
-- Spring Boot 4.1.1, Java target 17, Maven Wrapper.
-- JPA/MySQL và Bean Validation.
-- Genre: entity, DTO, mapper, repository, service, CRUD controller, phân cấp thể loại và thống kê số sách.
-- Book: entity, DTO, mapper, repository, service, CRUD, tạo hàng loạt, lọc/phân trang/sắp xếp và thống kê.
-- User/Auth: người dùng, vai trò `ROLE_USER`/`ROLE_ADMIN`, đăng ký, đăng nhập và BCrypt.
-- JWT: tạo token, đọc claims, filter xác thực và phân quyền endpoint quản trị.
-- Password reset: token có hạn 5 phút, cập nhật mật khẩu và gửi mail bằng `JavaMailSender`.
-- Subscription Plan: entity, DTO, mapper, repository, service và controller quản trị.
-- Subscription: entity, DTO, mapper, repository, đăng ký, kích hoạt, hủy, lấy gói hiện tại và vô hiệu hóa gói hết hạn.
-- Global exception handler cho lỗi domain và lỗi validation request.
-
-### Frontend
-
-- React 19 + Vite 8 + Material UI + Tailwind CSS.
-- Các màn hình đang có: Dashboard, Book, My Loans, My Reservations và User Layout.
-- Dữ liệu giao diện hiện vẫn chủ yếu là dữ liệu mẫu, chưa nối hoàn chỉnh với backend.
-- Frontend hiện nằm tại `.mvn/frontend/library-frontend`; vị trí này chạy được nhưng nên chuyển thành thư mục cấp cao như `frontend/` ở một bước riêng sau khi hoàn tất mốc tutorial.
-
-## Các nguyên nhân lỗi chính đã sửa
-
-| Hiện tượng | Nguyên nhân | Cách xử lý |
+| Nhóm | Lỗi ban đầu | Cách sửa |
 |---|---|---|
-| Hàng loạt `Cannot resolve method get.../set.../builder()` | JDK 23 không chạy annotation processing mặc định và mã Subscription còn lỗi cú pháp làm Lombok không vào vòng xử lý | Dùng Lombok 1.18.46, cấu hình Maven Compiler `proc=full`, sửa các lỗi khai báo chặn javac |
-| Không tìm thấy `User` | File là `UserE.java`, class là `UserE`, trong khi toàn hệ thống import `modal.User` | Đổi thành `User.java` và class `User` |
-| `Peageable`, `java.awt.print.Pageable` | Gõ sai tên và import nhầm package AWT | Dùng `org.springframework.data.domain.Pageable` |
-| Annotation `required` báo đỏ | Dùng `@RequestMapping` trên tham số | Đổi thành `@RequestParam` |
-| Controller gọi phương thức Subscription Plan không tồn tại | Inject nhầm `SubscriptionService`; implementation cũng implements nhầm interface | Tách đúng `SubscriptionPlanService` |
-| `GenreMapper` tạo thể loại nhưng lưu lỗi/null | `toEntity()` trả về `null`; update gọi getter thay cho setter | Trả về entity và dùng `setDisplayOrder()` |
-| Hai endpoint sách cùng `GET /{id}` | Hàm update dùng sai annotation | Đổi update thành `PUT /{id}` |
-| Hai endpoint user cùng `/list` | Mapping profile bị trùng | Tách `/list` và `/profile` |
-| Hard delete Genre lại soft delete | Controller gọi ngược service | Nối lại đúng `deleteGenre`/`hardDeleteGenre` |
-| Search Book lỗi khi Spring khởi động | JPQL thiếu `OR`, dùng `==`, ghép chuỗi thiếu khoảng trắng | Viết lại JPQL và kiểm tra bằng Spring context test |
-| `availableCopies > totalCopies` vẫn được lưu | Kết quả `isAvailableCopiesValid()` bị gọi rồi bỏ qua | Thêm validation service và ném `BookException` |
-| JWT tạo/chạy lỗi dù import đúng | Khóa cũ ngắn hơn mức HS256 yêu cầu; filter cắt chuỗi không kiểm tra `Bearer` | Dùng khóa tối thiểu 32 byte từ cấu hình, kiểm tra prefix và trả HTTP 401 khi token sai |
-| Password reset gửi mail nhưng thiếu link | `resetLink` được tạo nhưng không nối vào body | Gắn URL và token vào nội dung mail, xóa token cũ của user |
-| Subscription mapper lỗi kiểu User | Import nhầm `org.springframework.security.core.userdetails.User` | Dùng entity `modal.User` và gắn user vào Subscription |
-| Subscription query lỗi | Sai tên tham số `toay/toady`, `where.s` | Sửa JPQL và `@Param` |
-| Frontend không build | Sai đường dẫn My Reservations, nhiều import/component sai tên, Tailwind thiếu PostCSS | Sửa import/component và thêm cấu hình Tailwind/PostCSS |
+| Lombok/JDK | IntelliJ báo thiếu `get...`, `set...`, `builder()` | Cập nhật Lombok, bật annotation processing bằng `proc=full`, sửa Maven Wrapper trên Windows |
+| Tên package/class | `configration`, `Authprovider` làm import khác hướng dẫn | Chuẩn hóa thành `configuration` và `AuthProvider` |
+| Mapper | Thiếu `updateEntityFromDTO`, mapper trả `null`, gọi nhầm getter/setter | Hoàn thiện Book/Genre/Subscription/Loan/Review/Fine/Payment/Reservation/Wishlist mapper |
+| Kiểu dữ liệu | `Booklean`, `Peageable`, import `java.awt.print.Pageable` | Đổi thành `Boolean` và `org.springframework.data.domain.Pageable` |
+| Book API | Trùng endpoint, search JPQL sai, thiếu stats, validation tồn kho bị bỏ qua | Sửa mapping, query, thống kê và chặn `availableCopies > totalCopies` |
+| JWT | Không tìm thấy `Keys`, `Claims`, `Jwts`; API JJWT không khớp; khóa quá ngắn | Dùng JJWT 0.12.6 đúng API, `SecretKey`, khóa từ cấu hình và trả 401 cho token sai |
+| Auth | Điều kiện signup bị ngược, `userDetails == null` không phù hợp, trả `null`, role sai | Bắt `UsernameNotFoundException`, sửa điều kiện, trả `AuthResponse`, gắn authority đúng |
+| Password reset | Biến `user`/`frontendUrl` sai phạm vi, builder báo đỏ, mail thiếu link | Tạo và lưu token trong đúng hàm, xóa token cũ, tạo link 5 phút, gửi email |
+| Email | Không tìm thấy `MimeMessage`, `MimeMessageHelper`, catch sai cú pháp | Dùng `jakarta.mail.internet.MimeMessage`, Spring Mail và xử lý ngoại lệ đúng |
+| Subscription | Inject/implements nhầm service, repository/query sai, kích hoạt không kiểm tra payment | Sửa lớp service/repository và chỉ kích hoạt bằng giao dịch `SUCCESS` đúng đăng ký |
+| Loan | Sai tên biến/repository/ngày tháng, thiếu kiểm tra người dùng/gói/tồn kho | Hoàn chỉnh checkout, checkin, renew, overdue, quota và cập nhật tồn kho trong transaction |
+| Reservation | Sai người dùng khi admin đặt hộ, query dùng `LIMIT 1`, thiếu cập nhật hàng chờ | Dùng derived query, kiểm soát chủ sở hữu, xếp lại hàng và chuyển người tiếp theo sang `AVAILABLE` |
+| Fine | Thiếu liên kết loan/user, chưa xử lý trả một phần, hàm đánh dấu đã trả không lưu | Chuẩn hóa entity/repository/service, tính số tiền còn lại và lưu trạng thái |
+| Razorpay | Dependency/version sai, biến request sai, `e.getMessage()` lỗi, đối chiếu giao dịch thiếu | Dùng `razorpay-java:1.4.10`, chuẩn hóa request/response, kiểm tra status/amount/currency/người sở hữu |
+| Payment | `PaymentStatus.PENDING`, `getCreatedAt`, `initiatePayment`, `getAllPayments` báo đỏ | Hoàn thiện enum, entity timestamp, mapper, service, repository, controller và phân trang |
+| Review/Wishlist | Xóa review lại gọi save, typo mapper, thiếu ràng buộc trùng | Sửa service và thêm unique constraint ở database |
+| Exception | Ném `Exception` chung làm API trả lỗi khó hiểu | Thêm lỗi nghiệp vụ riêng, Việt hóa response validation và che chi tiết lỗi hệ thống |
 
-## Database
+## 3. Database sau khi đồng bộ
 
-File SQL ban đầu ở `D:\Codex\library_db.sql` chứa `genres`, `users`, `subscription_plans`, `subscriptions`, nhưng chưa có `books` và `password_reset_tokens`. Một số cột cũng không khớp Java:
-
-- SQL dùng role `ADMIN`/`USER`; Java dùng `ROLE_ADMIN`/`ROLE_USER`.
-- SQL cũ dùng `subscription_plans.title`, `duration_in_days`, `billing_cycle`; Java dùng `plan_code`, `name`, `duration_days`, giới hạn sách và giới hạn ngày mượn.
-- Kiểu giá của plan cũ là `DECIMAL`, trong khi Subscription hiện lưu số nguyên đơn vị nhỏ nhất bằng `BIGINT`.
-
-Schema chuẩn cho database **mới** đã được viết tại `database/library_db.sql`, gồm 6 bảng:
+Schema tham chiếu nằm ở `database/library_db.sql`, gồm 12 bảng:
 
 1. `genres`
 2. `users`
@@ -68,30 +51,35 @@ Schema chuẩn cho database **mới** đã được viết tại `database/libra
 4. `password_reset_tokens`
 5. `subscription_plans`
 6. `subscriptions`
+7. `book_loans`
+8. `book_reviews`
+9. `fines`
+10. `reservations`
+11. `wishlists`
+12. `payments`
 
-Schema này khớp tên bảng/cột, khóa ngoại, enum và kiểu dữ liệu của entity hiện tại. Không chạy file này đè lên database đang có dữ liệu. Với database hiện tại, cần dump backup và đọc `SHOW CREATE TABLE` trước khi viết migration giữ dữ liệu.
+Các bảng mới có khóa ngoại, index phục vụ truy vấn trạng thái, unique constraint chống dữ liệu trùng và check constraint cho số lượng/tiền/rating. Entity dùng `EnumType.STRING` để database lưu tên trạng thái dễ đọc và không bị đổi ý nghĩa khi enum thay đổi thứ tự.
 
-## API hiện tại
+Với database local chỉ mới có `books`, có thể chạy schema trên một database mới. Nếu database cũ đã có dữ liệu, cần sao lưu trước; `CREATE TABLE IF NOT EXISTS` không tự sửa một bảng cũ có cấu trúc sai. Ở local, `spring.jpa.hibernate.ddl-auto=update` sẽ bổ sung cột/bảng còn thiếu khi ứng dụng khởi động. Ở production nên dùng Flyway/Liquibase và `ddl-auto=validate`.
 
-- Auth: `/auth/signup`, `/auth/login`, `/auth/forgot-password`, `/auth/reset-password`.
-- Books: `/api/books`, `/api/books/{id}`, `/api/books/search`, `/api/books/stats`; thao tác ghi cần quyền admin.
-- Genres: `/api/genres`, `/api/genres/{id}`, `/api/genres/top-level`, `/api/genres/count`, `/api/genres/{id}/book-count`; thao tác ghi cần quyền admin.
-- User: `/api/user/profile`; `/api/user/list` cần quyền admin.
-- Subscription plans: `/api/subscription-plan`; các đường dẫn `/admin/**` cần quyền admin.
-- Subscriptions: subscribe, active subscription và cancel cho user; list, activate và deactivate-expired cho admin.
+## 4. Những điểm chủ động thống nhất khi tài liệu không đồng nhất
 
-## Kiểm tra đã chạy
+- Dùng tên `Genre`, không dùng `Genera`.
+- Dùng `Wishlist` theo source hiện tại; tài liệu có chỗ gọi là Watchlist.
+- Backend hiện dùng JWT local và Razorpay. Google OAuth, Stripe và module giao diện chưa được triển khai trong source này.
+- Tiền được lưu bằng `BIGINT` theo đơn vị tiền chính của gói. Khi gửi Razorpay, backend nhân 100 để đổi sang đơn vị nhỏ nhất. Khi dùng Razorpay thật nên cấu hình gói bằng `INR`.
+- Response đăng nhập giữ các trường `jwt`, `title`, `message`, `user` để khớp code hiện tại.
 
-- `mvn test`: thành công, 11 test, 0 failure, 0 error. Test dùng H2 memory riêng; đã kiểm tra Spring context, 6 repository, entity/controller/security mapping, JPQL và các nghiệp vụ chính của Book, Auth, Subscription.
-- Kiểm thử API local: `test.http` đã thống nhất cổng `5000` và có luồng 20 bước từ đăng ký, đăng nhập, tạo thể loại/sách đến đăng ký gói thành viên.
-- `npm run lint`: thành công, không còn warning.
-- `npm run build`: thành công. Bundle JS khoảng 569 kB và Vite chỉ cảnh báo nên tách chunk để tối ưu tải trang.
-- `git diff --check`: dùng để kiểm tra lỗi whitespace trước khi chốt.
+## 5. Kết quả kiểm tra
 
-## Phần chưa triển khai theo tiến độ hiện tại
+- Maven đã biên dịch toàn bộ source và khởi động được Spring context với H2 ở chế độ tương thích MySQL.
+- **20 test** bao phủ context/repository, Auth, Book, Subscription, BookLoan, Reservation và Payment.
+- Test kiểm tra các nhánh quan trọng: email/ISBN trùng, tồn kho sai, gói dừng hoạt động, hủy gói người khác, kích hoạt bằng payment hợp lệ, quota mượn, trả quá hạn sinh phạt, chuyển hàng đặt chỗ, đặt hộ đúng người và xác minh payment đúng chủ sở hữu.
+- Test tự động chỉ dùng H2 in-memory, không kết nối hoặc thay đổi MySQL local.
 
-- Xác minh payment thật khi kích hoạt subscription; `paymentId` mới là đầu vào giữ chỗ cho module thanh toán.
-- Backend Loan, Reservation, Fine và Wishlist chưa có dù frontend đã có màn hình/dữ liệu mẫu.
-- Frontend chưa gọi API thật và chưa có luồng lưu JWT/login hoàn chỉnh.
-- Chưa migration database MySQL đang có dữ liệu; schema mới chỉ là nguồn chuẩn cho database mới.
-- Chưa cấu hình secret/mail/admin cho production. Dùng `application.properties.example` làm mẫu và cấp giá trị bằng biến môi trường.
+## 6. Giới hạn cần biết
+
+- Test không gọi Razorpay, Gmail hay MySQL thật; các dịch vụ ngoài được mock để test an toàn và ổn định.
+- Payment thật chỉ hoạt động khi có `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` và callback URL hợp lệ.
+- Gửi email thật chỉ hoạt động khi có tài khoản SMTP hợp lệ; với Gmail cần App Password.
+- Dữ liệu MySQL đang có không được sửa tự động trong đợt rà soát này để tránh mất dữ liệu. Schema mới là nguồn đối chiếu trước khi migration.

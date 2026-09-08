@@ -1,6 +1,6 @@
 package com.zosh.librarymanagementsystem.service;
 
-import com.zosh.librarymanagementsystem.configration.JwtProvider;
+import com.zosh.librarymanagementsystem.configuration.JwtProvider;
 import com.zosh.librarymanagementsystem.domain.UserRole;
 import com.zosh.librarymanagementsystem.exception.UserException;
 import com.zosh.librarymanagementsystem.modal.PasswordResetToken;

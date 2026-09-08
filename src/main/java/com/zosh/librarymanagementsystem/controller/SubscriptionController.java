@@ -3,6 +3,7 @@ package com.zosh.librarymanagementsystem.controller;
 import com.zosh.librarymanagementsystem.exception.SubscriptionException;
 import com.zosh.librarymanagementsystem.payload.dto.SubscriptionDTO;
 import com.zosh.librarymanagementsystem.payload.response.ApiResponse;
+import com.zosh.librarymanagementsystem.payload.response.PaymentInitiateResponse;
 import com.zosh.librarymanagementsystem.service.SubscriptionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class SubscriptionController {
     public ResponseEntity<?> subscribe(
             @Valid @RequestBody SubscriptionDTO subscription
             ) {
-        SubscriptionDTO dto = subscriptionService.subscribe(subscription);
+        PaymentInitiateResponse dto = subscriptionService.subscribe(subscription);
         return ResponseEntity.ok(dto);
     }
 

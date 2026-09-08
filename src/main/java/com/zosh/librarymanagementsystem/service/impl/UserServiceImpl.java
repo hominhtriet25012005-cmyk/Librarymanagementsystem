@@ -40,4 +40,11 @@ public class UserServiceImpl  implements UserService {
                 UserMapper::toDTO
         ).collect(Collectors.toList());
     }
+
+    @Override
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow(
+                () -> new UserException("Không tìm thấy người dùng có ID " + id)
+        );
+    }
 }

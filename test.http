@@ -5,7 +5,7 @@
 ### 1. Kiểm tra backend đã chạy
 GET {{baseUrl}}/
 
-### 2. Đăng ký tài khoản bạn đọc
+### 2. Đăng ký tài khoản bạn đọc chính
 # @name signup
 POST {{baseUrl}}/auth/signup
 Content-Type: {{contentType}}
@@ -17,9 +17,23 @@ Content-Type: {{contentType}}
   "phone": "0900000000"
 }
 
-> {% client.global.set("userToken", response.body.jwt); %}
+> {% client.global.set("userToken", response.body.jwt); client.global.set("userId", response.body.user.id); %}
 
-### 3. Đăng nhập lại bằng tài khoản bạn đọc
+### 3. Đăng ký tài khoản thứ hai để kiểm tra hàng đặt chỗ
+# @name signupReservationUser
+POST {{baseUrl}}/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "email": "dat-cho@example.com",
+  "password": "matkhau123",
+  "fullName": "Bạn Đọc Đặt Chỗ",
+  "phone": "0911111111"
+}
+
+> {% client.global.set("reservationUserToken", response.body.jwt); client.global.set("reservationUserId", response.body.user.id); %}
+
+### 4. Đăng nhập lại bằng tài khoản bạn đọc chính
 # @name loginUser
 POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
@@ -31,8 +45,8 @@ Content-Type: {{contentType}}
 
 > {% client.global.set("userToken", response.body.jwt); %}
 
-### 4. Đăng nhập quản trị viên local
-# Thông tin mặc định có thể đổi trong application.properties.
+### 5. Đăng nhập quản trị viên local
+# Thông tin này phải khớp ADMIN_EMAIL và ADMIN_PASSWORD trong cấu hình local.
 # @name loginAdmin
 POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
@@ -44,7 +58,7 @@ Content-Type: {{contentType}}
 
 > {% client.global.set("adminToken", response.body.jwt); %}
 
-### 5. Tạo thể loại (ADMIN)
+### 6. Tạo thể loại (ADMIN)
 # @name createGenre
 POST {{baseUrl}}/api/genres/create
 Content-Type: {{contentType}}
@@ -61,11 +75,7 @@ Authorization: Bearer {{adminToken}}
 
 > {% client.global.set("genreId", response.body.id); %}
 
-### 6. Xem danh sách thể loại
-GET {{baseUrl}}/api/genres
-Authorization: Bearer {{userToken}}
-
-### 7. Tạo sách (ADMIN)
+### 7. Tạo một bản sách để kiểm tra hết sách và đặt chỗ (ADMIN)
 # @name createBook
 POST {{baseUrl}}/api/books/admin
 Content-Type: {{contentType}}
@@ -81,64 +91,21 @@ Authorization: Bearer {{adminToken}}
   "language": "vi",
   "pages": 200,
   "description": "Dữ liệu thử nghiệm cho backend local",
-  "totalCopies": 10,
-  "availableCopies": 10,
+  "totalCopies": 1,
+  "availableCopies": 1,
   "price": 85000,
   "coverImageUrl": "https://example.com/de-men.jpg"
 }
 
 > {% client.global.set("bookId", response.body.id); %}
 
-### 8. Xem chi tiết sách
-GET {{baseUrl}}/api/books/{{bookId}}
-Authorization: Bearer {{userToken}}
-
-### 9. Tìm sách theo từ khóa và thể loại
+### 8. Tìm sách bằng query parameter
 GET {{baseUrl}}/api/books?searchTerm=D%E1%BA%BF%20M%C3%A8n&genreId={{genreId}}&availableOnly=true&activeOnly=true&page=0&size=20&sortBy=createdAt&sortDirection=DESC
-Authorization: Bearer {{userToken}}
 
-### 10. Tìm kiếm nâng cao bằng JSON
-POST {{baseUrl}}/api/books/search
-Content-Type: {{contentType}}
-Authorization: Bearer {{userToken}}
-
-{
-  "searchTerm": "Tô Hoài",
-  "genreId": {{genreId}},
-  "availableOnly": true,
-  "activeOnly": true,
-  "page": 0,
-  "size": 20,
-  "sortBy": "title",
-  "sortDirection": "ASC"
-}
-
-### 11. Thống kê sách
+### 9. Thống kê sách
 GET {{baseUrl}}/api/books/stats
-Authorization: Bearer {{userToken}}
 
-### 12. Cập nhật sách (ADMIN)
-PUT {{baseUrl}}/api/books/{{bookId}}
-Content-Type: {{contentType}}
-Authorization: Bearer {{adminToken}}
-
-{
-  "isbn": "978-604-2-00001-1",
-  "title": "Dế Mèn phiêu lưu ký - Bản cập nhật",
-  "author": "Tô Hoài",
-  "genreId": {{genreId}},
-  "publisher": "Kim Đồng",
-  "publicationDate": "2024-01-01",
-  "language": "vi",
-  "pages": 210,
-  "description": "Đã cập nhật bằng test.http",
-  "totalCopies": 10,
-  "availableCopies": 9,
-  "price": 90000,
-  "active": true
-}
-
-### 13. Tạo gói thành viên (ADMIN)
+### 10. Tạo gói thành viên dùng Razorpay (ADMIN)
 # @name createPlan
 POST {{baseUrl}}/api/subscription-plan/admin/create
 Content-Type: {{contentType}}
@@ -149,8 +116,8 @@ Authorization: Bearer {{adminToken}}
   "name": "Cơ bản 30 ngày",
   "description": "Gói dùng để kiểm thử local",
   "durationDays": 30,
-  "price": 50000,
-  "currency": "VND",
+  "price": 499,
+  "currency": "INR",
   "maxBooksAllowed": 3,
   "maxDaysPerBook": 14,
   "displayOrder": 1,
@@ -160,11 +127,8 @@ Authorization: Bearer {{adminToken}}
 
 > {% client.global.set("planId", response.body.id); %}
 
-### 14. Xem các gói thành viên
-GET {{baseUrl}}/api/subscription-plan
-Authorization: Bearer {{userToken}}
-
-### 15. Đăng ký gói bằng tài khoản bạn đọc
+### 11. Đăng ký gói và nhận Payment Link Razorpay
+# Cần cấu hình RAZORPAY_KEY_ID và RAZORPAY_KEY_SECRET.
 # @name subscribe
 POST {{baseUrl}}/api/subscriptions/subscribe
 Content-Type: {{contentType}}
@@ -176,25 +140,158 @@ Authorization: Bearer {{userToken}}
   "notes": "Đăng ký thử trên máy local"
 }
 
-> {% client.global.set("subscriptionId", response.body.id); %}
+> {% client.global.set("paymentId", response.body.paymentId); client.global.set("subscriptionId", response.body.subscriptionId); %}
 
-### 16. Kích hoạt đăng ký sau thanh toán giả lập (ADMIN)
-POST {{baseUrl}}/api/subscriptions/admin/activate/{{subscriptionId}}?paymentId=1
-Authorization: Bearer {{adminToken}}
+### 12. Xác minh thanh toán Razorpay
+# Sau khi thanh toán tại checkoutUrl của bước 11, thay giá trị bên dưới bằng mã pay_... thật.
+POST {{baseUrl}}/api/payments/verify
+Content-Type: {{contentType}}
+Authorization: Bearer {{userToken}}
 
-### 17. Xem gói đang hoạt động của bạn đọc
+{
+  "razorpayPaymentId": "pay_THAY_BANG_MA_THANH_TOAN_THAT"
+}
+
+### 13. Xem gói thành viên đã được kích hoạt
 GET {{baseUrl}}/api/subscriptions/user/active
 Authorization: Bearer {{userToken}}
 
-### 18. Xem danh sách đăng ký có phân trang (ADMIN)
-GET {{baseUrl}}/api/subscriptions/admin?page=0&size=10
-Authorization: Bearer {{adminToken}}
-
-### 19. Hủy đăng ký
-POST {{baseUrl}}/api/subscriptions/cancel/{{subscriptionId}}?reason=Kiem-thu-huy-goi
+### 14. Mượn sách
+# @name checkoutBook
+POST {{baseUrl}}/api/book-loans/checkout
+Content-Type: {{contentType}}
 Authorization: Bearer {{userToken}}
 
-### 20. Quên mật khẩu
+{
+  "bookId": {{bookId}},
+  "checkoutDays": 7,
+  "notes": "Mượn thử bằng test.http"
+}
+
+> {% client.global.set("bookLoanId", response.body.id); %}
+
+### 15. Người dùng thứ hai đặt chỗ vì sách đã hết
+# @name createReservation
+POST {{baseUrl}}/api/reservations
+Content-Type: {{contentType}}
+Authorization: Bearer {{reservationUserToken}}
+
+{
+  "bookId": {{bookId}},
+  "notes": "Chờ người dùng trước trả sách"
+}
+
+> {% client.global.set("reservationId", response.body.id); %}
+
+### 16. Gia hạn phiếu mượn
+POST {{baseUrl}}/api/book-loans/renew
+Content-Type: {{contentType}}
+Authorization: Bearer {{userToken}}
+
+{
+  "bookLoanId": {{bookLoanId}},
+  "extensionDays": 3,
+  "notes": "Gia hạn thử"
+}
+
+### 17. Trả sách; đặt chỗ đầu hàng sẽ chuyển sang AVAILABLE
+POST {{baseUrl}}/api/book-loans/checkin
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+{
+  "bookLoanId": {{bookLoanId}},
+  "condition": "RETURNED",
+  "notes": "Sách nguyên vẹn"
+}
+
+### 18. Người dùng thứ hai kiểm tra đặt chỗ
+GET {{baseUrl}}/api/reservations/my?activeOnly=true&page=0&size=20
+Authorization: Bearer {{reservationUserToken}}
+
+### 19. Đánh giá sách sau khi đã trả
+# @name createReview
+POST {{baseUrl}}/api/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{userToken}}
+
+{
+  "bookId": {{bookId}},
+  "rating": 5,
+  "title": "Một tác phẩm đáng đọc",
+  "reviewText": "Nội dung dễ đọc, thú vị và phù hợp để kiểm thử module đánh giá."
+}
+
+> {% client.global.set("reviewId", response.body.id); %}
+
+### 20. Xem đánh giá công khai của sách
+GET {{baseUrl}}/api/reviews/book/{{bookId}}?page=0&size=10
+
+### 21. Thêm sách vào danh sách yêu thích
+POST {{baseUrl}}/api/wishlist/add/{{bookId}}?notes=Doc-lai-sau
+Authorization: Bearer {{userToken}}
+
+### 22. Xem danh sách yêu thích
+GET {{baseUrl}}/api/wishlist/my-wishlist?page=0&size=10
+Authorization: Bearer {{userToken}}
+
+### 23. Tạo khoản phí xử lý để kiểm tra Fine (ADMIN)
+# @name createFine
+POST {{baseUrl}}/api/fines
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+{
+  "bookLoanId": {{bookLoanId}},
+  "type": "PROCESSING",
+  "amount": 25,
+  "reason": "Phí xử lý thử nghiệm",
+  "notes": "Khoản phạt dùng cho test.http"
+}
+
+> {% client.global.set("fineId", response.body.id); %}
+
+### 24. Xem khoản phạt của bạn đọc
+GET {{baseUrl}}/api/fines/my?status=PENDING
+Authorization: Bearer {{userToken}}
+
+### 25. Miễn khoản phạt (ADMIN)
+POST {{baseUrl}}/api/fines/waive
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+{
+  "fineId": {{fineId}},
+  "reason": "Miễn khoản phạt thử nghiệm"
+}
+
+### 26. Tra cứu phiếu mượn toàn hệ thống (ADMIN)
+POST {{baseUrl}}/api/book-loans/search
+Content-Type: {{contentType}}
+Authorization: Bearer {{adminToken}}
+
+{
+  "userId": {{userId}},
+  "page": 0,
+  "size": 20,
+  "sortBy": "createdAt",
+  "sortDirection": "DESC"
+}
+
+### 27. Tra cứu thanh toán toàn hệ thống (ADMIN)
+GET {{baseUrl}}/api/payments?page=0&size=10&sortBy=createdAt&sortDir=DESC
+Authorization: Bearer {{adminToken}}
+
+### 28. Hủy đặt chỗ sau khi đã kiểm tra trạng thái AVAILABLE
+DELETE {{baseUrl}}/api/reservations/{{reservationId}}
+Authorization: Bearer {{reservationUserToken}}
+
+### 29. Xóa sách khỏi danh sách yêu thích
+DELETE {{baseUrl}}/api/wishlist/remove/{{bookId}}
+Authorization: Bearer {{userToken}}
+
+### 30. Quên mật khẩu
+# Chỉ gửi thành công khi cấu hình SMTP hợp lệ.
 POST {{baseUrl}}/auth/forgot-password
 Content-Type: {{contentType}}
 

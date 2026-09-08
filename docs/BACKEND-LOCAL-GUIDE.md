@@ -1,129 +1,148 @@
 # Hướng dẫn chạy và kiểm thử Backend trên máy local
 
-Tài liệu này mô tả trạng thái backend hiện tại của dự án Library Management System. Phần frontend chưa nằm trong phạm vi của đợt sửa này.
+Thư mục backend: `D:\Codex\Library-Management-System`
 
-## 1. Những module backend đã có
+Backend mặc định: `http://localhost:5000`
 
-- Xác thực: đăng ký, đăng nhập, JWT, quên mật khẩu và đặt lại mật khẩu.
-- Người dùng: xem hồ sơ cá nhân; quản trị viên xem danh sách người dùng.
-- Thể loại: tạo, xem, cập nhật, ẩn và xóa vĩnh viễn.
-- Sách: tạo một/nhiều sách, xem, cập nhật, tìm kiếm, thống kê, ẩn và xóa vĩnh viễn.
-- Gói thành viên: tạo, xem, cập nhật và ẩn gói.
-- Đăng ký thành viên: đăng ký, kích hoạt, xem gói hiện tại, hủy và vô hiệu hóa gói hết hạn.
+Frontend dự kiến: `http://localhost:5173`
 
-Các module mượn sách, trả sách, đặt trước và thanh toán thật chưa có trong source hiện tại. Tham số `paymentId` ở API kích hoạt đăng ký mới là vị trí chờ để nối module thanh toán.
+## 1. Phần mềm cần có
 
-## 2. Cấu hình Database MySQL
+- JDK 17. Dự án đặt Java target 17; dùng đúng JDK 17 giúp tránh lỗi khóa file của compiler trên JDK 23/Windows.
+- MySQL 8.x.
+- IntelliJ IDEA hoặc terminal PowerShell.
+- Không cần cài Maven toàn máy vì dự án có `mvnw.cmd`.
 
-Schema chuẩn nằm tại [`database/library_db.sql`](../database/library_db.sql). File này đã có bảng `books` và các khóa ngoại cần thiết.
+Kiểm tra Java:
 
-Trong MySQL Workbench:
+```powershell
+java -version
+```
 
-1. Sao lưu database cũ nếu đang có dữ liệu cần giữ.
-2. Mở `database/library_db.sql`.
-3. Chạy script để tạo database `library_db` và các bảng.
-4. Kiểm tra bằng lệnh:
+## 2. Tạo database
+
+Schema đầy đủ nằm tại [`database/library_db.sql`](../database/library_db.sql). Trong MySQL Workbench, mở file và chạy toàn bộ nếu đây là database mới.
+
+Kiểm tra sau khi tạo:
 
 ```sql
 USE library_db;
 SHOW TABLES;
-DESCRIBE books;
 ```
 
-Danh sách bảng hiện tại: `genres`, `users`, `books`, `password_reset_tokens`, `subscription_plans`, `subscriptions`.
+Kết quả cần có 12 bảng: `genres`, `users`, `books`, `password_reset_tokens`, `subscription_plans`, `subscriptions`, `book_loans`, `book_reviews`, `fines`, `reservations`, `wishlists`, `payments`.
 
-## 3. Cấu hình chạy local
+Nếu database đang có dữ liệu thật, hãy export backup trước. Script dùng `CREATE TABLE IF NOT EXISTS`, vì vậy không xóa dữ liệu nhưng cũng không sửa được một bảng cũ đã có sai cột. Khi đó hãy so sánh bằng:
 
-Backend dùng Java 17 trở lên, Maven và MySQL. Cổng mặc định đã thống nhất là `5000`.
+```sql
+SHOW CREATE TABLE books;
+SHOW CREATE TABLE users;
+SHOW CREATE TABLE subscriptions;
+```
 
-Nếu chưa có file cấu hình local, chạy ở thư mục gốc dự án:
+## 3. Tạo cấu hình local
+
+Nếu chưa có file local:
 
 ```powershell
 Copy-Item src/main/resources/application.properties.example `
   src/main/resources/application.properties
 ```
 
-Sau đó điền tài khoản MySQL và email vào `application.properties`. File này đã được `.gitignore`, vì vậy mật khẩu local không được commit lên Git.
+`application.properties` đã được bỏ khỏi Git để tránh commit mật khẩu. Có thể cấu hình qua biến môi trường:
 
-Các biến quan trọng:
+| Biến | Công dụng |
+|---|---|
+| `MYSQL_HOST`, `MYSQL_USERNAME`, `MYSQL_PASSWORD` | Kết nối MySQL `library_db` |
+| `JPA_DDL_AUTO` | Local dùng `update`; production dùng `validate` |
+| `JWT_SECRET` | Khóa JWT dài tối thiểu 32 byte |
+| `FRONTEND_URL` | URL tạo link đặt lại mật khẩu |
+| `CORS_ALLOWED_ORIGINS` | Danh sách frontend được gọi API, cách nhau bằng dấu phẩy |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_FULL_NAME` | Tài khoản admin tạo lần đầu |
+| `INITIALIZE_ADMIN` | Bật/tắt tạo admin local |
+| `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` | SMTP gửi email |
+| `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` | Khóa Razorpay |
+| `RAZORPAY_CALLBACK_BASE_URL` | URL frontend nhận kết quả thanh toán |
+| `OVERDUE_FINE_PER_DAY` | Tiền phạt cho mỗi ngày quá hạn |
 
-| Biến | Giá trị mặc định | Ý nghĩa |
-|---|---|---|
-| `server.port` | `5000` | Cổng backend |
-| `MYSQL_HOST` | `localhost` | Máy chạy MySQL |
-| `MYSQL_USERNAME` | `root` | Tài khoản MySQL |
-| `MYSQL_PASSWORD` | rỗng | Mật khẩu MySQL |
-| `JWT_SECRET` | chuỗi mẫu | Khóa ký JWT, phải dài ít nhất 32 byte |
-| `FRONTEND_URL` | `http://localhost:5173` | Địa chỉ dùng trong link reset mật khẩu |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Các origin được gọi backend, phân cách bằng dấu phẩy |
-| `ADMIN_EMAIL` | `admin@gmail.com` | Email admin local được tạo lần đầu |
-| `ADMIN_PASSWORD` | `admin123` | Mật khẩu admin local được tạo lần đầu |
-| `INITIALIZE_ADMIN` | `true` | Bật/tắt tạo admin local |
+Ví dụ đặt biến trong phiên PowerShell hiện tại:
 
-Nên đổi `JWT_SECRET` và `ADMIN_PASSWORD` trước khi đưa ứng dụng ra ngoài máy local.
+```powershell
+$env:MYSQL_USERNAME = "root"
+$env:MYSQL_PASSWORD = "mat-khau-mysql-cua-ban"
+$env:JWT_SECRET = "mot-khoa-bi-mat-local-dai-it-nhat-32-byte"
+$env:ADMIN_PASSWORD = "mat-khau-admin-local"
+```
 
 ## 4. Chạy backend
 
-Mở terminal tại `Library-Management-System`:
-
 ```powershell
+Set-Location D:\Codex\Library-Management-System
 .\mvnw.cmd spring-boot:run
 ```
 
-Đường dẫn kiểm tra:
-
-- Backend: `http://localhost:5000`
-- Đăng ký: `POST http://localhost:5000/auth/signup`
-- Đăng nhập: `POST http://localhost:5000/auth/login`
-- Sách: `http://localhost:5000/api/books`
-- Thể loại: `http://localhost:5000/api/genres`
-- Gói thành viên: `http://localhost:5000/api/subscription-plan`
-- Đăng ký thành viên: `http://localhost:5000/api/subscriptions`
-
-Các API dưới `/api/**` cần header JWT:
+Kiểm tra:
 
 ```text
-Authorization: Bearer <token nhận được sau khi đăng nhập>
+GET http://localhost:5000/
 ```
 
-API tạo/sửa/xóa và các đường dẫn có `/admin` cần tài khoản mang quyền `ROLE_ADMIN`.
+Các API bảo vệ cần header:
 
-## 5. Kiểm thử tự động
+```text
+Authorization: Bearer <jwt nhận từ /auth/login>
+```
 
-Chạy toàn bộ test:
+## 5. Chạy test tự động
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-Test dùng H2 in-memory và `src/test/resources/application.properties`; chúng không kết nối, xóa hay thay đổi database MySQL local.
+Test dùng cấu hình [`src/test/resources/application.properties`](../src/test/resources/application.properties) và database H2 trong bộ nhớ. Lệnh test không đọc, sửa hay xóa MySQL local.
 
-Các nhóm được kiểm tra:
+Nếu máy đang dùng JDK 23 và compiler báo lỗi khóa một file `.jar`, hãy cấu hình IntelliJ Project SDK và `JAVA_HOME` về JDK 17, sau đó chạy lại:
 
-- Spring khởi động context, tạo entity và kiểm tra repository query.
-- Book service chặn ISBN trùng và số bản có sẵn lớn hơn tổng số bản.
-- Tìm sách tự gán phân trang mặc định nếu request thiếu dữ liệu.
-- Auth service mã hóa mật khẩu, tạo JWT, chặn email trùng và token reset hết hạn.
-- Subscription service chặn gói ngừng hoạt động và chặn người dùng hủy gói của người khác.
+```powershell
+.\mvnw.cmd clean test
+```
+
+Kết quả chuẩn hiện tại: **20 test, 0 failure, 0 error**.
 
 ## 6. Kiểm thử API thủ công
 
-Mở [`test.http`](../test.http) trong IntelliJ IDEA rồi chạy lần lượt từ mục 1 đến mục 20. File sẽ tự lưu `userToken`, `adminToken`, `genreId`, `bookId`, `planId` và `subscriptionId` từ response để dùng cho bước sau.
+Mở [`test.http`](../test.http) trong IntelliJ. Chạy theo thứ tự để file tự lưu `userToken`, `adminToken`, `genreId`, `bookId`, `planId`, `subscriptionId`, `bookLoanId`, `reservationId` và `fineId`.
 
-Nếu chạy lại và nhận lỗi trùng email, mã thể loại, ISBN hoặc mã gói, hãy đổi dữ liệu mẫu trong `test.http` hoặc xóa đúng bản ghi thử nghiệm trong MySQL.
+Luồng chính:
 
-Riêng API quên mật khẩu chỉ gửi mail thành công khi `MAIL_USERNAME` và `MAIL_PASSWORD` hợp lệ. Với Gmail, `MAIL_PASSWORD` phải là App Password. Đây là kết nối ra dịch vụ email thật, không nằm trong test tự động.
+1. Đăng ký và đăng nhập bạn đọc.
+2. Đăng nhập admin.
+3. Admin tạo thể loại, sách và gói thành viên.
+4. Tạo/kích hoạt gói thành viên.
+5. Mượn, gia hạn và trả sách.
+6. Đánh giá sách sau khi trả.
+7. Thêm/xóa wishlist.
+8. Hết sách thì tạo đặt chỗ; admin giao sách khi đặt chỗ chuyển sang `AVAILABLE`.
+9. Tạo/xem/miễn hoặc thanh toán khoản phạt.
+10. Tra cứu payment với phân trang.
 
-## 7. Các lỗi đã được sửa
+Luồng Razorpay thật cần khóa hợp lệ. API đăng ký gói trả về `checkoutUrl`; mở URL đó để thanh toán, sau đó frontend gửi `razorpayPaymentId` đến `POST /api/payments/verify`. Khi xác minh thành công, backend tự kích hoạt subscription hoặc đóng fine tương ứng.
 
-- Đồng bộ cổng trong file test từ `8083` sang `5000`.
-- Thêm `searchTerm` vào GET `/api/books`.
-- Tránh lỗi null khi POST tìm kiếm không truyền `page`, `size`, `sortBy` hoặc `sortDirection`.
-- Hoàn thiện `BookMapper.updateEntityFromDTO` và kiểm tra thể loại tồn tại.
-- Chặn ISBN trùng và số lượng sách không hợp lệ.
-- Chặn mã thể loại trùng, thể loại cha không tồn tại và trường hợp tự chọn chính mình làm cha.
-- Thêm validation cho signup, login, quên mật khẩu và reset mật khẩu.
-- Tách URL frontend, CORS và tài khoản admin local ra cấu hình.
-- Sửa JWT theo API JJWT 0.12.6 và chuẩn hóa phản hồi token sai thành HTTP 401.
-- Sửa luồng đăng ký thành viên, quyền hủy đăng ký và phân trang danh sách admin.
-- Đổi thông báo lỗi nghiệp vụ chính sang tiếng Việt.
+## 7. Endpoint chính
+
+| Module | Đường dẫn gốc |
+|---|---|
+| Auth | `/auth` |
+| User | `/api/user` |
+| Genre | `/api/genres` |
+| Book | `/api/books` |
+| Subscription Plan | `/api/subscription-plan` |
+| Subscription | `/api/subscriptions` |
+| Book Loan | `/api/book-loans` |
+| Reservation | `/api/reservations` |
+| Fine | `/api/fines` |
+| Payment | `/api/payments` |
+| Review | `/api/reviews` |
+| Wishlist | `/api/wishlist` |
+
+Các endpoint ghi sách/thể loại, quản lý toàn bộ phiếu mượn, đặt chỗ, tiền phạt, payment và gói thành viên cần `ROLE_ADMIN`. Người dùng thường chỉ thao tác dữ liệu của chính mình.

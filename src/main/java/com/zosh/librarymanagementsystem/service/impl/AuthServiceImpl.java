@@ -1,6 +1,6 @@
 package com.zosh.librarymanagementsystem.service.impl;
 
-import com.zosh.librarymanagementsystem.configration.JwtProvider;
+import com.zosh.librarymanagementsystem.configuration.JwtProvider;
 import com.zosh.librarymanagementsystem.domain.UserRole;
 import com.zosh.librarymanagementsystem.exception.UserException;
 import com.zosh.librarymanagementsystem.mapper.UserMapper;
@@ -46,13 +46,11 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication = authenticate(username, password);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-   //     Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-   //     String role = authorities.iterator().next().getAuthority();
         String token = jwtProvider.generateToken(authentication);
 
         User user = userRepository.findByEmail(username);
 
-    //   update last login
+        // Cập nhật lần đăng nhập gần nhất.
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 

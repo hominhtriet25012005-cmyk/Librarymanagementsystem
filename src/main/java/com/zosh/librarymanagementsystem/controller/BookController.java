@@ -51,21 +51,15 @@ public class BookController {
         return ResponseEntity.ok(updateBook);
     }
 
-    /**
-     * Soft delete a book (mark as inactive)
-     * DELETE /api/books/{id}
-     */
+    /** Ẩn sách bằng cách chuyển sang trạng thái không hoạt động. */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteBook(@PathVariable Long id) throws BookException {
         bookService.deleteBook(id);
         return ResponseEntity.ok(new ApiResponse("Đã ẩn sách thành công", true));
     }
 
-    /**
-     *  Permanently delete a book
-     * DELETE /api/books/{id}/permanent
-     */
-    @DeleteMapping({"/{id}/permanent", "/{id}/permaent"})
+    /** Xóa vĩnh viễn sách khỏi database. */
+    @DeleteMapping("/{id}/permanent")
     public ResponseEntity<ApiResponse> hardDeleteBook(@PathVariable Long id) throws BookException {
         bookService.hardDeleteBook(id);
         return ResponseEntity.ok(new ApiResponse("Đã xóa vĩnh viễn sách", true));

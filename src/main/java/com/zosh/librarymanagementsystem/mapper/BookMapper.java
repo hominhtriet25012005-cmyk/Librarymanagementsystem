@@ -70,7 +70,7 @@ public class BookMapper {
         book.setAvailableCopies(dto.getAvailableCopies());
         book.setPrice(dto.getPrice());
         book.setCoverImageUrl(dto.getCoverImageUrl());
-        book.setActive(true); // Default to active
+        book.setActive(true); // Sách mới mặc định được phép hiển thị và cho mượn.
 
         return book;
     }

@@ -4,6 +4,8 @@ import com.zosh.librarymanagementsystem.modal.SubscriptionPlan;
 import com.zosh.librarymanagementsystem.payload.dto.SubscriptionPlanDTO;
 import org.springframework.stereotype.Component;
 
+import java.util.Locale;
+
 @Component
 public class SubscriptionPlanMapper {
 
@@ -47,7 +49,7 @@ public class SubscriptionPlanMapper {
         plan.setDescription(dto.getDescription());
         plan.setDurationDays(dto.getDurationDays());
         plan.setPrice(dto.getPrice());
-        plan.setCurrency(dto.getCurrency() != null ? dto.getCurrency() : "INR");
+        plan.setCurrency(normalizeCurrency(dto.getCurrency()));
         plan.setMaxBooksAllowed(dto.getMaxBooksAllowed());
         plan.setMaxDaysPerBook(dto.getMaxDaysPerBook());
         plan.setDisplayOrder(dto.getDisplayOrder() != null ? dto.getDisplayOrder() : 0);
@@ -61,15 +63,13 @@ public class SubscriptionPlanMapper {
         return plan;
     }
 
-    /**
-     * Update entity from DTO (for update operations)
-     */
+    /** Cập nhật entity gói thành viên từ DTO. */
     public void updateEntity(SubscriptionPlan plan, SubscriptionPlanDTO dto) {
         if (plan == null || dto == null) {
             return;
         }
 
-        // Don't update ID or planCode (immutable after creation)
+        // Không đổi ID; mã gói được giữ ổn định sau khi tạo.
         if (dto.getName() != null) {
             plan.setName(dto.getName());
         }
@@ -83,7 +83,7 @@ public class SubscriptionPlanMapper {
             plan.setPrice(dto.getPrice());
         }
         if (dto.getCurrency() != null) {
-            plan.setCurrency(dto.getCurrency());
+            plan.setCurrency(normalizeCurrency(dto.getCurrency()));
         }
         if (dto.getMaxBooksAllowed() != null) {
             plan.setMaxBooksAllowed(dto.getMaxBooksAllowed());
@@ -109,5 +109,11 @@ public class SubscriptionPlanMapper {
         if (dto.getUpdatedBy() != null) {
             plan.setUpdatedBy(dto.getUpdatedBy());
         }
+    }
+
+    private String normalizeCurrency(String currency) {
+        return currency == null || currency.isBlank()
+                ? "INR"
+                : currency.trim().toUpperCase(Locale.ROOT);
     }
 }

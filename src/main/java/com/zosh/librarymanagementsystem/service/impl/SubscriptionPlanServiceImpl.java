@@ -68,4 +68,11 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
                 planMapper::toDTO
         ).collect(Collectors.toList());
     }
+
+    @Override
+    public SubscriptionPlan getBySubscriptionPlanCode(String subscriptionPlanCode) {
+        return planRepository.findByPlanCode(subscriptionPlanCode)
+                .orElseThrow(() -> new SubscriptionException(
+                        "Không tìm thấy gói thành viên có mã " + subscriptionPlanCode));
+    }
 }

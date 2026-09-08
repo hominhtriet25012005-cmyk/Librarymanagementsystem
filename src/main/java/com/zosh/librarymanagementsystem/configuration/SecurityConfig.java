@@ -1,4 +1,4 @@
-package com.zosh.librarymanagementsystem.configration;
+package com.zosh.librarymanagementsystem.configuration;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.jspecify.annotations.Nullable;
@@ -38,6 +38,34 @@ public class SecurityConfig {
                 ))
 
                 .authorizeHttpRequests(Authorize -> Authorize
+                        // Các API tra cứu công khai phục vụ trang danh mục sách.
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/books/**", "/api/genres/**", "/api/subscription-plan/**",
+                                "/api/reviews/book/**")
+                        .permitAll()
+
+                        // Nghiệp vụ mượn/trả và tra cứu toàn hệ thống dành cho quản trị viên.
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/book-loans/checkout/user/**",
+                                "/api/book-loans/checkin",
+                                "/api/book-loans/search",
+                                "/api/book-loans/admin/**")
+                        .hasRole("ADMIN")
+
+                        // Quản trị đặt chỗ hộ, giao sách và tra cứu toàn bộ hàng chờ.
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/reservations/user/**", "/api/reservations/*/fulfill")
+                        .hasRole("ADMIN")
+                        .requestMatchers("/api/reservations/admin/**")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/reservations")
+                        .hasRole("ADMIN")
+
+                        // Tạo/miễn phạt, xem toàn bộ phạt và xem toàn bộ thanh toán là quyền quản trị.
+                        .requestMatchers(HttpMethod.POST, "/api/fines", "/api/fines/waive")
+                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/fines", "/api/payments")
+                        .hasRole("ADMIN")
                         .requestMatchers("/api/subscription-plan/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/subscriptions/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/list").hasRole("ADMIN")

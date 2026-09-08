@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class BookServiceImpl implements BookService {
     private final BookMapper bookMapper;
 
     @Override
+    @Transactional
     public BookDTO createBook(BookDTO bookDTO) throws BookException {
 
         if (bookRepository.existsByIsbn(bookDTO.getIsbn())) {
@@ -42,6 +44,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public List<BookDTO> createBookBulk(List<BookDTO> bookDTOs) throws BookException {
 
         List<BookDTO> createdBooks= new ArrayList<>();
@@ -67,6 +70,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public BookDTO updateBook(Long bookId, BookDTO bookDTO) throws BookException {
         Book existingBook=bookRepository.findById(bookId).orElseThrow(
                 ()-> new BookException("Không tìm thấy sách")
@@ -78,6 +82,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public void deleteBook(Long bookId) throws BookException {
         Book existingBook=bookRepository.findById(bookId).orElseThrow(
                 ()-> new BookException("Không tìm thấy sách")
@@ -87,6 +92,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public void hardDeleteBook(Long bookId) throws BookException {
         Book existingBook=bookRepository.findById(bookId).orElseThrow(
                 ()-> new BookException("Không tìm thấy sách")

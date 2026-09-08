@@ -22,20 +22,24 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "plan_id", nullable = false)
     private SubscriptionPlan plan;
 
+    @Column(nullable = false, length = 100)
     private String planName;
 
+    @Column(nullable = false, length = 100)
     private String planCode;
 
+    @Column(nullable = false)
     private Long price;
 
+    @Column(nullable = false, length = 3)
     private String currency;
 
     @Column(nullable = false)
@@ -54,7 +58,9 @@ public class Subscription {
     @Builder.Default
     private Boolean isActive = true;
 
-    private Boolean autoRenew;
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean autoRenew = false;
 
     private LocalDateTime cancelledAt;
 

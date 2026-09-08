@@ -30,12 +30,15 @@ public class Genre {
     private String code;
 
     @NotBlank(message = "Tên thể loại là bắt buộc")
+    @Column(nullable = false, length = 100)
     private String name;
 
     @Size(max = 500,message = "Mô tả không được vượt quá 500 ký tự")
+    @Column(length = 500)
     private String description;
 
     @Min(value = 0, message = "Thứ tự hiển thị không được âm")
+    @Column(nullable = false)
     @Builder.Default
     private Integer displayOrder=0;
 
@@ -52,9 +55,11 @@ public class Genre {
     private List<Genre> subGenres=new ArrayList<>();
 
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
 }

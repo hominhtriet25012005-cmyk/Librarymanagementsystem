@@ -43,8 +43,6 @@ public class GenreMapper {
 
         }
 
-//        dto.setBookCount((long) (savedGenre.getB));
-
         return dto;
     }
 

@@ -1,4 +1,4 @@
-package com.zosh.librarymanagementsystem.configration;
+package com.zosh.librarymanagementsystem.configuration;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

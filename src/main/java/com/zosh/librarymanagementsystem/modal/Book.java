@@ -23,7 +23,7 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private String isbn;
 
     @Column(nullable = false)
@@ -36,10 +36,12 @@ public class Book {
     @ManyToOne
     private Genre genre;
 
+    @Column(length = 100)
     private String publisher;
 
     private LocalDate publishedDate;
 
+    @Column(length = 20)
     private String language;
 
     private Integer pages;
@@ -53,6 +55,7 @@ public class Book {
     @Column(nullable = false)
     private Integer availableCopies;
 
+    @Column(precision = 12, scale = 2)
     private BigDecimal price;
 
     @Column(length = 500)

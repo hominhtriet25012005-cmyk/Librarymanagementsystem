@@ -21,7 +21,7 @@ public class SubscriptionPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 100)
     private String planCode;
 
     @Column(nullable = false, length = 100)
@@ -38,6 +38,7 @@ public class SubscriptionPlan {
     @Positive(message = "Giá gói phải lớn hơn 0")
     private Long price;
 
+    @Column(nullable = false, length = 3)
     @Builder.Default
     private String currency="INR";
 
@@ -49,25 +50,36 @@ public class SubscriptionPlan {
     @Positive(message = "Số ngày mượn tối đa phải lớn hơn 0")
     private Integer maxDaysPerBook;
 
+    @Column(nullable = false)
     @Builder.Default
     private Integer displayOrder=0;
 
+    @Column(nullable = false)
     @Builder.Default
     private Boolean isActive=true;
+
+    @Column(nullable = false)
     @Builder.Default
     private Boolean isFeatured=false;
 
+    @Column(length = 255)
     private String badgeText;
 
+    @Column(length = 255)
     private String adminNotes;
 
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(length = 150)
     private String createdBy;
+
+    @Column(length = 150)
     private String updatedBy;
 
 }

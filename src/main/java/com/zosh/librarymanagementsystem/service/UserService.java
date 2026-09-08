@@ -8,5 +8,7 @@ import java.util.List;
 public interface UserService {
 
    User getCurrentUser();
-   public List<UserDTO> getAllUsers();
+   List<UserDTO> getAllUsers();
+
+   User findById(Long id);
 }
