@@ -1,7 +1,7 @@
 import { Avatar, Box, Divider, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
-import { AdminPanelSettings, Login, Logout, MenuBook } from "@mui/icons-material";
+import { Login, Logout, MenuBook } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
-import { navigationItems, secondaryItems } from "./NavigationItems";
+import { adminNavigationItems, navigationItems, secondaryItems } from "./NavigationItems";
 import { isActive } from "./util";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -10,15 +10,16 @@ export default function SidebarDrawer({ onNavigate }) {
   const location = useLocation();
   const navigate = useNavigate();
   const go = (path) => { navigate(path); onNavigate?.(); };
-  const items = user ? [...navigationItems, ...secondaryItems] : navigationItems.filter((item) => item.path === "/books");
-  if (isAdmin) items.push(
-    { title: "Quản trị", path: "/admin", icon: <AdminPanelSettings /> },
-    { title: "Quản lý sách", path: "/admin/books", icon: <MenuBook /> },
-  );
+  const inAdminArea = isAdmin && location.pathname.startsWith("/admin");
+  const items = inAdminArea
+    ? adminNavigationItems
+    : user
+      ? [...navigationItems, ...secondaryItems]
+      : navigationItems.filter((item) => item.path === "/books");
   return <Box sx={{ minHeight: "100%", background: "linear-gradient(180deg,#1e293b,#0f172a)", color: "white", p: 2 }}>
     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 2 }}>
       <Avatar sx={{ bgcolor: "#4f46e5" }}><MenuBook /></Avatar>
-      <div><Typography sx={{ fontWeight: 700 }}>Thư viện sách</Typography><Typography variant="caption">Cùng bạn mở trang mới</Typography></div>
+      <div><Typography sx={{ fontWeight: 700 }}>{inAdminArea ? "Quản trị thư viện" : "Thư viện sách"}</Typography><Typography variant="caption">{inAdminArea ? "Trung tâm điều hành" : "Cùng bạn mở trang mới"}</Typography></div>
     </Box>
     <List aria-label="Điều hướng chính">
       {items.map((item) => <ListItemButton key={item.path} selected={isActive(item.path, location)} onClick={() => go(item.path)}

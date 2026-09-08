@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppBar, Avatar, Button, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material";
 import { Menu as MenuIcon, Search } from "@mui/icons-material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { navigationItems, secondaryItems } from "./NavigationItems";
+import { adminNavigationItems, navigationItems, secondaryItems } from "./NavigationItems";
 import { isActive } from "./util";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -12,7 +12,7 @@ export default function Navbar({ handleDrawerToggle }) {
   const navigate = useNavigate();
   const [anchor, setAnchor] = useState(null);
   const go = (path) => { setAnchor(null); navigate(path); };
-  const title = [...navigationItems, ...secondaryItems, { path: "/admin", title: "Quản trị" }]
+  const title = [...adminNavigationItems, ...navigationItems, ...secondaryItems]
     .find((item) => isActive(item.path, location))?.title || "Thư viện sách";
   return <AppBar position="fixed" sx={{
     width: { md: "calc(100% - 240px)" }, ml: { md: "240px" },

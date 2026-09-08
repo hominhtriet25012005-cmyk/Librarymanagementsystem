@@ -13,6 +13,12 @@ function mount(path, role) {
   httpClient.defaults.adapter = async (config) => {
     let data = { content: [], pageNumber: 0, totalPages: 0, totalElements: 0 };
     if (config.url === "/api/user/profile") data = { ...profile, role };
+    else if (config.url === "/api/books/stats") data = { totalActiveBooks: 4, totalAvailableBooks: 3 };
+    else if (config.url === "/api/genres/count") data = 2;
+    else if (config.url === "/api/user/list") data = [{ ...profile, role }];
+    else if (config.url === "/api/book-loans/search") data = { content: [], pageNumber: 0, totalPages: 0, totalElements: 0 };
+    else if (config.url === "/api/reservations") data = { content: [], pageNumber: 0, totalPages: 0, totalElements: 0 };
+    else if (config.url === "/api/fines") data = { content: [], pageNumber: 0, totalPages: 0, totalElements: 0 };
     else if (config.url === "/api/genres") data = [];
     else if (config.url === "/api/subscriptions/user/active") data = { isValid: true, maxDaysPerBook: 14 };
     else if (config.url === "/api/book-loans/my" && !config.params.status) data = { content: [{ id: 1, bookId: 4, bookTitle: "Sách từ API", status: "CHECKED_OUT", renewalCount: 0, maxRenewals: 2 }], pageNumber: 0, totalPages: 1, totalElements: 1 };
@@ -41,13 +47,13 @@ it("trang hồ sơ hiển thị tài khoản thật, menu đăng xuất hoạt �
 });
 it("admin đang đăng nhập được chuyển từ trang login đến khu vực quản trị", async () => {
   mount("/login", "ROLE_ADMIN");
-  expect(await screen.findByRole("heading", { name: "Quản lý sách" })).toBeTruthy();
+  expect(await screen.findByRole("heading", { name: "Tổng quan quản trị" })).toBeTruthy();
 });
 
-it("đường dẫn quản trị mặc định chuyển đến trang quản lý sách", async () => {
+it("đường dẫn quản trị mặc định chuyển đến trang tổng quan", async () => {
   mount("/admin", "ROLE_ADMIN");
-  expect(await screen.findByRole("heading", { name: "Quản lý sách" })).toBeTruthy();
-  expect(screen.getByRole("button", { name: "Tạo sách mới" })).toBeTruthy();
+  expect(await screen.findByRole("heading", { name: "Tổng quan quản trị" })).toBeTruthy();
+  expect(screen.getByRole("link", { name: "Quản lý sách" })).toBeTruthy();
 });
 it("bạn đọc bị chặn khi nhập thẳng địa chỉ quản trị", async () => {
   mount("/admin", "ROLE_USER");
