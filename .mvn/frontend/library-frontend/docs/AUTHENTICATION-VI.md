@@ -55,7 +55,7 @@ Frontend mặc định ở http://localhost:5173. Biến `VITE_API_BASE_URL` m�
 
 Kết quả: 26/26 test đạt, lint sạch và production build thành công. Các test tự động dùng Axios adapter giả lập và DOM thử nghiệm; không gửi email hoặc thay đổi MySQL thật. Đã kiểm tra trực tiếp màn hình đăng nhập/đăng ký, lỗi biểu mẫu trống và thông báo thiếu token trong trình duyệt. Tích hợp với MySQL và dịch vụ gửi email thật cần kiểm tra ở môi trường đã cấu hình riêng.
 
-Dashboard, Loans và Reservations vẫn dùng dữ liệu minh họa, được ghi rõ trên màn hình. Các nút nghiệp vụ chưa có xử lý đã được vô hiệu hóa. Giai đoạn tiếp theo: chi tiết sách và kết nối nghiệp vụ mượn/đặt trước.
+Dashboard vẫn dùng dữ liệu minh họa. Các trang phiếu mượn, đặt trước, yêu thích, đánh giá và tiền phạt đã kết nối backend trong giai đoạn 3; xem [hướng dẫn hoạt động thư viện](LIBRARY-ACTIVITY-VI.md).
 
 ## Tài liệu kỹ thuật tham khảo
 

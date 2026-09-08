@@ -12,6 +12,8 @@ const BookPage = lazy(() => import("./pages/Books/BookPage"));
 const BookDetail = lazy(() => import("./pages/Books/BookDetail"));
 const MyLoans = lazy(() => import("./pages/Loans/MyLoans"));
 const MyReservations = lazy(() => import("./pages/Reservations/MyReservations"));
+const MyFines = lazy(() => import("./pages/Fines/MyFines"));
+const WishlistPage = lazy(() => import("./pages/Wishlist/WishlistPage"));
 
 export default function App() {
   return <Suspense fallback={<div role="status" className="p-8 text-center">Đang tải giao diện...</div>}>
@@ -29,9 +31,9 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="my-loans" element={<MyLoans />} />
           <Route path="my-reservations" element={<MyReservations />} />
-          <Route path="my-fines" element={<ModulePlaceholder title="Tiền phạt của tôi" />} />
+          <Route path="my-fines" element={<MyFines />} />
           <Route path="subscriptions" element={<ModulePlaceholder title="Gói thành viên" />} />
-          <Route path="wishlist" element={<ModulePlaceholder title="Danh sách yêu thích" />} />
+          <Route path="wishlist" element={<WishlistPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="settings" element={<ModulePlaceholder title="Cài đặt" />} />
           <Route path="forbidden" element={<ForbiddenPage />} />

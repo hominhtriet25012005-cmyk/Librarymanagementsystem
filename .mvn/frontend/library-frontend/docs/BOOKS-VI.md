@@ -54,4 +54,4 @@ npm run build
 
 ## Phạm vi tiếp theo
 
-Các trang **Sách tôi đã mượn**, **Sách đã đặt trước**, **Tổng quan** vẫn dùng dữ liệu minh họa có nhãn. Giai đoạn 3 sẽ kết nối danh sách/lịch sử và các nghiệp vụ tiếp theo; phiếu mới hiện được xác nhận ngay tại trang chi tiết. Trang đăng ký và thanh toán gói trực tuyến thuộc giai đoạn 4. Không có thanh toán tự động trong luồng mượn/đặt trước này.
+Các trang **Sách tôi đã mượn**, **Sách đã đặt trước**, **Yêu thích**, **Tiền phạt** và phần đánh giá đã được kết nối trong giai đoạn 3. Xem [hướng dẫn hoạt động thư viện](LIBRARY-ACTIVITY-VI.md). Trang **Tổng quan** vẫn có nhãn dữ liệu minh họa. Trang đăng ký gói và quy trình xác minh thanh toán đầy đủ thuộc giai đoạn 4.

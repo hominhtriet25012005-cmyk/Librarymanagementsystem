@@ -37,6 +37,8 @@ function mount({ guest = false, data = book, subscription = plan, loans = [], re
       }
       else if (config.url === "/api/book-loans/my") result = pageOf(loans.filter((loan) => loan.status === config.params.status));
       else if (config.url === "/api/reservations/my") result = pageOf(reservations);
+      else if (config.url === "/api/wishlist/my-wishlist") result = pageOf([]);
+      else if (config.url === "/api/reviews/book/42") result = pageOf([]);
       else if (config.url === "/api/book-loans/checkout") result = { id: 501, bookId: 42, dueDate: "2026-12-20" };
       else if (config.url === "/api/reservations") result = { id: 601, bookId: 42, queuePosition: 2 };
       else throw new Error(`API chưa được mô phỏng: ${config.url}`);

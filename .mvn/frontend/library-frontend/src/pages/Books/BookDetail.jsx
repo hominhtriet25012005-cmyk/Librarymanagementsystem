@@ -7,6 +7,8 @@ import { SessionStatus } from "../../auth/RouteGuards";
 import { formatDate } from "../../utils/locale";
 import BookCover from "./BookCover";
 import BookActions from "./BookActions";
+import BookReviews from "./BookReviews";
+import WishlistButton from "./WishlistButton";
 
 export default function BookDetail() {
   const { id } = useParams();
@@ -41,7 +43,7 @@ function DetailContent({ id }) {
       : <>
         {loading && <p role="status" className="py-10">Đang tải thông tin sách...</p>}
         {error && <Alert severity="error" className="my-4" action={<Button color="inherit" onClick={refresh}>Thử lại</Button>}>{error}</Alert>}
-        {book && <div className="mt-6 grid gap-8 lg:grid-cols-[280px_1fr]">
+        {book && <><div className="mt-6 grid gap-8 lg:grid-cols-[280px_1fr]">
           <BookCover book={book} className="h-96 rounded-2xl border border-indigo-100" />
           <div className="min-w-0">
             <div className="mb-3 flex flex-wrap gap-2">
@@ -59,11 +61,12 @@ function DetailContent({ id }) {
             </dl>
             <h2 className="text-xl font-semibold">Giới thiệu sách</h2>
             <p className="mb-8 mt-3 whitespace-pre-wrap break-words leading-relaxed text-slate-600">{book.description || "Chưa có nội dung giới thiệu cho cuốn sách này."}</p>
+            {status === "authenticated" && <WishlistButton key={`wishlist-${user.id}`} bookId={book.id} />}
             {status === "loading" || status === "error" ? <SessionStatus />
               : status === "guest" ? <Alert severity="info" action={<Button component={Link} to="/login" state={{ from: `/books/${id}` }}>Đăng nhập</Button>}>Đăng nhập để mượn sách hoặc đặt trước.</Alert>
                 : <BookActions key={user.id} book={book} onRefresh={refresh} />}
           </div>
-        </div>}
+        </div><BookReviews bookId={book.id} authStatus={status} user={user} /></>}
       </>}
   </section>;
 }

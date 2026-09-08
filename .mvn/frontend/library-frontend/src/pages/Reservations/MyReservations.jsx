@@ -1,119 +1,65 @@
-import { AccessAlarm, Book, CalendarToday } from '@mui/icons-material';
-import React from 'react';
-import { tabs } from "./tabs";
-import { myReservation } from "./reservation";
+import { useEffect, useRef, useState } from "react";
+import { Alert, Button, Card, Dialog, DialogActions, DialogContent, DialogTitle, Pagination, Tab, Tabs } from "@mui/material";
+import { getApiErrorMessage, reservationsApi } from "../../api";
 import MyReservationCard from "./MyReservationCard";
+import { tabs } from "./tabs";
 
-const MyReservations = () => {
-    const state = { total: myReservation.length, active: myReservation.filter((item) => item.status === "PENDING").length, available: myReservation.filter((item) => item.status === "AVAILABLE").length };
-    const [activeTab, setActiveTab] = React.useState(0);
+const EMPTY_PAGE = { content: [], pageNumber: 0, totalElements: 0, totalPages: 0 };
 
-    return (
-        <div className='min-h-screen py-8'>
-            <div className="px-4 sm:px-6 lg:px-8">
+export default function MyReservations() {
+  const [tab, setTab] = useState(0);
+  const [page, setPage] = useState(0);
+  const [data, setData] = useState(EMPTY_PAGE);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [revision, setRevision] = useState(0);
+  const [uncertainIds, setUncertainIds] = useState(() => new Set());
+  const submitting = useRef(false);
+  const status = tabs[tab].value;
 
-                {/* header */}
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center space-x-3">
-                        <span aria-hidden="true" className="text-5xl">📑</span>
-                        <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                            Sách đã đặt trước
-                        </span>
-                    </h1>
+  useEffect(() => {
+    let active = true;
+    reservationsApi.getMine({ status, page, size: 9, sortBy: "reservedAt", sortDirection: "DESC" })
+      .then((result) => { if (active) { setData(result); setUncertainIds(new Set()); } })
+      .catch((e) => { if (active) { setData(EMPTY_PAGE); setError(getApiErrorMessage(e, "Không tải được danh sách đặt trước.")); } })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [page, revision, status]);
 
-                    <p className="text-lg text-gray-600">
-                        Theo dõi trạng thái và thứ tự chờ của các yêu cầu đặt sách
-                    </p>
-                </div>
+  async function cancelReservation() {
+    if (!selected || submitting.current) return;
+    submitting.current = true;
+    setBusy(true);
+    try {
+      await reservationsApi.cancel(selected.id);
+      setSelected(null);
+      setNotice({ severity: "success", text: `Đã hủy đặt trước sách “${selected.bookTitle}”.` });
+      setLoading(true); setRevision((value) => value + 1);
+    } catch (e) {
+      setSelected(null);
+      const uncertain = !e.response || e.response.status >= 500;
+      if (uncertain) setUncertainIds((current) => new Set(current).add(selected.id));
+      setNotice({ severity: uncertain ? "warning" : "error", text: uncertain
+        ? "Chưa xác nhận được kết quả hủy. Hãy tải lại danh sách trước khi thao tác tiếp."
+        : getApiErrorMessage(e, "Không thể hủy đặt trước.") });
+    } finally {
+      submitting.current = false;
+      setBusy(false);
+    }
+  }
 
-                <p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">Danh sách đặt trước bên dưới là dữ liệu minh họa.</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-
-                    {/* 1. Reservation */}
-                    <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Tổng lượt đặt</p>
-                                <p className="text-4xl font-extrabold text-gray-900 mt-1">{state.total}</p>
-                            </div>
-
-                            <div className="p-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg">
-                                <Book className="w-8 h-8 text-white" />
-                            </div>
-
-                        </div>
-                    </div>
-
-                    {/* 2. Active */}
-                    <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                                    Đang chờ
-                                </p>
-                                <p className="text-4xl font-extrabold text-gray-900 mt-1">
-                                    {state.active}
-                                </p>
-                            </div>
-
-                            <div className="p-4 bg-gradient-to-br from-yellow-400 to-amber-400 rounded-xl shadow-lg">
-                                <AccessAlarm className="w-8 h-8 text-white" />
-                            </div>
-
-                        </div>
-                    </div>
-
-                    {/* 3. Sẵn sàng nhận */}
-                    <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                                    Sẵn sàng nhận
-                                </p>
-                                <p className="text-4xl font-extrabold text-gray-900 mt-1">
-                                    {state.available}</p>
-                            </div>
-
-                            <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
-                                <CalendarToday className="w-8 h-8 text-white" />
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-
-                {/* Tabs */}
-                <div className="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
-                    <div className="flex border-b border-gray-200">
-                        {tabs.map((tab, index) =>
-                        (<button
-                            onClick={() => setActiveTab(index)}
-                            key={index}
-                            className={`flex-1 px-2 sm:px-6 py-4 font-semibold text-base flex items-center ${
-                                activeTab === index
-                                    ? "text-indigo-600 border-b-4 border-indigo-600 bg-indigo-50"
-                                    : "text-gray-600 hover:bg-gray-50"
-                            }`}>
-                            {tab.icon}
-                            {tab.label}
-                        </button>
-                        ))}
-
-
-                    </div>
-                </div>
-
-
-                {/* Content - Reservation List */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {myReservation.filter((item) => activeTab === 0 || (activeTab === 1 ? ["PENDING", "AVAILABLE"].includes(item.status) : ["FULFILLED", "EXPIRED", "CANCELLED"].includes(item.status))).map((reservation) => (
-                        <MyReservationCard key={reservation.id} reservation={reservation} />
-                    ))}
-                </div>
-            </div>
-        </div>
-    )
+  return <section aria-labelledby="reservations-title" className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+    <header className="mb-8"><h1 id="reservations-title" className="text-4xl font-bold text-slate-900">Sách đã đặt trước</h1><p className="mt-2 text-lg text-slate-600">Theo dõi hàng chờ, hạn nhận sách và hủy yêu cầu còn hiệu lực.</p></header>
+    {notice && <Alert severity={notice.severity} className="mb-4" action={notice.severity === "warning" ? <Button onClick={() => { setLoading(true); setRevision((value) => value + 1); }}>Tải lại</Button> : undefined}>{notice.text}</Alert>}
+    <Card className="mb-6"><Tabs value={tab} onChange={(_, value) => { setLoading(true); setError(""); setTab(value); setPage(0); setNotice(null); }} aria-label="Trạng thái đặt trước" variant="scrollable" scrollButtons="auto">{tabs.map((item) => <Tab key={item.label} label={item.label} />)}</Tabs></Card>
+    {loading ? <p role="status" className="py-10 text-center">Đang tải danh sách đặt trước...</p>
+      : error ? <Alert severity="error" action={<Button onClick={() => { setLoading(true); setRevision((value) => value + 1); }}>Thử lại</Button>}>{error}</Alert>
+        : data.content.length === 0 ? <Alert severity="info">Không có đặt trước ở trạng thái này.</Alert>
+          : <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">{data.content.map((item) => <MyReservationCard key={item.id} reservation={item} onCancel={setSelected} cancelBlocked={uncertainIds.has(item.id)} />)}</div>}
+    {data.totalPages > 1 && <Pagination className="mt-8 flex justify-center" page={data.pageNumber + 1} count={data.totalPages} onChange={(_, value) => { setLoading(true); setPage(value - 1); }} />}
+    <Dialog open={!!selected} onClose={() => { if (!busy) setSelected(null); }} fullWidth maxWidth="xs"><DialogTitle>Xác nhận hủy đặt trước</DialogTitle><DialogContent>Bạn muốn hủy đặt trước sách “{selected?.bookTitle}”?</DialogContent><DialogActions><Button disabled={busy} onClick={() => setSelected(null)}>Giữ lại</Button><Button color="error" variant="contained" disabled={busy} onClick={cancelReservation}>{busy ? "Đang hủy..." : "Hủy đặt trước"}</Button></DialogActions></Dialog>
+  </section>;
 }
-
-export default MyReservations

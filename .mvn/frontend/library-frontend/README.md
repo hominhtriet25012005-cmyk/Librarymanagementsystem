@@ -52,13 +52,13 @@ src/
 
 Kho sách và Chi tiết sách đã dùng API thật. Từ `/books`, chọn **Xem chi tiết** để mượn sách hoặc đặt trước bằng tài khoản đang đăng nhập. Trang chi tiết đọc các phiếu và gói thành viên thật để kiểm tra điều kiện, rồi hiển thị mã phiếu khi thao tác thành công.
 
-Các trang danh sách **Sách tôi đã mượn**, **Sách đã đặt trước** và **Tổng quan** vẫn hiển thị dữ liệu minh họa có thông báo. Phiếu mới chưa xuất hiện trên các trang này; phần danh sách sẽ được kết nối trong giai đoạn 3.
+Các trang **Sách tôi đã mượn**, **Sách đã đặt trước**, **Yêu thích**, **Tiền phạt** và phần **Đánh giá** trong chi tiết sách đã dùng API thật. Trang **Tổng quan** vẫn hiển thị dữ liệu minh họa có thông báo và sẽ được thay khi xây dựng thống kê tổng hợp.
 
 ## Các giai đoạn tiếp theo
 
 1. Đã hoàn thiện tài khoản và Việt hóa giao diện. Xem [hướng dẫn giai đoạn 1](docs/AUTHENTICATION-VI.md).
 2. Đã hoàn thiện chi tiết sách, mượn sách và đặt trước. Xem [hướng dẫn giai đoạn 2](docs/BOOKS-VI.md).
-3. Kết nối Loans, Reservations, Wishlist, Reviews và Fines.
+3. Đã kết nối Loans, Reservations, Wishlist, Reviews và Fines. Xem [hướng dẫn giai đoạn 3](docs/LIBRARY-ACTIVITY-VI.md).
 4. Kết nối Subscription và Razorpay.
 5. Xây dựng giao diện quản trị.
 6. Bổ sung kiểm thử giao diện và kiểm thử luồng nghiệp vụ.

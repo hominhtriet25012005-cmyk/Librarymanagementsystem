@@ -10,11 +10,15 @@ import { ACCESS_TOKEN_KEY } from "../src/auth/session";
 const profile = { id: 7, fullName: "Trần Mai", email: "mai@example.test", role: "ROLE_USER" };
 function mount(path, role) {
   if (role) localStorage.setItem(ACCESS_TOKEN_KEY, `a.${btoa(JSON.stringify({ exp: Date.now() / 1000 + 3600 }))}.c`);
-  httpClient.defaults.adapter = async (config) => ({
-    config, status: 200, statusText: "OK", headers: {},
-    data: config.url === "/api/user/profile" ? { ...profile, role }
-      : config.url === "/api/genres" ? [] : { content: [], pageNumber: 0, totalPages: 0, totalElements: 0 },
-  });
+  httpClient.defaults.adapter = async (config) => {
+    let data = { content: [], pageNumber: 0, totalPages: 0, totalElements: 0 };
+    if (config.url === "/api/user/profile") data = { ...profile, role };
+    else if (config.url === "/api/genres") data = [];
+    else if (config.url === "/api/subscriptions/user/active") data = { isValid: true, maxDaysPerBook: 14 };
+    else if (config.url === "/api/book-loans/my" && !config.params.status) data = { content: [{ id: 1, bookId: 4, bookTitle: "Sách từ API", status: "CHECKED_OUT", renewalCount: 0, maxRenewals: 2 }], pageNumber: 0, totalPages: 1, totalElements: 1 };
+    else if (config.url === "/api/reservations/my" && !config.params.status) data = { content: [{ id: 2, bookId: 4, bookTitle: "Sách đang chờ", status: "PENDING", canBeCancelled: true }], pageNumber: 0, totalPages: 1, totalElements: 1 };
+    return { config, status: 200, statusText: "OK", headers: {}, data };
+  };
   return render(<MemoryRouter initialEntries={[path]}><AuthProvider><App /></AuthProvider></MemoryRouter>);
 }
 beforeEach(() => localStorage.clear());
@@ -47,6 +51,7 @@ it("tab phiếu mượn đã dịch và lọc theo trạng thái", async () => {
   mount("/my-loans", "ROLE_USER");
   await screen.findByRole("heading", { name: "Sách tôi đã mượn" });
   expect(screen.queryByText("My Borrowed Books")).toBeNull();
+  expect(await screen.findByText("Sách từ API")).toBeTruthy();
   await userEvent.setup().click(screen.getByRole("tab", { name: "Đã trả" }));
   await waitFor(() => expect(screen.queryByRole("button", { name: "Gia hạn sách" })).toBeNull());
 });
@@ -54,6 +59,7 @@ it("thẻ đặt trước hiển thị nhãn tiếng Việt thay mã trạng th�
   mount("/my-reservations", "ROLE_USER");
   await screen.findByRole("heading", { name: "Sách đã đặt trước" });
   expect(screen.getAllByText("Đang chờ").length).toBeGreaterThan(0);
+  expect(await screen.findByText("Sách đang chờ")).toBeTruthy();
   expect(screen.queryByText("PENDING")).toBeNull();
   expect(screen.queryByText("Total Reservation")).toBeNull();
 });

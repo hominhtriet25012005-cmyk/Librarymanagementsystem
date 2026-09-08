@@ -1,134 +1,19 @@
-import { formatDate, statusLabel } from "../../utils/locale";
-import {
-    AccessAlarm,
-    Book,
-    CalendarMonth,
-    CheckCircle,
-    Close,
-    HourglassBottom,
-    Notifications
+import { AccessAlarm, Book, CalendarMonth, CheckCircle, Close, HourglassBottom } from "@mui/icons-material";
+import { Button, Chip, Divider } from "@mui/material";
+import { Link } from "react-router-dom";
+import { formatDateTime, statusLabel } from "../../utils/locale";
+
+const icons = { PENDING: HourglassBottom, AVAILABLE: CalendarMonth, FULFILLED: CheckCircle, CANCELLED: Close, EXPIRED: AccessAlarm };
+
+export default function MyReservationCard({ reservation, onCancel, cancelBlocked = false }) {
+  const Icon = icons[reservation.status] || AccessAlarm;
+  const canCancel = reservation.canBeCancelled ?? ["PENDING", "AVAILABLE"].includes(reservation.status);
+  return <article className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-md">
+    <div className="flex items-center justify-between bg-indigo-50 px-5 py-3"><Chip icon={<Icon />} label={statusLabel(reservation.status)} color={reservation.status === "AVAILABLE" ? "success" : "primary"} variant="outlined" />{reservation.queuePosition > 0 && <span className="text-sm font-medium">Vị trí chờ: {reservation.queuePosition}</span>}</div>
+    <div className="p-5"><div className="flex items-start gap-3"><Book className="mt-1 text-indigo-600" /><div className="min-w-0"><h2 className="break-words text-lg font-semibold">{reservation.bookTitle}</h2><p className="mt-1 text-sm text-slate-600">{reservation.bookAuthor || `ISBN: ${reservation.bookIsbn || "Chưa cập nhật"}`}</p></div></div>
+      <Divider sx={{ my: 2 }} /><dl className="space-y-3 text-sm"><div><dt className="text-slate-500">Ngày đặt</dt><dd className="font-medium">{formatDateTime(reservation.reservedAt)}</dd></div>{reservation.availableAt && <div><dt className="text-green-700">Sẵn sàng từ</dt><dd className="font-medium">{formatDateTime(reservation.availableAt)}</dd></div>}{reservation.availableUntil && <div><dt className="text-red-700">Hạn nhận</dt><dd className="font-medium">{formatDateTime(reservation.availableUntil)}</dd></div>}{reservation.fulfilledAt && <div><dt className="text-slate-500">Đã nhận</dt><dd className="font-medium">{formatDateTime(reservation.fulfilledAt)}</dd></div>}</dl>
+      {reservation.notes && <p className="mt-4 rounded-lg bg-slate-50 p-3 text-sm">Ghi chú: {reservation.notes}</p>}
+      <div className="mt-5 flex flex-wrap justify-end gap-2"><Button component={Link} to={`/books/${reservation.bookId}`} variant="outlined">Xem sách</Button>{canCancel && <Button color="error" disabled={cancelBlocked} onClick={() => onCancel(reservation)}>Hủy đặt trước</Button>}</div>
+    </div>
+  </article>;
 }
-    from "@mui/icons-material";
-import { Divider } from "@mui/material";
-import { getStatusColor } from "./getStatusColor";
-
-const MyReservationCard = ({ reservation }) => {
-
-    const statusColors = getStatusColor(reservation.status);
-    //    const timeRemaining=getTimeRemaining(reservation.availableUntil);
-
-    const getStatusIcon = (status) => {
-        const iconClass = "w-5 h-5";
-        const icons = {
-            PENDING: <HourglassBottom className={iconClass} />,
-            AVAILABLE: <CalendarMonth className={iconClass} />,
-            FULFILLED: <CheckCircle className={iconClass} />,
-            CANCELLED: <Close className={iconClass} />,
-            EXPIRED: <AccessAlarm className={iconClass} />,
-        };
-        return icons[status] || <AccessAlarm className={iconClass} />;
-    };
-
-    return (
-        <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden border border-gray-100">
-            {/* status banner */}
-            <div
-                className={`bg-gradient-to-r ${statusColors.gradient} p-4 px-4 py-3 flex items-center justify-between`}>
-                <div className="flex items-center gap-2">
-                    <span>{getStatusIcon(reservation.status)}</span>
-                    <span className={` ${getStatusColor(reservation.status).text} font-bold text-sm uppercase
-                        tracking-wider`}>{statusLabel(reservation.status)}</span>
-                </div>
-
-
-            </div>
-
-            <div className="p-6">
-                {/* book header */}
-                <div className="mb-4">
-                    <div className="flex items-center gap-3 mb-2">
-
-                        <div className="p-3 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg">
-
-                            <Book className="w-6 h-6 text-white" />
-
-                        </div>
-                        <div>
-                            <p>Mã sách</p>
-                            <h3>#{reservation.bookId}</h3>
-                        </div>
-
-                    </div>
-
-                    <p>{reservation.bookTitle}</p>
-
-                </div>
-
-                <Divider />
-
-                {/* Timeline */}
-
-                <div className="space-y-3 mt-3">
-                    <div className="flex items-start gap-2">
-                        <AccessAlarm className="w-4 h-4 text-gray-400 mt-0.5" />
-                        <div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase">
-                                Ngày đặt
-                            </p>
-                            <p className="text-sm font-semibold text-gray-700">
-                                {formatDate(reservation.reservedAt)}
-                            </p>
-                        </div>
-                    </div>
-
-                    {reservation.availableAt && (
-                        <div className="flex items-start gap-2">
-                            <CalendarMonth className="w-4 h-4 text-green-500 mt-0.5" />
-                            <div>
-                                <p className="text-xs font-semibold text-green-600 uppercase">
-                                    Sẵn sàng từ
-                                </p>
-                                <p className="text-sm font-semibold text-green-700">
-                                    {formatDate(reservation.availableAt)}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-
-
-                    {reservation.availableUntil && (
-                        <div className="flex items-start gap-2">
-                            <Notifications className="w-4 h-4 text-red-500 mt-0.5" />
-                            <div>
-                                <p className="text-xs font-semibold text-red-600 uppercase">
-                                    Hạn nhận
-                                </p>
-                                <p className="text-sm font-semibold text-red-700">
-                                    {formatDate(reservation.availableUntil)}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-
-
-                    {reservation.fulfilledAt && (
-                        <div className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5" />
-                            <div>
-                                <p className="text-xs font-semibold text-blue-600 uppercase">
-                                    Đã nhận
-                                </p>
-                                <p className="text-sm font-semibold text-blue-700">
-                                    {formatDate(reservation.fulfilledAt)}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-
-    );
-};
-
-export default MyReservationCard;
