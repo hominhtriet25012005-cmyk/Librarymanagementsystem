@@ -8,7 +8,7 @@ D:\Codex\Library-Management-System\.mvn\frontend\library-frontend
 
 ## Chạy trên máy local
 
-Backend cần chạy tại `http://localhost:8080` và frontend mặc định chạy tại `http://localhost:5173`.
+Backend cần chạy tại `http://localhost:5000` và frontend mặc định chạy tại `http://localhost:5173`.
 
 ```powershell
 cd D:\Codex\Library-Management-System\.mvn\frontend\library-frontend
@@ -20,7 +20,7 @@ npm run dev
 Nội dung `.env`:
 
 ```dotenv
-VITE_API_BASE_URL=http://localhost:8080
+VITE_API_BASE_URL=http://localhost:5000
 ```
 
 ## Kiểm tra mã nguồn
