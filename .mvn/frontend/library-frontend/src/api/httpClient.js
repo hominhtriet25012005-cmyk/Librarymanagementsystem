@@ -3,7 +3,7 @@ import { getAccessToken, invalidateToken, isTokenExpired } from "../auth/session
 export { ACCESS_TOKEN_KEY, getAccessToken, setAccessToken } from "../auth/session";
 
 const httpClient = axios.create({
-  baseURL: (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, ""),
+  baseURL: (import.meta.env.VITE_API_BASE_URL || "http://localhost:5000").replace(/\/$/, ""),
   timeout: 15000,
 });
 

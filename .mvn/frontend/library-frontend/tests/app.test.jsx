@@ -41,7 +41,13 @@ it("trang hồ sơ hiển thị tài khoản thật, menu đăng xuất hoạt �
 });
 it("admin đang đăng nhập được chuyển từ trang login đến khu vực quản trị", async () => {
   mount("/login", "ROLE_ADMIN");
-  expect(await screen.findByRole("heading", { name: "Khu vực quản trị" })).toBeTruthy();
+  expect(await screen.findByRole("heading", { name: "Quản lý sách" })).toBeTruthy();
+});
+
+it("đường dẫn quản trị mặc định chuyển đến trang quản lý sách", async () => {
+  mount("/admin", "ROLE_ADMIN");
+  expect(await screen.findByRole("heading", { name: "Quản lý sách" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Tạo sách mới" })).toBeTruthy();
 });
 it("bạn đọc bị chặn khi nhập thẳng địa chỉ quản trị", async () => {
   mount("/admin", "ROLE_USER");

@@ -1,6 +1,6 @@
 import "./App.css";
 import { lazy, Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import UserLayout from "./layouts/UserLayout/UserLayout";
 import ModulePlaceholder from "./components/common/ModulePlaceholder";
 import { AdminRoute, ForbiddenPage, GuestRoute, ProtectedRoute } from "./auth/RouteGuards";
@@ -39,7 +39,7 @@ export default function App() {
           <Route path="settings" element={<ModulePlaceholder title="Cài đặt" />} />
           <Route path="forbidden" element={<ForbiddenPage />} />
           <Route element={<AdminRoute />}>
-            <Route path="admin" element={<ModulePlaceholder title="Khu vực quản trị" />} />
+            <Route path="admin" element={<Navigate to="/admin/books" replace />} />
             <Route path="admin/books" element={<AdminBooksPage />} />
           </Route>
         </Route>
