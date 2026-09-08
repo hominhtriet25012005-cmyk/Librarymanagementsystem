@@ -9,6 +9,7 @@ import MyFines from "../src/pages/Fines/MyFines";
 import WishlistPage from "../src/pages/Wishlist/WishlistPage";
 import BookReviews from "../src/pages/Books/BookReviews";
 import WishlistButton from "../src/pages/Books/WishlistButton";
+import AdminBooksPage from "../src/pages/Admin/AdminBooksPage";
 
 const originalAdapter = httpClient.defaults.adapter;
 afterEach(() => { httpClient.defaults.adapter = originalAdapter; });
@@ -164,4 +165,26 @@ it("chủ đánh giá có thể sửa và xóa, người khác thì không", asy
   await ui.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Xóa đánh giá" }));
   expect(await screen.findByText("Đã xóa đánh giá.")).toBeTruthy();
   expect(calls.find((call) => call.method === "delete").url).toBe("/api/reviews/5");
+});
+
+it("quản trị viên tạo sách bằng form tiếng Việt và gửi đúng payload", async () => {
+  const calls = [];
+  httpClient.defaults.adapter = async (config) => {
+    calls.push(config);
+    if (config.url === "/api/genres") return response(config, [{ id: 3, name: "Văn học", active: true }]);
+    if (config.method === "post" && config.url === "/api/books/admin") return response(config, { id: 99, title: "Dế Mèn phiêu lưu ký" });
+    return response(config, pageOf([]));
+  };
+  render(<MemoryRouter><AdminBooksPage /></MemoryRouter>);
+  const ui = userEvent.setup();
+  await ui.click(await screen.findByRole("button", { name: "Tạo sách mới" }));
+  await ui.type(screen.getByRole("textbox", { name: "ISBN" }), "978-1");
+  await ui.type(screen.getByRole("textbox", { name: "Tên sách" }), "Dế Mèn phiêu lưu ký");
+  await ui.type(screen.getByRole("textbox", { name: "Tác giả" }), "Tô Hoài");
+  await ui.click(screen.getByRole("combobox", { name: "Thể loại" }));
+  await ui.click(screen.getByRole("option", { name: "Văn học" }));
+  await ui.click(screen.getByRole("button", { name: "Tạo sách", exact: true }));
+  expect(await screen.findByText("Đã tạo sách mới.")).toBeTruthy();
+  const payload = JSON.parse(calls.find((call) => call.method === "post").data);
+  expect(payload).toMatchObject({ isbn: "978-1", title: "Dế Mèn phiêu lưu ký", author: "Tô Hoài", genreId: 3, totalCopies: 1, availableCopies: 1 });
 });

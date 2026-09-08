@@ -11,7 +11,10 @@ export default function SidebarDrawer({ onNavigate }) {
   const navigate = useNavigate();
   const go = (path) => { navigate(path); onNavigate?.(); };
   const items = user ? [...navigationItems, ...secondaryItems] : navigationItems.filter((item) => item.path === "/books");
-  if (isAdmin) items.push({ title: "Quản trị", path: "/admin", icon: <AdminPanelSettings /> });
+  if (isAdmin) items.push(
+    { title: "Quản trị", path: "/admin", icon: <AdminPanelSettings /> },
+    { title: "Quản lý sách", path: "/admin/books", icon: <MenuBook /> },
+  );
   return <Box sx={{ minHeight: "100%", background: "linear-gradient(180deg,#1e293b,#0f172a)", color: "white", p: 2 }}>
     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 2 }}>
       <Avatar sx={{ bgcolor: "#4f46e5" }}><MenuBook /></Avatar>

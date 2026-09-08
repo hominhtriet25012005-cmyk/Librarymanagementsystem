@@ -14,6 +14,7 @@ const MyLoans = lazy(() => import("./pages/Loans/MyLoans"));
 const MyReservations = lazy(() => import("./pages/Reservations/MyReservations"));
 const MyFines = lazy(() => import("./pages/Fines/MyFines"));
 const WishlistPage = lazy(() => import("./pages/Wishlist/WishlistPage"));
+const AdminBooksPage = lazy(() => import("./pages/Admin/AdminBooksPage"));
 
 export default function App() {
   return <Suspense fallback={<div role="status" className="p-8 text-center">Đang tải giao diện...</div>}>
@@ -39,6 +40,7 @@ export default function App() {
           <Route path="forbidden" element={<ForbiddenPage />} />
           <Route element={<AdminRoute />}>
             <Route path="admin" element={<ModulePlaceholder title="Khu vực quản trị" />} />
+            <Route path="admin/books" element={<AdminBooksPage />} />
           </Route>
         </Route>
         <Route path="*" element={<ModulePlaceholder title="Không tìm thấy trang" description="Đường dẫn không tồn tại. Hãy chọn một mục trong thanh điều hướng." />} />
