@@ -107,6 +107,10 @@ public class Fine {
     }
 
     public long getAmountOutstanding() {
+        // Khoản phạt đã được miễn không còn tạo nghĩa vụ thanh toán cho bạn đọc.
+        if (status == FineStatus.WAIVED) {
+            return 0L;
+        }
         long paid = amountPaid == null ? 0L : amountPaid;
         return Math.max(amount - paid, 0L);
     }
