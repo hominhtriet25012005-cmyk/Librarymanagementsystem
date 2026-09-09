@@ -32,6 +32,7 @@ export const loansApi = {
 };
 
 export const reservationsApi = {
+  getAllMine(params = {}) { return readEveryPage("/api/reservations/my", params); },
   async getMine(params = {}) {
     const { data } = await httpClient.get("/api/reservations/my", { params: compact(params) });
     return data;

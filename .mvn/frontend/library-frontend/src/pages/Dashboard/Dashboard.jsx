@@ -1,120 +1,93 @@
-import React from 'react';
-import StatsCard from './StatsCard';
-import { AutoAwesome } from "@mui/icons-material";
-import LinearProgress from "@mui/material/LinearProgress";
-import { Box, Tab, Tabs } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import { Alert, Box, Button, CircularProgress, Tab, Tabs } from "@mui/material";
+import { Link } from "react-router-dom";
+import { booksApi, finesApi, getApiErrorMessage, loansApi, reservationsApi, subscriptionsApi } from "../../api";
+import StatsCard from "./StatsCard";
 import { statsConfig } from "./StatsConfig";
 import CurrentLoans from "./CurrentLoans";
 import Reservation from "./Reservation";
 import ReadingHistory from "./ReadingHistory";
 import Recommendation from "./Recommendation";
 
-// Lưu ý: Đảm bảo bạn đã import hàm statsConfig từ file tương ứng
-// import { statsConfig } from './utils/statsConfig'; 
+const EMPTY_DATA = { loans: [], reservations: [], fines: [], recommendations: [], subscription: null };
+const ACTIVE_LOAN_STATUSES = new Set(["CHECKED_OUT", "OVERDUE"]);
+const ACTIVE_RESERVATION_STATUSES = new Set(["PENDING", "AVAILABLE"]);
+const OPEN_FINE_STATUSES = new Set(["PENDING", "PARTIALLY_PAID"]);
 
-const Dashboard = () => {
-  const [activeTab, setActiveTab] = React.useState(0);
+export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState(0);
+  const [data, setData] = useState(EMPTY_DATA);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [partialError, setPartialError] = useState(false);
+  const [revision, setRevision] = useState(0);
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
+  useEffect(() => {
+    let active = true;
+    Promise.allSettled([
+      loansApi.getAllMine(),
+      reservationsApi.getAllMine({ sortBy: "reservedAt", sortDirection: "DESC" }),
+      finesApi.getMine(),
+      booksApi.search({ activeOnly: true, availableOnly: true, page: 0, size: 4, sortBy: "createdAt", sortDirection: "DESC" }),
+      subscriptionsApi.getActive(),
+    ]).then((results) => {
+      if (!active) return;
+      const value = (index, fallback) => results[index].status === "fulfilled" ? results[index].value : fallback;
+      const failed = results.filter((result) => result.status === "rejected");
+      setData({
+        loans: value(0, []),
+        reservations: value(1, []),
+        fines: value(2, []),
+        recommendations: value(3, { content: [] }).content || [],
+        subscription: value(4, null),
+      });
+      setPartialError(failed.length > 0 && failed.length < results.length);
+      if (failed.length === results.length) {
+        setError(getApiErrorMessage(failed[0].reason, "Không tải được dữ liệu tổng quan."));
+      } else {
+        setError("");
+      }
+    }).finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [revision]);
 
-  const stateData = statsConfig({
-    myLoans: [1, 2, 3],
-    reservations: [1, 2],
-    stats: { readingStreak: 5 }
-  });
+  const currentYear = new Date().getFullYear();
+  const activeLoans = useMemo(() => data.loans.filter((loan) => ACTIVE_LOAN_STATUSES.has(loan.status)), [data.loans]);
+  const activeReservations = useMemo(() => data.reservations.filter((item) => ACTIVE_RESERVATION_STATUSES.has(item.status)), [data.reservations]);
+  const readingHistory = useMemo(() => data.loans.filter((loan) => loan.status === "RETURNED"), [data.loans]);
+  const readThisYear = useMemo(() => readingHistory.filter((loan) => Number(String(loan.returnDate || "").slice(0, 4)) === currentYear), [currentYear, readingHistory]);
+  const openFines = useMemo(() => data.fines.filter((fine) => OPEN_FINE_STATUSES.has(fine.status)), [data.fines]);
+  const stateData = statsConfig({ activeLoans, activeReservations, readThisYear, openFines });
 
-  return (
-    <div className='min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-500 py-8'>
-      <div className='px-4 sm:px-6 lg:px-8 mx-auto'>
+  return <section aria-labelledby="dashboard-title" className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 px-4 py-8 sm:px-6 lg:px-8">
+    <header className="mb-8">
+      <p className="text-sm font-semibold uppercase tracking-widest text-indigo-600">Không gian bạn đọc</p>
+      <h1 id="dashboard-title" className="mt-2 text-4xl font-bold text-slate-900">Trang tổng quan</h1>
+      <p className="mt-2 text-lg text-slate-600">Dữ liệu mới nhất về hoạt động thư viện của bạn.</p>
+    </header>
 
-        {/* Header */}
-        <div className='mb-8 animate-fade-in-up'><p className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">Bản xem trước: số liệu đọc sách bên dưới là dữ liệu minh họa.</p>
-          <h1 className='text-4xl font-bold text-indigo-500 mb-2'>
-            Trang {" "}
-            <span className='bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent'>
-              tổng quan
-            </span>
-          </h1>
-          <p className="text-lg text-gray-600">
-            Theo dõi hành trình đọc và quản lý sách của bạn
-          </p>
-        </div>
+    {loading ? <div className="flex min-h-80 items-center justify-center"><CircularProgress aria-label="Đang tải tổng quan" /></div>
+      : error ? <Alert severity="error" action={<Button onClick={() => { setLoading(true); setError(""); setRevision((value) => value + 1); }}>Thử lại</Button>}>{error}</Alert>
+        : <>
+          {partialError && <Alert severity="warning" className="mb-5" action={<Button onClick={() => { setLoading(true); setRevision((value) => value + 1); }}>Tải lại</Button>}>Một phần dữ liệu chưa tải được. Các mục còn lại vẫn đang hiển thị bình thường.</Alert>}
+          <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {stateData.map((item) => <StatsCard key={item.id} {...item} />)}
+          </div>
 
-        {/* State cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stateData.map((item, index) => (
-            <StatsCard
-              bgColor={item.bgColor}
-              textColor={item.textColor}
-              icon={item.icon}
-              value={item.value}
-              title={item.title}
-              subtitle={item.subtitle}
-              key={item.id || index} // Dùng index làm fallback nếu item không có id
-            />
-          ))}
-        </div>
-
-        {/* Reading Progress */}
-        <div className="bg-white rounded-2xl shadow-2xl p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-1">
-                Mục tiêu đọc sách
-              </h3>
-              <p className="text-gray-600">
-                Đã đọc 9 trong 30 cuốn sách
-              </p>
-            </div>
-
-            <div className="p-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full">
-              <AutoAwesome sx={{ fontSize: 32, color: "#4F46E5" }} />
+          <div className="mb-8 rounded-2xl border border-indigo-100 bg-white p-6 shadow-md">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div><p className="text-sm font-semibold uppercase tracking-wider text-indigo-600">Gói thành viên</p><h2 className="mt-1 text-xl font-bold text-slate-900">{data.subscription ? data.subscription.planName : "Chưa có gói đang hoạt động"}</h2><p className="mt-1 text-slate-600">{data.subscription ? `Hiệu lực đến ${new Date(`${data.subscription.endDate}T00:00:00`).toLocaleDateString("vi-VN")} · Tối đa ${data.subscription.maxBooksAllowed} sách` : "Đăng ký gói để sử dụng quyền mượn và gia hạn sách."}</p></div>
+              <Button component={Link} to="/subscriptions" variant={data.subscription ? "outlined" : "contained"}>{data.subscription ? "Xem quyền lợi" : "Xem gói thành viên"}</Button>
             </div>
           </div>
 
-          <LinearProgress
-            variant="determinate"
-            value={30}
-            sx={{
-              height: 12,
-              borderRadius: 6,
-              backgroundColor: "#E0E7FF",
-              "& .MuiLinearProgress-bar": {
-                background: "linear-gradient(90deg, #4F46E5 0%, #9333EA 100%)",
-                borderRadius: 6,
-              },
-            }}
-          />
-          <p className="text-sm text-gray-600 mt-2">30%</p>
-        </div>
-        {/* tab section */}
-        <div className=" bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Tabs value={activeTab} onChange={handleTabChange} aria-label="Thông tin đọc sách" variant="scrollable" scrollButtons="auto">
-              <Tab label="Đang mượn" />
-              <Tab label="Đặt trước" />
-              <Tab label="Lịch sử đọc" />
-              <Tab label="Gợi ý sách" />
-            </Tabs>
-          </Box>
-
-          {/* current loans tab */}
-          {activeTab === 0 && <CurrentLoans />}
-          
-          {/* Reservations Tab */}
-          {activeTab === 1 && <Reservation />}
-
-          {/* Reading History Tab */}
-          {activeTab === 2 && <ReadingHistory />}
-
-          {/* Recommendations Tab */}
-            {activeTab === 3 && <Recommendation />}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
+          <div className="overflow-hidden rounded-2xl border bg-white shadow-md">
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}><Tabs value={activeTab} onChange={(_, value) => setActiveTab(value)} aria-label="Thông tin đọc sách" variant="scrollable" scrollButtons="auto"><Tab label={`Đang mượn (${activeLoans.length})`} /><Tab label={`Đặt trước (${activeReservations.length})`} /><Tab label={`Lịch sử đọc (${readingHistory.length})`} /><Tab label="Sách mới" /></Tabs></Box>
+            {activeTab === 0 && <CurrentLoans loans={activeLoans} />}
+            {activeTab === 1 && <Reservation reservations={activeReservations} />}
+            {activeTab === 2 && <ReadingHistory loans={readingHistory} />}
+            {activeTab === 3 && <Recommendation books={data.recommendations} />}
+          </div>
+        </>}
+  </section>;
+}

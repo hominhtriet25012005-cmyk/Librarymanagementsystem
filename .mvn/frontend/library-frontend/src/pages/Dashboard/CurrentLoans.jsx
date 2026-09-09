@@ -1,35 +1,10 @@
-import React from 'react'
-import CurrentLoanCard from './CurrentLoanCard';
+import { Alert, Button } from "@mui/material";
+import { Link } from "react-router-dom";
+import CurrentLoanCard from "./CurrentLoanCard";
 
-const loan = {
-    bookTitle: "The Great Gatsby",
-    bookCoverImage: "https://images-na.ssl-images-amazon.com/images/I/81af+MCATTL.jpg",
-    bookAuthor: "F. Scott Fitzgerald",
-    dueDate: "2023-12-01",
-    status: "CHECKED_OUT",
-    remainingDays: 5,
-    overdueDays: 0
-
+export default function CurrentLoans({ loans }) {
+  return <div className="p-6">
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-3"><h2 className="text-2xl font-bold text-slate-900">Sách bạn đang mượn</h2><Button component={Link} to="/my-loans">Xem tất cả phiếu mượn</Button></div>
+    {loans.length === 0 ? <Alert severity="info">Bạn chưa có sách đang mượn.</Alert> : <div className="space-y-4">{loans.slice(0, 4).map((loan) => <CurrentLoanCard loan={loan} key={loan.id} />)}</div>}
+  </div>;
 }
-
-const CurrentLoans = () => {
-  return (
-    <div className='p-6'>
-
-        <h3 className='text-2xl font-bold text-gray-900 mb-6'>
-            Sách bạn đang đọc
-        </h3>
-
-        <div className='space-y-4'>
-            {/* List of current loans will go here */}
-
-            {[1, 2, 3, 4].map((item) => (
-                <CurrentLoanCard loan={{ ...loan, id: item }} key={item} />
-            ))}
-        </div>
-
-    </div>
-  )
-}
-
-export default CurrentLoans
