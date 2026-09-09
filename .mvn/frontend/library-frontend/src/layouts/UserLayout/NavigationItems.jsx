@@ -105,6 +105,12 @@ export const adminNavigationItems = [
         description: 'Cho mượn, nhận trả và gia hạn',
     },
     {
+        title: 'Quản lý đặt trước',
+        path: '/admin/reservations',
+        icon: <EventAvailableIcon />,
+        description: 'Theo dõi và xử lý hàng chờ',
+    },
+    {
         title: 'Khu vực bạn đọc',
         path: '/books',
         icon: <StorefrontIcon />,

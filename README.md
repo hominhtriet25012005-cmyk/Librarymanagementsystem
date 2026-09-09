@@ -45,6 +45,7 @@ Library-Management-System/
 - Quản lý thể loại tại `/admin/genres`.
 - Quản lý sách tại `/admin/books`.
 - Quản lý mượn, trả và gia hạn tại `/admin/loans`.
+- Quản lý đặt trước và hàng chờ tại `/admin/reservations`.
 
 ## Chuẩn bị MySQL
 
@@ -131,7 +132,7 @@ Nếu danh sách sách báo “Chưa có sách phù hợp”, hãy kiểm tra:
 - Backend có chạy tại cổng `5000` hay không.
 - Frontend có dùng đúng `VITE_API_BASE_URL` hay không.
 
-## Các màn hình quản trị giai đoạn 0–4
+## Các màn hình quản trị giai đoạn 0–5
 
 ### Tổng quan quản trị
 
@@ -166,6 +167,17 @@ Nếu danh sách sách báo “Chưa có sách phù hợp”, hãy kiểm tra:
 
 Frontend gọi trực tiếp các API `/api/book-loans/search`, `/api/book-loans/checkout/user/{userId}`, `/api/book-loans/checkin`, `/api/book-loans/renew` và `/api/book-loans/admin/update-overdue`. Axios tự gắn JWT vào từng yêu cầu. Các API quản trị yêu cầu tài khoản có `ROLE_ADMIN`.
 
+### Quản lý đặt trước và hàng chờ
+
+- Lọc yêu cầu theo bạn đọc, sách, trạng thái và phạm vi đang hoạt động.
+- Theo dõi vị trí hàng chờ, thời hạn nhận sách và trạng thái gửi thông báo.
+- Tạo đặt trước hộ bạn đọc khi không còn bản sách trống.
+- Giao sách cho lượt đã sẵn sàng; backend đồng thời tạo phiếu mượn.
+- Hủy yêu cầu và tự sắp xếp lại hàng chờ.
+- Quét các lượt đã quá hạn nhận sách và chuyển người tiếp theo lên.
+
+Frontend sử dụng các API `/api/reservations`, `/api/reservations/user/{userId}`, `/api/reservations/{id}`, `/api/reservations/{id}/fulfill` và `/api/reservations/admin/expire`. Backend từ chối đặt trước sách đã ngừng hoạt động và không cho giao lượt giữ sách đã quá hạn.
+
 ## Kiểm tra thủ công
 
 1. Khởi động MySQL, backend và frontend.
@@ -177,7 +189,10 @@ Frontend gọi trực tiếp các API `/api/book-loans/search`, `/api/book-loans
 7. Thử tìm kiếm, lọc, sửa và ẩn sách.
 8. Vào `/admin/loans`, thử kết hợp nhiều bộ lọc và tạo một phiếu mượn.
 9. Thử gia hạn, nhận trả sách và cập nhật phiếu quá hạn.
-10. Đăng nhập bằng tài khoản người dùng để xác nhận không truy cập được route admin.
+10. Vào `/admin/reservations`, tạo một đặt trước cho cuốn sách đã hết bản.
+11. Trả một bản sách để kiểm tra người đầu hàng chờ chuyển sang trạng thái sẵn sàng.
+12. Thử giao sách, hủy yêu cầu và cập nhật các lượt hết hạn.
+13. Đăng nhập bằng tài khoản người dùng để xác nhận không truy cập được route admin.
 
 ## Tài liệu liên quan
 
@@ -189,7 +204,6 @@ Frontend gọi trực tiếp các API `/api/book-loans/search`, `/api/book-loans
 
 ## Các giai đoạn tiếp theo
 
-- Giai đoạn 5: quản lý đặt trước và hàng chờ.
 - Giai đoạn 6: quản lý tiền phạt.
 - Giai đoạn 7: quản lý người dùng.
 - Giai đoạn 8: quản lý gói thành viên và đăng ký.
