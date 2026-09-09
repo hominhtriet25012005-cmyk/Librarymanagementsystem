@@ -46,6 +46,7 @@ Library-Management-System/
 - Quản lý sách tại `/admin/books`.
 - Quản lý mượn, trả và gia hạn tại `/admin/loans`.
 - Quản lý đặt trước và hàng chờ tại `/admin/reservations`.
+- Quản lý tiền phạt tại `/admin/fines`.
 
 ## Chuẩn bị MySQL
 
@@ -132,7 +133,7 @@ Nếu danh sách sách báo “Chưa có sách phù hợp”, hãy kiểm tra:
 - Backend có chạy tại cổng `5000` hay không.
 - Frontend có dùng đúng `VITE_API_BASE_URL` hay không.
 
-## Các màn hình quản trị giai đoạn 0–5
+## Các màn hình quản trị giai đoạn 0–6
 
 ### Tổng quan quản trị
 
@@ -178,6 +179,17 @@ Frontend gọi trực tiếp các API `/api/book-loans/search`, `/api/book-loans
 
 Frontend sử dụng các API `/api/reservations`, `/api/reservations/user/{userId}`, `/api/reservations/{id}`, `/api/reservations/{id}/fulfill` và `/api/reservations/admin/expire`. Backend từ chối đặt trước sách đã ngừng hoạt động và không cho giao lượt giữ sách đã quá hạn.
 
+### Quản lý tiền phạt
+
+- Lọc khoản phạt theo bạn đọc, trạng thái và loại phạt.
+- Theo dõi tổng tiền, số đã thanh toán và số tiền còn phải thu.
+- Tạo khoản phạt theo mã phiếu mượn; người bị phạt được lấy từ chính phiếu mượn.
+- Miễn phần tiền phạt còn lại và bắt buộc ghi lý do.
+- Hiển thị thông tin giao dịch, người miễn và lý do miễn khi có.
+- Không tính khoản đã miễn vào tổng tiền còn phải trả.
+
+Frontend sử dụng các API `/api/fines` và `/api/fines/waive`. Người dùng thanh toán khoản phạt của mình qua `/api/fines/{id}/pay`; phần giao diện đối soát Razorpay dành cho giai đoạn 9.
+
 ## Kiểm tra thủ công
 
 1. Khởi động MySQL, backend và frontend.
@@ -192,7 +204,9 @@ Frontend sử dụng các API `/api/reservations`, `/api/reservations/user/{user
 10. Vào `/admin/reservations`, tạo một đặt trước cho cuốn sách đã hết bản.
 11. Trả một bản sách để kiểm tra người đầu hàng chờ chuyển sang trạng thái sẵn sàng.
 12. Thử giao sách, hủy yêu cầu và cập nhật các lượt hết hạn.
-13. Đăng nhập bằng tài khoản người dùng để xác nhận không truy cập được route admin.
+13. Vào `/admin/fines`, tạo khoản phạt bằng mã phiếu mượn.
+14. Kiểm tra các bộ lọc, số tiền còn lại và thao tác miễn phạt.
+15. Đăng nhập bằng tài khoản người dùng để xác nhận không truy cập được route admin.
 
 ## Tài liệu liên quan
 
@@ -204,7 +218,6 @@ Frontend sử dụng các API `/api/reservations`, `/api/reservations/user/{user
 
 ## Các giai đoạn tiếp theo
 
-- Giai đoạn 6: quản lý tiền phạt.
 - Giai đoạn 7: quản lý người dùng.
 - Giai đoạn 8: quản lý gói thành viên và đăng ký.
 - Giai đoạn 9: thanh toán và xác minh Razorpay.

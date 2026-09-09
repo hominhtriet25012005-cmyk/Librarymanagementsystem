@@ -10,6 +10,7 @@ export const adminApi = {
       httpClient.post("/api/book-loans/search", { status: "OVERDUE", page: 0, size: 1 }),
       httpClient.get("/api/reservations", { params: { activeOnly: true, page: 0, size: 1 } }),
       httpClient.get("/api/fines", { params: { status: "PENDING", page: 0, size: 1 } }),
+      httpClient.get("/api/fines", { params: { status: "PARTIALLY_PAID", page: 0, size: 1 } }),
     ];
     const results = await Promise.allSettled(requests);
     const dataAt = (index, fallback) => results[index].status === "fulfilled" ? results[index].value.data : fallback;
@@ -21,7 +22,10 @@ export const adminApi = {
       recentLoans: dataAt(3, { content: [], totalElements: 0 }),
       overdueLoans: dataAt(4, { totalElements: 0 }),
       reservations: dataAt(5, { totalElements: 0 }),
-      fines: dataAt(6, { totalElements: 0 }),
+      fines: {
+        totalElements: (dataAt(6, { totalElements: 0 }).totalElements || 0)
+          + (dataAt(7, { totalElements: 0 }).totalElements || 0),
+      },
       hasPartialError: results.some((result) => result.status === "rejected"),
     };
   },

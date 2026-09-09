@@ -86,6 +86,7 @@ export default function AdminDashboardPage() {
           <Button component={Link} to="/admin/genres" variant="outlined" fullWidth>Tạo thể loại</Button>
           <Button component={Link} to="/admin/books" variant="outlined" fullWidth>Thêm sách mới</Button>
           <Button component={Link} to="/admin/reservations" variant="outlined" fullWidth>Xử lý hàng chờ đặt trước</Button>
+          <Button component={Link} to="/admin/fines" variant="outlined" fullWidth>Xử lý tiền phạt</Button>
           <div className="rounded-lg bg-indigo-50 p-4 text-sm text-indigo-900"><p className="font-semibold">Đặt trước đang hoạt động</p><p className="mt-1 text-2xl font-bold">{dashboard.reservations.totalElements ?? 0}</p></div>
         </div>
       </Card>

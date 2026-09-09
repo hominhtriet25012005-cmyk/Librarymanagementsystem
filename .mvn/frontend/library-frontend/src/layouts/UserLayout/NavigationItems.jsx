@@ -111,6 +111,12 @@ export const adminNavigationItems = [
         description: 'Theo dõi và xử lý hàng chờ',
     },
     {
+        title: 'Quản lý tiền phạt',
+        path: '/admin/fines',
+        icon: <ReceiptIcon />,
+        description: 'Tạo, theo dõi và miễn phạt',
+    },
+    {
         title: 'Khu vực bạn đọc',
         path: '/books',
         icon: <StorefrontIcon />,
