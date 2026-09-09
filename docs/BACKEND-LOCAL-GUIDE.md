@@ -63,6 +63,8 @@ Copy-Item src/main/resources/application.properties.example `
 | `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` | SMTP gửi email |
 | `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` | Khóa Razorpay |
 | `RAZORPAY_CALLBACK_BASE_URL` | URL frontend nhận kết quả thanh toán |
+| `VIETQR_BANK_NAME`, `VIETQR_ACCOUNT_NAME`, `VIETQR_ACCOUNT_NUMBER` | Thông tin tài khoản nhận chuyển khoản |
+| `VIETQR_IMAGE_URL` | Đường dẫn ảnh QR, mặc định `/payment/mb-vietqr.png` |
 | `OVERDUE_FINE_PER_DAY` | Tiền phạt cho mỗi ngày quá hạn |
 
 Ví dụ đặt biến trong phiên PowerShell hiện tại:
@@ -126,7 +128,9 @@ Luồng chính:
 9. Tạo/xem/miễn hoặc thanh toán khoản phạt.
 10. Tra cứu payment với phân trang.
 
-Luồng Razorpay thật cần khóa hợp lệ. API đăng ký gói trả về `checkoutUrl`; mở URL đó để thanh toán, sau đó frontend gửi `razorpayPaymentId` đến `POST /api/payments/verify`. Khi xác minh thành công, backend tự kích hoạt subscription hoặc đóng fine tương ứng.
+Luồng mặc định dùng VietQR. API đăng ký gói hoặc thanh toán phạt trả thông tin QR, số tiền và nội dung chuyển khoản. Bạn đọc gửi xác nhận qua `POST /api/payments/{paymentId}/submit`; quản trị viên đối chiếu ngân hàng rồi gọi `POST /api/payments/admin/{paymentId}/confirm` hoặc `/reject`. Backend chỉ kích hoạt subscription hoặc đóng fine sau khi quản trị viên xác nhận.
+
+Với database đã tạo trước giai đoạn 9, chạy `database/stage-09-vietqr.sql` một lần trước khi khởi động backend. Script có thể chạy lại và tự bỏ qua các cột đã tồn tại.
 
 ## 7. Endpoint chính
 

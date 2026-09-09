@@ -7,7 +7,7 @@
 - Backend: Java 17, Spring Boot, Spring Security, Spring Data JPA, JWT.
 - Frontend: React 19, Vite, Material UI, Tailwind CSS và Axios.
 - Database: MySQL.
-- Tích hợp: Java Mail và Razorpay.
+- Tích hợp: Java Mail, VietQR đối soát thủ công và Razorpay dự phòng.
 
 ## Cấu trúc thư mục
 
@@ -33,7 +33,7 @@ Library-Management-System/
 - Mượn, trả, gia hạn và xử lý phiếu quá hạn.
 - Đặt trước và quản lý hàng chờ.
 - Gói thành viên và đăng ký thành viên.
-- Tiền phạt, thanh toán và xác minh Razorpay.
+- Tiền phạt, thanh toán VietQR và đối soát giao dịch.
 - Đánh giá sách và danh sách yêu thích.
 
 ### Frontend
@@ -49,13 +49,17 @@ Library-Management-System/
 - Quản lý tiền phạt tại `/admin/fines`.
 - Quản lý người dùng và phân quyền tại `/admin/users`.
 - Quản lý gói thành viên và đăng ký tại `/admin/subscriptions`.
+- Đối soát chuyển khoản VietQR tại `/admin/payments`.
 - Bạn đọc xem và đăng ký gói tại `/subscriptions`.
+- Bạn đọc xem lịch sử giao dịch tại `/my-payments`.
 
 ## Chuẩn bị MySQL
 
 1. Mở MySQL Workbench và kết nối MySQL local.
 2. Chạy file `database/library_db.sql` để tạo database và các bảng.
 3. Chạy file `database/seed-dev.sql` để thêm thể loại, sách và gói thành viên mẫu.
+
+Nếu database đã tồn tại từ giai đoạn 8, chạy thêm `database/stage-09-vietqr.sql` trước khi khởi động backend để bổ sung các cột đối soát và chuyển dữ liệu tiền tệ mẫu sang VND.
 
 `seed-dev.sql` chỉ thêm dữ liệu còn thiếu dựa trên mã hoặc ISBN nên có thể chạy lại khi cần. Hãy sao lưu trước nếu database đang chứa dữ liệu quan trọng.
 
@@ -191,7 +195,7 @@ Frontend sử dụng các API `/api/reservations`, `/api/reservations/user/{user
 - Hiển thị thông tin giao dịch, người miễn và lý do miễn khi có.
 - Không tính khoản đã miễn vào tổng tiền còn phải trả.
 
-Frontend sử dụng các API `/api/fines` và `/api/fines/waive`. Người dùng thanh toán khoản phạt của mình qua `/api/fines/{id}/pay`; phần giao diện đối soát Razorpay dành cho giai đoạn 9.
+Frontend sử dụng các API `/api/fines` và `/api/fines/waive`. Người dùng tạo giao dịch VietQR cho khoản phạt qua `/api/fines/{id}/pay`, quét mã rồi gửi yêu cầu đối soát tại `/api/payments/{paymentId}/submit`.
 
 ### Quản lý người dùng
 
@@ -210,7 +214,7 @@ Bạn đọc tại `/subscriptions` có thể:
 
 - Xem các gói đang mở, giá, thời hạn và hạn mức mượn.
 - Xem gói đang hoạt động, số ngày còn lại và lịch sử đăng ký.
-- Tạo đăng ký chờ và nhận liên kết thanh toán Razorpay.
+- Tạo đăng ký chờ và nhận mã VietQR kèm nội dung chuyển khoản riêng.
 - Hủy gói đang sử dụng hoặc đăng ký đang chờ thanh toán.
 - Không tạo trùng khi đã có gói hoạt động hoặc một đăng ký đang chờ.
 
@@ -223,7 +227,16 @@ Quản trị viên tại `/admin/subscriptions` có thể:
 
 Danh sách công khai `/api/subscription-plan` chỉ trả các gói đang mở và không trả ghi chú quản trị. Các API `/api/subscription-plan/admin/**` và `/api/subscriptions/admin/**` yêu cầu `ROLE_ADMIN`. Cấu trúc bảng `subscription_plans` và `subscriptions` đã có sẵn trong `database/library_db.sql`; dữ liệu mẫu có ba gói trong `database/seed-dev.sql`.
 
-Giai đoạn 8 sử dụng phần tạo liên kết Razorpay đã có trong backend. Luồng xác minh kết quả thanh toán và đối soát giao dịch được hoàn thiện ở giai đoạn 9.
+### Thanh toán VietQR và đối soát – giai đoạn 9
+
+- Ảnh QR của tài khoản MB được backend phục vụ tại `/payment/mb-vietqr.png`.
+- Mỗi giao dịch có số tiền và nội dung chuyển khoản riêng dạng `TXN_...`.
+- Bạn đọc quét QR, nhập đúng nội dung và bấm **Tôi đã chuyển khoản**; trạng thái đổi từ `PENDING` sang `PROCESSING`.
+- Quản trị viên vào `/admin/payments`, kiểm tra tiền trên ứng dụng ngân hàng rồi nhập mã giao dịch để xác nhận hoặc ghi lý do từ chối.
+- Chỉ khi quản trị viên xác nhận, trạng thái mới thành `SUCCESS`; backend mới kích hoạt gói thành viên hoặc đóng khoản phạt.
+- Lịch sử của bạn đọc nằm tại `/my-payments`. Thông tin người đối soát và thời gian xử lý được lưu trong bảng `payments`.
+
+QR hiện tại là QR tĩnh nên không tự biết tiền đã vào tài khoản. Nút xác nhận của bạn đọc chỉ gửi yêu cầu, không tự cấp quyền thành viên.
 
 ## Kiểm tra thủ công
 
@@ -247,8 +260,10 @@ Giai đoạn 8 sử dụng phần tạo liên kết Razorpay đã có trong back
 18. Đăng nhập bằng tài khoản người dùng để xác nhận không truy cập được route admin.
 19. Vào `/admin/subscriptions`, tạo một gói mới rồi thử ẩn và kích hoạt lại.
 20. Đăng nhập tài khoản bạn đọc, vào `/subscriptions` và chọn một gói.
-21. Kiểm tra liên kết Razorpay, đăng ký chờ và thao tác hủy đăng ký.
-22. Quay lại tài khoản admin để lọc đăng ký và chạy cập nhật gói hết hạn.
+21. Chọn gói, quét VietQR, chuyển đúng số tiền và nội dung rồi bấm **Tôi đã chuyển khoản**.
+22. Đăng nhập admin, vào `/admin/payments`, đối chiếu ứng dụng MB rồi xác nhận hoặc từ chối giao dịch.
+23. Kiểm tra giao dịch thành công đã kích hoạt gói hoặc đóng khoản phạt tương ứng.
+24. Quay lại trang quản lý thành viên để lọc đăng ký và chạy cập nhật gói hết hạn.
 
 ## Tài liệu liên quan
 
@@ -260,5 +275,5 @@ Giai đoạn 8 sử dụng phần tạo liên kết Razorpay đã có trong back
 
 ## Các giai đoạn tiếp theo
 
-- Giai đoạn 9: thanh toán và xác minh Razorpay.
-- Giai đoạn 10 trở đi: hoàn thiện cổng bạn đọc, email, bảo mật, migration database và triển khai.
+- Giai đoạn 9: đã hoàn thành thanh toán VietQR và đối soát thủ công.
+- Giai đoạn 10 trở đi: webhook ngân hàng/cổng thanh toán tự động, email, bảo mật, migration database và triển khai.

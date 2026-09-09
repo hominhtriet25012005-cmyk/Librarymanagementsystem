@@ -14,7 +14,7 @@ Tài liệu đối chiếu chính: [Production-Grade Library Management System J
 - Mượn/trả: kiểm tra gói, hạn mức, sách quá hạn, gia hạn, trả/mất/hỏng, cập nhật tồn kho và thống kê.
 - Đặt chỗ: hàng chờ, thông báo khi có sách, nhận sách, hủy và hết hạn sau 48 giờ.
 - Tiền phạt: tạo phạt, phạt quá hạn tự động, miễn phạt, thanh toán một phần/toàn bộ.
-- Thanh toán: tạo Payment Link Razorpay, xác minh giao dịch, chống dùng lại mã thanh toán và phát sự kiện nghiệp vụ.
+- Thanh toán: tạo giao dịch VietQR, tiếp nhận yêu cầu đối soát, quản trị viên xác nhận/từ chối, chống dùng lại mã ngân hàng và phát sự kiện nghiệp vụ.
 - Đánh giá sách: chỉ người đã mượn và trả sách mới được đánh giá; mỗi người một đánh giá cho mỗi sách.
 - Danh sách yêu thích: thêm, xóa và phân trang danh sách của người dùng.
 - Phân quyền: các thao tác quản trị được giới hạn cho `ROLE_ADMIN`; dữ liệu cá nhân chỉ chủ sở hữu được thao tác.
@@ -66,8 +66,8 @@ Với database local chỉ mới có `books`, có thể chạy schema trên mộ
 
 - Dùng tên `Genre`, không dùng `Genera`.
 - Dùng `Wishlist` theo source hiện tại; tài liệu có chỗ gọi là Watchlist.
-- Backend hiện dùng JWT local và Razorpay. Google OAuth, Stripe và module giao diện chưa được triển khai trong source này.
-- Tiền được lưu bằng `BIGINT` theo đơn vị tiền chính của gói. Khi gửi Razorpay, backend nhân 100 để đổi sang đơn vị nhỏ nhất. Khi dùng Razorpay thật nên cấu hình gói bằng `INR`.
+- Backend hiện dùng JWT local và VietQR đối soát thủ công; mã Razorpay cũ vẫn được giữ làm phương án mở rộng. Google OAuth và Stripe chưa được triển khai trong source này.
+- Tiền được lưu bằng `BIGINT` theo đơn vị tiền chính của gói. Luồng VietQR dùng `VND`; dữ liệu mẫu và mặc định database đã được chuyển sang VND.
 - Response đăng nhập giữ các trường `jwt`, `title`, `message`, `user` để khớp code hiện tại.
 
 ## 5. Kết quả kiểm tra
@@ -80,6 +80,6 @@ Với database local chỉ mới có `books`, có thể chạy schema trên mộ
 ## 6. Giới hạn cần biết
 
 - Test không gọi Razorpay, Gmail hay MySQL thật; các dịch vụ ngoài được mock để test an toàn và ổn định.
-- Payment thật chỉ hoạt động khi có `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` và callback URL hợp lệ.
+- QR tĩnh không có webhook ngân hàng; quản trị viên phải kiểm tra giao dịch trên ứng dụng MB trước khi xác nhận.
 - Gửi email thật chỉ hoạt động khi có tài khoản SMTP hợp lệ; với Gmail cần App Password.
 - Dữ liệu MySQL đang có không được sửa tự động trong đợt rà soát này để tránh mất dữ liệu. Schema mới là nguồn đối chiếu trước khi migration.
