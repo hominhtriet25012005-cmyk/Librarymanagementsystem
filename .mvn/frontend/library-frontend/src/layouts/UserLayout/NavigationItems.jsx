@@ -124,6 +124,12 @@ export const adminNavigationItems = [
         description: 'Phân quyền và xác minh tài khoản',
     },
     {
+        title: 'Quản lý thành viên',
+        path: '/admin/subscriptions',
+        icon: <CardMembershipIcon />,
+        description: 'Gói thành viên và đăng ký',
+    },
+    {
         title: 'Khu vực bạn đọc',
         path: '/books',
         icon: <StorefrontIcon />,

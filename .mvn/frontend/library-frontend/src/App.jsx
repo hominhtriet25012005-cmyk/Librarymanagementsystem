@@ -14,6 +14,7 @@ const MyLoans = lazy(() => import("./pages/Loans/MyLoans"));
 const MyReservations = lazy(() => import("./pages/Reservations/MyReservations"));
 const MyFines = lazy(() => import("./pages/Fines/MyFines"));
 const WishlistPage = lazy(() => import("./pages/Wishlist/WishlistPage"));
+const SubscriptionsPage = lazy(() => import("./pages/Subscriptions/SubscriptionsPage"));
 const AdminDashboardPage = lazy(() => import("./pages/Admin/AdminDashboardPage"));
 const AdminBooksPage = lazy(() => import("./pages/Admin/AdminBooksPage"));
 const AdminGenresPage = lazy(() => import("./pages/Admin/AdminGenresPage"));
@@ -21,6 +22,7 @@ const AdminLoansPage = lazy(() => import("./pages/Admin/AdminLoansPage"));
 const AdminReservationsPage = lazy(() => import("./pages/Admin/AdminReservationsPage"));
 const AdminFinesPage = lazy(() => import("./pages/Admin/AdminFinesPage"));
 const AdminUsersPage = lazy(() => import("./pages/Admin/AdminUsersPage"));
+const AdminMembershipPage = lazy(() => import("./pages/Admin/AdminMembershipPage"));
 
 export default function App() {
   return <Suspense fallback={<div role="status" className="p-8 text-center">Đang tải giao diện...</div>}>
@@ -39,7 +41,7 @@ export default function App() {
           <Route path="my-loans" element={<MyLoans />} />
           <Route path="my-reservations" element={<MyReservations />} />
           <Route path="my-fines" element={<MyFines />} />
-          <Route path="subscriptions" element={<ModulePlaceholder title="Gói thành viên" />} />
+          <Route path="subscriptions" element={<SubscriptionsPage />} />
           <Route path="wishlist" element={<WishlistPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="settings" element={<ModulePlaceholder title="Cài đặt" />} />
@@ -53,6 +55,7 @@ export default function App() {
             <Route path="admin/reservations" element={<AdminReservationsPage />} />
             <Route path="admin/fines" element={<AdminFinesPage />} />
             <Route path="admin/users" element={<AdminUsersPage />} />
+            <Route path="admin/subscriptions" element={<AdminMembershipPage />} />
           </Route>
         </Route>
         <Route path="*" element={<ModulePlaceholder title="Không tìm thấy trang" description="Đường dẫn không tồn tại. Hãy chọn một mục trong thanh điều hướng." />} />

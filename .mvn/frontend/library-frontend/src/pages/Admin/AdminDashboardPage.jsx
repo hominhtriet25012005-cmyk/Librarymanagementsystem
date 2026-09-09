@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Alert, Button, Card, Chip, CircularProgress } from "@mui/material";
 import {
   AutoStories,
+  CardMembership,
   Category,
   EventBusy,
   Group,
@@ -61,6 +62,7 @@ export default function AdminDashboardPage() {
     { label: "Người dùng", value: dashboard.userStats.totalUsers, hint: "Tài khoản trong hệ thống", icon: <Group className="text-sky-700" />, color: "bg-sky-100" },
     { label: "Phiếu đang quá hạn", value: dashboard.overdueLoans.totalElements, hint: "Cần được xử lý", icon: <EventBusy className="text-rose-700" />, color: "bg-rose-100" },
     { label: "Tiền phạt chưa xử lý", value: dashboard.fines.totalElements, hint: "Khoản phạt đang chờ", icon: <ReceiptLong className="text-amber-700" />, color: "bg-amber-100" },
+    { label: "Thành viên đang hoạt động", value: dashboard.subscriptionStats.activeSubscriptions, hint: "Đăng ký còn hiệu lực", icon: <CardMembership className="text-teal-700" />, color: "bg-teal-100" },
   ];
 
   return <section aria-labelledby="admin-dashboard-title" className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
@@ -88,6 +90,7 @@ export default function AdminDashboardPage() {
           <Button component={Link} to="/admin/reservations" variant="outlined" fullWidth>Xử lý hàng chờ đặt trước</Button>
           <Button component={Link} to="/admin/fines" variant="outlined" fullWidth>Xử lý tiền phạt</Button>
           <Button component={Link} to="/admin/users" variant="outlined" fullWidth>Quản lý người dùng</Button>
+          <Button component={Link} to="/admin/subscriptions" variant="outlined" fullWidth>Quản lý thành viên</Button>
           <div className="rounded-lg bg-indigo-50 p-4 text-sm text-indigo-900"><p className="font-semibold">Đặt trước đang hoạt động</p><p className="mt-1 text-2xl font-bold">{dashboard.reservations.totalElements ?? 0}</p></div>
         </div>
       </Card>

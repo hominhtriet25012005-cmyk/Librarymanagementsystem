@@ -11,6 +11,7 @@ export const adminApi = {
       httpClient.get("/api/reservations", { params: { activeOnly: true, page: 0, size: 1 } }),
       httpClient.get("/api/fines", { params: { status: "PENDING", page: 0, size: 1 } }),
       httpClient.get("/api/fines", { params: { status: "PARTIALLY_PAID", page: 0, size: 1 } }),
+      httpClient.get("/api/subscriptions/admin/stats"),
     ];
     const results = await Promise.allSettled(requests);
     const dataAt = (index, fallback) => results[index].status === "fulfilled" ? results[index].value.data : fallback;
@@ -26,6 +27,7 @@ export const adminApi = {
         totalElements: (dataAt(6, { totalElements: 0 }).totalElements || 0)
           + (dataAt(7, { totalElements: 0 }).totalElements || 0),
       },
+      subscriptionStats: dataAt(8, { activeSubscriptions: 0 }),
       hasPartialError: results.some((result) => result.status === "rejected"),
     };
   },

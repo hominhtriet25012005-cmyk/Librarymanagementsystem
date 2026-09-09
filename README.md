@@ -48,6 +48,8 @@ Library-Management-System/
 - Quản lý đặt trước và hàng chờ tại `/admin/reservations`.
 - Quản lý tiền phạt tại `/admin/fines`.
 - Quản lý người dùng và phân quyền tại `/admin/users`.
+- Quản lý gói thành viên và đăng ký tại `/admin/subscriptions`.
+- Bạn đọc xem và đăng ký gói tại `/subscriptions`.
 
 ## Chuẩn bị MySQL
 
@@ -134,7 +136,7 @@ Nếu danh sách sách báo “Chưa có sách phù hợp”, hãy kiểm tra:
 - Backend có chạy tại cổng `5000` hay không.
 - Frontend có dùng đúng `VITE_API_BASE_URL` hay không.
 
-## Các màn hình quản trị giai đoạn 0–7
+## Các màn hình quản trị giai đoạn 0–8
 
 ### Tổng quan quản trị
 
@@ -202,6 +204,27 @@ Frontend sử dụng các API `/api/fines` và `/api/fines/waive`. Người dùn
 
 Frontend sử dụng các API quản trị `/api/user/admin`, `/api/user/admin/stats` và `/api/user/admin/{userId}`. API `/api/user/list` cũ vẫn được giữ để chọn bạn đọc ở các nghiệp vụ mượn trả, đặt trước và tiền phạt.
 
+### Gói thành viên và đăng ký
+
+Bạn đọc tại `/subscriptions` có thể:
+
+- Xem các gói đang mở, giá, thời hạn và hạn mức mượn.
+- Xem gói đang hoạt động, số ngày còn lại và lịch sử đăng ký.
+- Tạo đăng ký chờ và nhận liên kết thanh toán Razorpay.
+- Hủy gói đang sử dụng hoặc đăng ký đang chờ thanh toán.
+- Không tạo trùng khi đã có gói hoạt động hoặc một đăng ký đang chờ.
+
+Quản trị viên tại `/admin/subscriptions` có thể:
+
+- Tạo, cập nhật, đánh dấu nổi bật, ẩn và kích hoạt lại gói thành viên.
+- Xem toàn bộ đăng ký, tìm theo bạn đọc hoặc gói và lọc theo trạng thái.
+- Theo dõi tổng số đăng ký đang hoạt động, chờ thanh toán, hết hạn và đã hủy.
+- Hủy đăng ký kèm lý do và cập nhật hàng loạt các đăng ký hết hạn.
+
+Danh sách công khai `/api/subscription-plan` chỉ trả các gói đang mở và không trả ghi chú quản trị. Các API `/api/subscription-plan/admin/**` và `/api/subscriptions/admin/**` yêu cầu `ROLE_ADMIN`. Cấu trúc bảng `subscription_plans` và `subscriptions` đã có sẵn trong `database/library_db.sql`; dữ liệu mẫu có ba gói trong `database/seed-dev.sql`.
+
+Giai đoạn 8 sử dụng phần tạo liên kết Razorpay đã có trong backend. Luồng xác minh kết quả thanh toán và đối soát giao dịch được hoàn thiện ở giai đoạn 9.
+
 ## Kiểm tra thủ công
 
 1. Khởi động MySQL, backend và frontend.
@@ -222,6 +245,10 @@ Frontend sử dụng các API quản trị `/api/user/admin`, `/api/user/admin/s
 16. Dùng một tài khoản phụ để thử cấp rồi thu hồi quyền quản trị.
 17. Xác nhận tài khoản quản trị đang đăng nhập không thể tự hạ quyền.
 18. Đăng nhập bằng tài khoản người dùng để xác nhận không truy cập được route admin.
+19. Vào `/admin/subscriptions`, tạo một gói mới rồi thử ẩn và kích hoạt lại.
+20. Đăng nhập tài khoản bạn đọc, vào `/subscriptions` và chọn một gói.
+21. Kiểm tra liên kết Razorpay, đăng ký chờ và thao tác hủy đăng ký.
+22. Quay lại tài khoản admin để lọc đăng ký và chạy cập nhật gói hết hạn.
 
 ## Tài liệu liên quan
 
@@ -233,6 +260,5 @@ Frontend sử dụng các API quản trị `/api/user/admin`, `/api/user/admin/s
 
 ## Các giai đoạn tiếp theo
 
-- Giai đoạn 8: quản lý gói thành viên và đăng ký.
 - Giai đoạn 9: thanh toán và xác minh Razorpay.
 - Giai đoạn 10 trở đi: hoàn thiện cổng bạn đọc, email, bảo mật, migration database và triển khai.

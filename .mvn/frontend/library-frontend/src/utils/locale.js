@@ -11,7 +11,12 @@ export function formatDateTime(value) {
   });
 }
 export function formatMoney(value, currency = "INR") {
-  return new Intl.NumberFormat("vi-VN", { style: "currency", currency }).format(Number(value) || 0);
+  const amount = Number(value) || 0;
+  try {
+    return new Intl.NumberFormat("vi-VN", { style: "currency", currency }).format(amount);
+  } catch {
+    return `${new Intl.NumberFormat("vi-VN").format(amount)} ${currency}`;
+  }
 }
 export const statusLabels = {
   ACTIVE: "Đang hoạt động", CHECKED_OUT: "Đang mượn", OVERDUE: "Quá hạn", RETURNED: "Đã trả",
