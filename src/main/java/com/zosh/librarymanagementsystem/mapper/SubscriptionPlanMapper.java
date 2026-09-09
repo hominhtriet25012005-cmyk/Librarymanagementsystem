@@ -73,9 +73,7 @@ public class SubscriptionPlanMapper {
         if (dto.getName() != null) {
             plan.setName(dto.getName());
         }
-        if (dto.getDescription() != null) {
-            plan.setDescription(dto.getDescription());
-        }
+        plan.setDescription(dto.getDescription());
         if (dto.getDurationDays() != null) {
             plan.setDurationDays(dto.getDurationDays());
         }
@@ -100,15 +98,8 @@ public class SubscriptionPlanMapper {
         if (dto.getIsFeatured() != null) {
             plan.setIsFeatured(dto.getIsFeatured());
         }
-        if (dto.getBadgeText() != null) {
-            plan.setBadgeText(dto.getBadgeText());
-        }
-        if (dto.getAdminNotes() != null) {
-            plan.setAdminNotes(dto.getAdminNotes());
-        }
-        if (dto.getUpdatedBy() != null) {
-            plan.setUpdatedBy(dto.getUpdatedBy());
-        }
+        plan.setBadgeText(dto.getBadgeText());
+        plan.setAdminNotes(dto.getAdminNotes());
     }
 
     private String normalizeCurrency(String currency) {

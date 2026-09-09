@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +25,8 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
 
     @Override
     public SubscriptionPlanDTO createSubscriptionPlan(SubscriptionPlanDTO planDTO) {
+
+        planDTO.setPlanCode(planDTO.getPlanCode().trim().toUpperCase(Locale.ROOT));
 
         if (planRepository.existsByPlanCode(planDTO.getPlanCode())) {
             throw new SubscriptionException("Mã gói thành viên đã tồn tại");
