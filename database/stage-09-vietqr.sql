@@ -21,6 +21,66 @@ BEGIN
         ALTER TABLE subscription_plans DROP COLUMN title;
     END IF;
 
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = 'subscription_plans'
+          AND column_name = 'duration_in_days'
+    ) THEN
+        UPDATE subscription_plans
+        SET duration_days = duration_in_days
+        WHERE duration_days IS NULL OR duration_days <= 0;
+        ALTER TABLE subscription_plans DROP COLUMN duration_in_days;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = 'subscription_plans'
+          AND column_name = 'active'
+    ) THEN
+        UPDATE subscription_plans SET is_active = active WHERE is_active IS NULL;
+        ALTER TABLE subscription_plans DROP COLUMN active;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = 'subscription_plans'
+          AND column_name = 'billing_cycle'
+    ) THEN
+        ALTER TABLE subscription_plans DROP COLUMN billing_cycle;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = 'subscription_plans'
+          AND column_name = 'trial_days'
+    ) THEN
+        ALTER TABLE subscription_plans DROP COLUMN trial_days;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = 'subscription_plans'
+          AND column_name = 'max_users_allowed'
+    ) THEN
+        ALTER TABLE subscription_plans DROP COLUMN max_users_allowed;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = 'subscription_plans'
+          AND column_name = 'features'
+    ) THEN
+        ALTER TABLE subscription_plans DROP COLUMN features;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = 'subscription_plans'
+          AND column_name = 'auto_renew'
+    ) THEN
+        ALTER TABLE subscription_plans DROP COLUMN auto_renew;
+    END IF;
+
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
         WHERE table_schema = DATABASE() AND table_name = 'payments' AND column_name = 'payer_reference'
@@ -69,6 +129,10 @@ DELIMITER ;
 
 ALTER TABLE payments ALTER COLUMN currency SET DEFAULT 'VND';
 ALTER TABLE subscription_plans ALTER COLUMN currency SET DEFAULT 'VND';
+ALTER TABLE subscription_plans
+    MODIFY COLUMN display_order INT NOT NULL DEFAULT 0,
+    MODIFY COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    MODIFY COLUMN is_featured BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- Dữ liệu mẫu cũ ghi INR dù giá được nhập theo đồng Việt Nam.
 UPDATE subscription_plans SET currency = 'VND' WHERE currency = 'INR';

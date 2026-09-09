@@ -10,6 +10,7 @@ import com.zosh.librarymanagementsystem.service.UserService;
 import com.zosh.librarymanagementsystem.exception.SubscriptionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
@@ -24,6 +25,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     private final UserService userService;
 
     @Override
+    @Transactional
     public SubscriptionPlanDTO createSubscriptionPlan(SubscriptionPlanDTO planDTO) {
 
         planDTO.setPlanCode(planDTO.getPlanCode().trim().toUpperCase(Locale.ROOT));
@@ -41,6 +43,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     }
 
     @Override
+    @Transactional
     public SubscriptionPlanDTO updateSubscriptionPlan(Long planId, SubscriptionPlanDTO planDTO) {
         SubscriptionPlan existingPlan = planRepository.findById(planId).orElseThrow(
                 () -> new SubscriptionException("Không tìm thấy gói thành viên")
@@ -54,6 +57,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     }
 
     @Override
+    @Transactional
     public void deleteSubscriptionPlan(Long planId) {
         SubscriptionPlan existingPlan = planRepository.findById(planId).orElseThrow(
                 () -> new SubscriptionException("Không tìm thấy gói thành viên")

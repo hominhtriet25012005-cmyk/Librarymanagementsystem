@@ -35,10 +35,21 @@ public class GlobalException {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse> handleDataIntegrityViolation(
             DataIntegrityViolationException e) {
-        log.warn("Thao tác vi phạm ràng buộc dữ liệu: {}", e.getMostSpecificCause().getMessage());
+        String databaseMessage = e.getMostSpecificCause().getMessage();
+        log.warn("Thao tác vi phạm ràng buộc dữ liệu: {}", databaseMessage);
+
+        String userMessage = "Không thể thực hiện vì dữ liệu đang được tham chiếu hoặc đã tồn tại";
+        if (databaseMessage != null && databaseMessage.contains("doesn't have a default value")) {
+            // Thường xảy ra khi database cũ còn cột bắt buộc mà entity hiện tại không sử dụng.
+            userMessage = "Cấu trúc database chưa đồng bộ với backend. Hãy chạy migration mới nhất";
+        } else if (databaseMessage != null && databaseMessage.contains("Duplicate entry")) {
+            userMessage = "Mã hoặc dữ liệu này đã tồn tại";
+        } else if (databaseMessage != null
+                && databaseMessage.toLowerCase().contains("foreign key constraint")) {
+            userMessage = "Không thể thay đổi vì dữ liệu đang được sử dụng ở chức năng khác";
+        }
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ApiResponse(
-                        "Không thể thực hiện vì dữ liệu đang được tham chiếu hoặc đã tồn tại", false));
+                .body(new ApiResponse(userMessage, false));
     }
 
     @ExceptionHandler(Exception.class)
