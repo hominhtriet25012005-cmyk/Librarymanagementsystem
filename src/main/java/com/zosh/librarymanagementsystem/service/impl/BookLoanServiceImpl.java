@@ -310,55 +310,32 @@ public class BookLoanServiceImpl implements BookLoanService {
 
     @Override
     public PageResponse<BookLoanDTO> getBookLoans(BookLoanSearchRequest request) {
-            if (request == null) {
-                request = new BookLoanSearchRequest();
-            }
-            // 1. Tạo thông tin phân trang và sắp xếp từ yêu cầu tìm kiếm.
-                Pageable pageable = createPageable(
-                        request.getPage(),
-                        request.getSize(),
-                        request.getSortBy(),
-                        request.getSortDirection()
-                );
+        if (request == null) {
+            request = new BookLoanSearchRequest();
+        }
+        // 1. Tạo thông tin phân trang và sắp xếp từ yêu cầu tìm kiếm.
+        Pageable pageable = createPageable(
+                request.getPage(),
+                request.getSize(),
+                request.getSortBy(),
+                request.getSortDirection()
+        );
 
-                 Page<BookLoan> bookLoanPage;
+        // 2. Ghép tất cả điều kiện được gửi từ frontend vào cùng một truy vấn.
+        Page<BookLoan> bookLoanPage = bookLoanRepository.searchBookLoans(
+                request.getUserId(),
+                request.getBookId(),
+                request.getStatus(),
+                Boolean.TRUE.equals(request.getOverdueOnly()),
+                Boolean.TRUE.equals(request.getUnpaidFinesOnly()),
+                request.getStartDate(),
+                request.getEndDate(),
+                LocalDate.now(),
+                pageable
+        );
 
-            // 2. Áp dụng bộ lọc phù hợp với dữ liệu được truyền lên.
-             if (Boolean.TRUE.equals(request.getOverdueOnly())) {
-                 // Chỉ lấy các phiếu đang quá hạn.
-                 bookLoanPage = bookLoanRepository.findOverdueBookLoans(LocalDate.now(), pageable);
-             }
-             else if (Boolean.TRUE.equals(request.getUnpaidFinesOnly())) {
-                 // Chỉ lấy các phiếu có khoản phạt chưa thanh toán đủ.
-                 bookLoanPage = bookLoanRepository.findBookLoansWithUnpaidFines(pageable);
-             }
-             else if (request.getUserId() != null) {
-                 // Lọc theo người dùng.
-                 bookLoanPage = bookLoanRepository.findByUserId(request.getUserId(),pageable);
-             }
-             else if (request.getBookId() != null) {
-                 // Lọc theo sách.
-                 bookLoanPage = bookLoanRepository.findByBookId(request.getBookId(), pageable);
-             }
-             else if (request.getStatus() != null) {
-                 // Lọc theo trạng thái phiếu mượn.
-                 bookLoanPage = bookLoanRepository.findByStatus(request.getStatus(), pageable);
-             }
-             else if (request.getStartDate() != null && request.getEndDate() != null)  {
-                 // Lọc theo khoảng ngày mượn.
-                 bookLoanPage = bookLoanRepository.findBookLoansByDateRange(
-                          request.getStartDate(),
-                          request.getEndDate(),
-                         pageable
-                 );
-             }
-             else  {
-                 // Mặc định trả toàn bộ phiếu mượn.
-                 bookLoanPage = bookLoanRepository.findAll(pageable);
-             }
-
-             // 3. Chuyển entity sang DTO và đóng gói thông tin phân trang.
-            return convertToPageResponse(bookLoanPage);
+        // 3. Chuyển entity sang DTO và đóng gói thông tin phân trang.
+        return convertToPageResponse(bookLoanPage);
     }
 
     @Override
@@ -370,23 +347,22 @@ public class BookLoanServiceImpl implements BookLoanService {
 
         int updateCount = 0;
         for (BookLoan bookLoan : overduePage.getContent()) {
-            if (bookLoan.getStatus() == BookLoanStatus.CHECKED_OUT) {
+            int overdueDays = calculateOverdueDate(bookLoan.getDueDate(), LocalDate.now());
+            boolean statusChanged = bookLoan.getStatus() == BookLoanStatus.CHECKED_OUT;
+            boolean daysChanged = bookLoan.getOverdueDays() == null
+                    || bookLoan.getOverdueDays() != overdueDays;
+
+            // Cập nhật cả phiếu mới quá hạn lẫn số ngày của phiếu đã quá hạn từ trước.
+            if (statusChanged || daysChanged || !Boolean.TRUE.equals(bookLoan.getIsOverdue())) {
                 bookLoan.setStatus(BookLoanStatus.OVERDUE);
                 bookLoan.setIsOverdue(true);
-
-                // Tính số ngày quá hạn.
-                int overdueDays = calculateOverdueDate(
-                        bookLoan.getDueDate(),
-                        LocalDate.now()
-                );
                 bookLoan.setOverdueDays(overdueDays);
-
                 bookLoanRepository.save(bookLoan);
                 updateCount++;
             }
-    }
-        return updateCount;
         }
+        return updateCount;
+    }
 
     private Pageable createPageable(Integer page,
                                     Integer size,

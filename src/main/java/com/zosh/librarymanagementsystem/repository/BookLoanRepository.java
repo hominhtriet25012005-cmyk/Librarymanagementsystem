@@ -56,5 +56,31 @@ public interface BookLoanRepository extends JpaRepository<BookLoan, Long> {
             "WHERE f.status = 'PENDING' OR f.status = 'PARTIALLY_PAID'")
     Page<BookLoan> findBookLoansWithUnpaidFines(Pageable pageable);
 
+    /**
+     * Tìm phiếu mượn bằng nhiều điều kiện cùng lúc cho màn hình quản trị.
+     * Tham số rỗng được bỏ qua, nhờ vậy frontend không phải chọn một bộ lọc ưu tiên.
+     */
+    @Query("SELECT bl FROM BookLoan bl WHERE " +
+            "(:userId IS NULL OR bl.user.id = :userId) AND " +
+            "(:bookId IS NULL OR bl.book.id = :bookId) AND " +
+            "(:status IS NULL OR bl.status = :status) AND " +
+            "(:overdueOnly = false OR (bl.dueDate < :currentDate " +
+            "AND (bl.status = 'CHECKED_OUT' OR bl.status = 'OVERDUE'))) AND " +
+            "(:unpaidFinesOnly = false OR EXISTS (SELECT f.id FROM Fine f " +
+            "WHERE f.bookLoan = bl AND (f.status = 'PENDING' OR f.status = 'PARTIALLY_PAID'))) AND " +
+            "(:startDate IS NULL OR bl.checkoutDate >= :startDate) AND " +
+            "(:endDate IS NULL OR bl.checkoutDate <= :endDate)")
+    Page<BookLoan> searchBookLoans(
+            @Param("userId") Long userId,
+            @Param("bookId") Long bookId,
+            @Param("status") BookLoanStatus status,
+            @Param("overdueOnly") boolean overdueOnly,
+            @Param("unpaidFinesOnly") boolean unpaidFinesOnly,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("currentDate") LocalDate currentDate,
+            Pageable pageable
+    );
+
     boolean existsByUserIdAndBookIdAndStatus(Long userId, Long bookId, BookLoanStatus status);
 }
