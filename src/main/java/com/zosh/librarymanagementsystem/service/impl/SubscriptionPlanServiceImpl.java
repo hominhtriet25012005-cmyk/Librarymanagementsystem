@@ -62,11 +62,24 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     @Override
     public List<SubscriptionPlanDTO> getAllSubscriptionPlan() {
 
-        List<SubscriptionPlan> planList = planRepository.findAll();
+        List<SubscriptionPlan> planList = planRepository.findAllByOrderByDisplayOrderAscIdAsc();
 
         return planList.stream().map(
                 planMapper::toDTO
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SubscriptionPlanDTO> getActiveSubscriptionPlans() {
+        return planRepository.findByIsActiveTrueOrderByDisplayOrderAscIdAsc().stream()
+                .map(planMapper::toDTO)
+                .peek(plan -> {
+                    // Không trả ghi chú nội bộ và người chỉnh sửa ra danh sách công khai.
+                    plan.setAdminNotes(null);
+                    plan.setCreatedBy(null);
+                    plan.setUpdatedBy(null);
+                })
+                .toList();
     }
 
     @Override

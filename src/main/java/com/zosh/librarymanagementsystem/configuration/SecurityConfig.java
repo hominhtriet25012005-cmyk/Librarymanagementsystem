@@ -38,9 +38,14 @@ public class SecurityConfig {
                 ))
 
                 .authorizeHttpRequests(Authorize -> Authorize
+                        // API quản trị gói phải được xét trước API tra cứu công khai.
+                        .requestMatchers("/api/subscription-plan/admin", "/api/subscription-plan/admin/**")
+                        .hasRole("ADMIN")
+                        .requestMatchers("/api/subscriptions/admin", "/api/subscriptions/admin/**")
+                        .hasRole("ADMIN")
                         // Các API tra cứu công khai phục vụ trang danh mục sách.
                         .requestMatchers(HttpMethod.GET,
-                                "/api/books/**", "/api/genres/**", "/api/subscription-plan/**",
+                                "/api/books/**", "/api/genres/**", "/api/subscription-plan",
                                 "/api/reviews/book/**")
                         .permitAll()
 
@@ -66,8 +71,6 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/fines", "/api/payments")
                         .hasRole("ADMIN")
-                        .requestMatchers("/api/subscription-plan/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/subscriptions/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/list").hasRole("ADMIN")
                         .requestMatchers("/api/user/admin", "/api/user/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/books/admin/**", "/api/genres/**")

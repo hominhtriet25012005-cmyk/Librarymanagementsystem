@@ -16,6 +16,8 @@ public interface SubscriptionPlanService {
 
     List<SubscriptionPlanDTO> getAllSubscriptionPlan();
 
+    List<SubscriptionPlanDTO> getActiveSubscriptionPlans();
+
     SubscriptionPlan getBySubscriptionPlanCode(String subscriptionPlanCode);
 
 

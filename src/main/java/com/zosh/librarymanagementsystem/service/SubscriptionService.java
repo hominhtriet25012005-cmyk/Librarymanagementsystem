@@ -1,10 +1,10 @@
 package com.zosh.librarymanagementsystem.service;
 
 import com.zosh.librarymanagementsystem.payload.dto.SubscriptionDTO;
+import com.zosh.librarymanagementsystem.payload.request.SubscriptionSearchRequest;
+import com.zosh.librarymanagementsystem.payload.response.PageResponse;
 import com.zosh.librarymanagementsystem.payload.response.PaymentInitiateResponse;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
+import com.zosh.librarymanagementsystem.payload.response.SubscriptionStatsResponse;
 
 public interface SubscriptionService {
 
@@ -18,7 +18,11 @@ public interface SubscriptionService {
 
     SubscriptionDTO activateSubscription(Long subscriptionId, Long paymentId);
 
-    List<SubscriptionDTO> getAllSubscriptions(Pageable pageable);
+    PageResponse<SubscriptionDTO> getMySubscriptions(int page, int size);
+
+    PageResponse<SubscriptionDTO> searchSubscriptions(SubscriptionSearchRequest request);
+
+    SubscriptionStatsResponse getSubscriptionStats();
 
     void deactivateExpiredSubscriptions();
 }
