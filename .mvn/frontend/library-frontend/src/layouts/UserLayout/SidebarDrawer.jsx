@@ -16,23 +16,25 @@ export default function SidebarDrawer({ onNavigate }) {
     : user
       ? [...navigationItems, ...secondaryItems]
       : navigationItems.filter((item) => item.path === "/books");
-  return <Box sx={{ minHeight: "100%", background: "linear-gradient(180deg,#1e293b,#0f172a)", color: "white", p: 2 }}>
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 2 }}>
+  return <Box sx={{ height: "100%", display: "flex", flexDirection: "column", overflow: "hidden", background: "linear-gradient(180deg,#1e293b,#0f172a)", color: "white", p: 2 }}>
+    <Box sx={{ display: "flex", flexShrink: 0, alignItems: "center", gap: 1.5, py: 2 }}>
       <Avatar sx={{ bgcolor: "#4f46e5" }}><MenuBook /></Avatar>
       <div><Typography sx={{ fontWeight: 700 }}>{inAdminArea ? "Quản trị thư viện" : "Thư viện sách"}</Typography><Typography variant="caption">{inAdminArea ? "Trung tâm điều hành" : "Cùng bạn mở trang mới"}</Typography></div>
     </Box>
-    <List aria-label="Điều hướng chính">
+    <List aria-label="Điều hướng chính" sx={{ flex: 1, minHeight: 0, overflowY: "auto", pr: 0.5 }}>
       {items.map((item) => <ListItemButton key={item.path} selected={isActive(item.path, location)} onClick={() => go(item.path)}
         sx={{ borderRadius: 2, mb: 0.5, "&.Mui-selected": { bgcolor: "#3730a3" }, "&:hover": { bgcolor: "#334155" } }}>
         <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>{item.icon}</ListItemIcon><ListItemText primary={item.title} />
       </ListItemButton>)}
     </List>
-    <Divider sx={{ borderColor: "#334155", my: 2 }} />
-    {user && <Typography variant="body2" sx={{ px: 2, mb: 1, overflowWrap: "anywhere" }}>{user.fullName}</Typography>}
-    <ListItemButton onClick={() => { if (user) logout(); go("/login"); }} sx={{ borderRadius: 2 }}>
-      <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>{user ? <Logout /> : <Login />}</ListItemIcon>
-      <ListItemText primary={user ? "Đăng xuất" : "Đăng nhập"} />
-    </ListItemButton>
-    <Typography variant="caption" sx={{ display: "block", p: 2, color: "#94a3b8" }}>© {new Date().getFullYear()} Thư viện sách</Typography>
+    <Box sx={{ flexShrink: 0 }}>
+      <Divider sx={{ borderColor: "#334155", my: 2 }} />
+      {user && <Typography variant="body2" sx={{ px: 2, mb: 1, overflowWrap: "anywhere" }}>{user.fullName}</Typography>}
+      <ListItemButton onClick={() => { if (user) logout(); go("/login"); }} sx={{ borderRadius: 2 }}>
+        <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>{user ? <Logout /> : <Login />}</ListItemIcon>
+        <ListItemText primary={user ? "Đăng xuất" : "Đăng nhập"} />
+      </ListItemButton>
+      <Typography variant="caption" sx={{ display: "block", p: 2, color: "#94a3b8" }}>© {new Date().getFullYear()} Thư viện sách</Typography>
+    </Box>
   </Box>;
 }

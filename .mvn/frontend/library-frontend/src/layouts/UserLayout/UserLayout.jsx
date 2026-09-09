@@ -1,12 +1,18 @@
 import { Box, Toolbar } from "@mui/material";
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import UserSidebar from "./UserSidebar";
 
 const drawerWidth = 240;
 const UserLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    // Mỗi trang phải bắt đầu từ đầu; nếu giữ vị trí cuộn cũ, tiêu đề sẽ nằm sau thanh đầu trang.
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location.pathname]);
 
   return (
     <Box sx={{ display: "flex",

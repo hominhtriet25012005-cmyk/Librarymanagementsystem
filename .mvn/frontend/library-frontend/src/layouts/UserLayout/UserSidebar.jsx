@@ -21,6 +21,7 @@ const UserSidebar = ({ mobileOpen, onClose }) => {
                         boxSizing: "border-box",
                         width: drawerWidth,
                         border: "none",
+                        overflow: "hidden",
                     },
                 }}
             >
@@ -35,6 +36,7 @@ const UserSidebar = ({ mobileOpen, onClose }) => {
                         boxSizing: "border-box",
                         width: drawerWidth,
                         border: "none",
+                        overflow: "hidden",
                     },
                 }}
                 open
