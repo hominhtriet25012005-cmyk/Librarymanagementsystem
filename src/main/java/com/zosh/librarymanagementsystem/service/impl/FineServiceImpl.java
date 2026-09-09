@@ -49,7 +49,9 @@ public class FineServiceImpl  implements FineService {
     public FineDTO createFine(CreateFineRequest createFineRequest) {
         // 1. Kiểm tra phiếu mượn tồn tại.
         BookLoan bookLoan = bookLoanRepository.findById(createFineRequest.getBookLoanId())
-                .orElseThrow(() -> new LibraryOperationException("Không tìm thấy phiếu mượn"));
+                .orElseThrow(() -> new LibraryOperationException(
+                        "Không tìm thấy phiếu mượn #" + createFineRequest.getBookLoanId()
+                                + ". Vui lòng chọn lại từ danh sách phiếu mượn."));
 
         fineRepository.findByBookLoanIdAndType(bookLoan.getId(), createFineRequest.getType())
                 .ifPresent(existing -> {

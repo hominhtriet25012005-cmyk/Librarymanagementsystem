@@ -1,6 +1,19 @@
 import httpClient from "./httpClient";
 import { adminLoansApi } from "./adminLoansApi";
 
+async function getAllLoans() {
+  const query = { page: 0, size: 100, sortBy: "createdAt", sortDirection: "DESC" };
+  const firstPage = await adminLoansApi.search(query);
+  if (!firstPage?.totalPages || firstPage.totalPages <= 1) return firstPage?.content || [];
+
+  const remainingPages = await Promise.all(
+    Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+      adminLoansApi.search({ ...query, page: index + 1 }),
+    ),
+  );
+  return [firstPage, ...remainingPages].flatMap((page) => page.content || []);
+}
+
 export const adminFinesApi = {
   async search(params = {}) {
     const { data } = await httpClient.get("/api/fines", { params });
@@ -18,4 +31,5 @@ export const adminFinesApi = {
   },
 
   getUsers: adminLoansApi.getUsers,
+  getLoans: getAllLoans,
 };

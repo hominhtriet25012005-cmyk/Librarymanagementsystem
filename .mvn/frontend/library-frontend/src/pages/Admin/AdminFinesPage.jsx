@@ -27,6 +27,7 @@ const STATUSES = ["PENDING", "PARTIALLY_PAID", "PAID", "WAIVED"];
 const TYPES = ["OVERDUE", "DAMAGE", "LOSS", "PROCESSING"];
 const OPEN_STATUSES = new Set(["PENDING", "PARTIALLY_PAID"]);
 const STATUS_COLORS = { PENDING: "warning", PARTIALLY_PAID: "info", PAID: "success", WAIVED: "default" };
+const LOAN_STATUS_LABELS = { CHECKED_OUT: "Đang mượn", RETURNED: "Đã trả", OVERDUE: "Quá hạn", LOST: "Bị mất", DAMAGED: "Hư hỏng" };
 
 function total(items, field) {
   return items.reduce((sum, item) => sum + Number(item[field] || 0), 0);
@@ -35,6 +36,8 @@ function total(items, field) {
 export default function AdminFinesPage() {
   const [data, setData] = useState(EMPTY_PAGE);
   const [users, setUsers] = useState([]);
+  const [loans, setLoans] = useState([]);
+  const [optionsLoading, setOptionsLoading] = useState(true);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -42,6 +45,7 @@ export default function AdminFinesPage() {
   const [notice, setNotice] = useState(null);
   const [revision, setRevision] = useState(0);
   const [createOpen, setCreateOpen] = useState(false);
+  const [createError, setCreateError] = useState("");
   const [form, setForm] = useState(EMPTY_FORM);
   const [waiveForm, setWaiveForm] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -49,11 +53,16 @@ export default function AdminFinesPage() {
 
   useEffect(() => {
     let active = true;
-    adminFinesApi.getUsers()
-      .then((items) => { if (active) setUsers(items.filter((user) => user.role === "ROLE_USER")); })
+    Promise.all([adminFinesApi.getUsers(), adminFinesApi.getLoans()])
+      .then(([items, loanItems]) => {
+        if (!active) return;
+        setUsers(items.filter((user) => user.role === "ROLE_USER"));
+        setLoans(loanItems);
+      })
       .catch((requestError) => {
-        if (active) setNotice({ severity: "warning", text: getApiErrorMessage(requestError, "Không tải được danh sách bạn đọc để lọc.") });
-      });
+        if (active) setNotice({ severity: "warning", text: getApiErrorMessage(requestError, "Không tải được bạn đọc hoặc phiếu mượn.") });
+      })
+      .finally(() => { if (active) setOptionsLoading(false); });
     return () => { active = false; };
   }, []);
 
@@ -97,6 +106,7 @@ export default function AdminFinesPage() {
     if (!form.bookLoanId || Number(form.amount) <= 0 || submitting.current) return;
     submitting.current = true;
     setSaving(true);
+    setCreateError("");
     try {
       await adminFinesApi.create({
         bookLoanId: Number(form.bookLoanId),
@@ -109,7 +119,7 @@ export default function AdminFinesPage() {
       setForm(EMPTY_FORM);
       reload("Đã tạo khoản phạt cho phiếu mượn.");
     } catch (requestError) {
-      setNotice({ severity: "error", text: getApiErrorMessage(requestError, "Không thể tạo khoản phạt.") });
+      setCreateError(getApiErrorMessage(requestError, "Không thể tạo khoản phạt."));
     } finally {
       submitting.current = false;
       setSaving(false);
@@ -140,7 +150,7 @@ export default function AdminFinesPage() {
   return <section aria-labelledby="admin-fines-title" className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
     <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
       <div><p className="text-sm font-semibold uppercase tracking-widest text-indigo-600">Tài chính thư viện</p><h1 id="admin-fines-title" className="mt-2 text-4xl font-bold text-slate-900">Quản lý tiền phạt</h1><p className="mt-2 text-lg text-slate-600">Theo dõi nghĩa vụ thanh toán, tạo và miễn khoản phạt.</p></div>
-      <Button variant="contained" startIcon={<Add />} onClick={() => { setForm(EMPTY_FORM); setCreateOpen(true); }}>Tạo khoản phạt</Button>
+      <Button variant="contained" startIcon={<Add />} disabled={optionsLoading} onClick={() => { setForm(EMPTY_FORM); setCreateError(""); setCreateOpen(true); }}>Tạo khoản phạt</Button>
     </div>
 
     <Alert severity="info" className="mb-5">Đơn vị tiền là đồng Việt Nam. Giao dịch VietQR được xác nhận tại trang Đối soát thanh toán.</Alert>
@@ -178,7 +188,8 @@ export default function AdminFinesPage() {
           </>}
 
     <Dialog open={createOpen} onClose={() => { if (!saving) setCreateOpen(false); }} fullWidth maxWidth="sm"><DialogTitle>Tạo khoản phạt</DialogTitle><DialogContent><form id="create-fine-form" onSubmit={createFine} className="grid gap-4 pt-2 sm:grid-cols-2">
-      <TextField required label="Mã phiếu mượn" type="number" value={form.bookLoanId} onChange={(event) => setForm((current) => ({ ...current, bookLoanId: event.target.value }))} slotProps={{ htmlInput: { min: 1 } }} helperText="Xem mã tại trang Quản lý mượn trả" />
+      {createError && <Alert severity="error" className="sm:col-span-2">{createError}</Alert>}
+      <FormControl required><InputLabel id="create-fine-loan">Phiếu mượn</InputLabel><Select labelId="create-fine-loan" label="Phiếu mượn" value={form.bookLoanId} onChange={(event) => { setCreateError(""); setForm((current) => ({ ...current, bookLoanId: event.target.value })); }}>{loans.length === 0 && <MenuItem disabled value="">Chưa có phiếu mượn</MenuItem>}{loans.map((loan) => <MenuItem key={loan.id} value={loan.id}>#{loan.id} — {loan.userName} — {loan.bookTitle} ({LOAN_STATUS_LABELS[loan.status] || loan.status})</MenuItem>)}</Select></FormControl>
       <FormControl required><InputLabel id="create-fine-type">Loại phạt</InputLabel><Select labelId="create-fine-type" label="Loại phạt" value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: event.target.value }))}>{TYPES.map((type) => <MenuItem key={type} value={type}>{fineTypeLabel(type)}</MenuItem>)}</Select></FormControl>
       <TextField required label="Số tiền phạt" type="number" value={form.amount} onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))} slotProps={{ htmlInput: { min: 1, step: 1 } }} helperText="Đơn vị VND" />
       <TextField label="Lý do" value={form.reason} onChange={(event) => setForm((current) => ({ ...current, reason: event.target.value }))} />
