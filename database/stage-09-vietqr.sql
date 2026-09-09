@@ -6,6 +6,21 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS migrate_stage09_vietqr$$
 CREATE PROCEDURE migrate_stage09_vietqr()
 BEGIN
+    -- Một số database được tạo theo bản hướng dẫn cũ còn cột title bắt buộc.
+    -- Backend hiện dùng name; chuyển dữ liệu sang name rồi xóa cột title dư thừa.
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE()
+          AND table_name = 'subscription_plans'
+          AND column_name = 'title'
+    ) THEN
+        UPDATE subscription_plans
+        SET name = title
+        WHERE (name IS NULL OR TRIM(name) = '') AND title IS NOT NULL;
+
+        ALTER TABLE subscription_plans DROP COLUMN title;
+    END IF;
+
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
         WHERE table_schema = DATABASE() AND table_name = 'payments' AND column_name = 'payer_reference'

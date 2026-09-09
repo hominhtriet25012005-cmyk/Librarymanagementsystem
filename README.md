@@ -61,6 +61,8 @@ Library-Management-System/
 
 Nếu database đã tồn tại từ giai đoạn 8, chạy thêm `database/stage-09-vietqr.sql` trước khi khởi động backend để bổ sung các cột đối soát và chuyển dữ liệu tiền tệ mẫu sang VND.
 
+Script này cũng sửa database cũ còn cột `subscription_plans.title`: dữ liệu tên gói được chuyển sang cột `name`, sau đó cột `title` dư thừa được xóa. Lỗi `Field 'title' doesn't have a default value` sẽ hết sau khi chạy script và khởi động lại backend.
+
 `seed-dev.sql` chỉ thêm dữ liệu còn thiếu dựa trên mã hoặc ISBN nên có thể chạy lại khi cần. Hãy sao lưu trước nếu database đang chứa dữ liệu quan trọng.
 
 ## Cấu hình backend

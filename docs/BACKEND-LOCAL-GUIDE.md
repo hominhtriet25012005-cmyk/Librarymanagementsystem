@@ -132,6 +132,8 @@ Luồng mặc định dùng VietQR. API đăng ký gói hoặc thanh toán phạ
 
 Với database đã tạo trước giai đoạn 9, chạy `database/stage-09-vietqr.sql` một lần trước khi khởi động backend. Script có thể chạy lại và tự bỏ qua các cột đã tồn tại.
 
+Nếu MySQL báo `Field 'title' doesn't have a default value` khi tạo gói thành viên, bảng `subscription_plans` vẫn còn cột `title` của schema cũ. Bản migration trên sẽ sao chép tên còn thiếu sang `name` và xóa cột legacy này.
+
 ## 7. Endpoint chính
 
 | Module | Đường dẫn gốc |
