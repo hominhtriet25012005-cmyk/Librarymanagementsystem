@@ -32,6 +32,8 @@ public class PaymentDTO {
 
     private Long subscriptionId;
 
+    private Long fineId;
+
     @NotNull(message = "Loại thanh toán là bắt buộc")
     private PaymentType paymentType;
 
@@ -51,6 +53,8 @@ public class PaymentDTO {
 
     private String gatewayPaymentId;
 
+    private String payerReference;
+
     private String gatewayOrderId;
 
     private String gatewaySignature;
@@ -64,6 +68,14 @@ public class PaymentDTO {
     private LocalDateTime initiatedAt;
 
     private LocalDateTime completedAt;
+
+    private LocalDateTime submittedAt;
+
+    private Long reviewedById;
+
+    private String reviewedByName;
+
+    private LocalDateTime reviewedAt;
 
     private LocalDateTime createdAt;
 

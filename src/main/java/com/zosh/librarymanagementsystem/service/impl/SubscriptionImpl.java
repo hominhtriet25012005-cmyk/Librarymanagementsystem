@@ -84,13 +84,13 @@ public class SubscriptionImpl implements SubscriptionService {
         subscription.setIsActive(false);
         Subscription saveSubscription = subscriptionRepository.save(subscription);
 
-        // Tạo thanh toán; gói chỉ được kích hoạt sau khi Razorpay xác minh thành công.
+        // Tạo thanh toán VietQR; gói chỉ được kích hoạt sau khi quản trị viên đối soát.
         PaymentInitiateRequest paymentInitiateRequest = PaymentInitiateRequest
                     .builder()
                     .userId(user.getId())
                     .subscriptionId(saveSubscription.getId())
                     .paymentType(PaymentType.MEMBERSHIP)
-                    .gateway(PaymentGateway.RAZORPAY)
+                    .gateway(PaymentGateway.VIETQR)
                     .amount(saveSubscription.getPrice())
                     .currency(saveSubscription.getCurrency())
                     .description("Đăng ký thư viện - " + plan.getName())

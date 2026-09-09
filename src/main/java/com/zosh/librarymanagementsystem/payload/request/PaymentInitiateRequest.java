@@ -26,15 +26,15 @@ public class PaymentInitiateRequest {
     private PaymentType paymentType;
 
     @NotNull(message = "Cổng thanh toán là bắt buộc")
-    private PaymentGateway gateway; // Hiện backend hỗ trợ RAZORPAY.
+    private PaymentGateway gateway; // Backend hỗ trợ RAZORPAY và chuyển khoản VIETQR.
 
     @NotNull(message = "Số tiền là bắt buộc")
     @Positive(message = "Số tiền phải lớn hơn 0")
     private Long amount;
 
-    @Size(min = 3, max = 3, message = "Mã tiền tệ phải có đúng 3 ký tự, ví dụ INR")
+    @Size(min = 3, max = 3, message = "Mã tiền tệ phải có đúng 3 ký tự, ví dụ VND")
     @Builder.Default
-    private String currency = "INR";
+    private String currency = "VND";
 
     @Size(max =  500, message = "Mô tả không được vượt quá 500 ký tự")
     private  String description;

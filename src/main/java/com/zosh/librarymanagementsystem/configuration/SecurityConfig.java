@@ -43,6 +43,8 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
                         .requestMatchers("/api/subscriptions/admin", "/api/subscriptions/admin/**")
                         .hasRole("ADMIN")
+                        .requestMatchers("/api/payments/admin/**")
+                        .hasRole("ADMIN")
                         // Các API tra cứu công khai phục vụ trang danh mục sách.
                         .requestMatchers(HttpMethod.GET,
                                 "/api/books/**", "/api/genres/**", "/api/subscription-plan",

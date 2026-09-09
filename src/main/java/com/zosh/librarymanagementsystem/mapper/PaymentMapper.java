@@ -25,6 +25,9 @@ public class PaymentMapper {
         if (payment.getFine() != null && payment.getFine().getBookLoan() != null) {
             dto.setBookLoanId(payment.getFine().getBookLoan().getId());
         }
+        if (payment.getFine() != null) {
+            dto.setFineId(payment.getFine().getId());
+        }
 
         // Thông tin gói thành viên.
         if (payment.getSubscription() != null) {
@@ -38,12 +41,19 @@ public class PaymentMapper {
         dto.setCurrency(payment.getCurrency());
         dto.setTransactionId(payment.getTransactionId());
         dto.setGatewayPaymentId(payment.getGatewayPaymentId());
+        dto.setPayerReference(payment.getPayerReference());
         dto.setGatewayOrderId(payment.getGatewayOrderId());
         dto.setGatewaySignature(payment.getGatewaySignature());
         dto.setDescription(payment.getDescription());
         dto.setFailureReason(payment.getFailureReason());
         dto.setInitiatedAt(payment.getInitiatedAt());
         dto.setCompletedAt(payment.getCompletedAt());
+        dto.setSubmittedAt(payment.getSubmittedAt());
+        if (payment.getReviewedBy() != null) {
+            dto.setReviewedById(payment.getReviewedBy().getId());
+            dto.setReviewedByName(payment.getReviewedBy().getFullName());
+        }
+        dto.setReviewedAt(payment.getReviewedAt());
         dto.setCreatedAt(payment.getCreatedAt());
         dto.setUpdatedAt(payment.getUpdatedAt());
 

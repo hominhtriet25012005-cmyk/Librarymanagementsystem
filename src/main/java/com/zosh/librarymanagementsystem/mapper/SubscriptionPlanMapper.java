@@ -104,7 +104,7 @@ public class SubscriptionPlanMapper {
 
     private String normalizeCurrency(String currency) {
         return currency == null || currency.isBlank()
-                ? "INR"
+                ? "VND"
                 : currency.trim().toUpperCase(Locale.ROOT);
     }
 }

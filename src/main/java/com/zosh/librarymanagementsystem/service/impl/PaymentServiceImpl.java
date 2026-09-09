@@ -13,6 +13,9 @@ import com.zosh.librarymanagementsystem.modal.Subscription;
 import com.zosh.librarymanagementsystem.modal.User;
 import com.zosh.librarymanagementsystem.payload.dto.PaymentDTO;
 import com.zosh.librarymanagementsystem.payload.request.PaymentInitiateRequest;
+import com.zosh.librarymanagementsystem.payload.request.PaymentConfirmRequest;
+import com.zosh.librarymanagementsystem.payload.request.PaymentRejectRequest;
+import com.zosh.librarymanagementsystem.payload.request.PaymentSubmitRequest;
 import com.zosh.librarymanagementsystem.payload.request.PaymentVerifyRequest;
 import com.zosh.librarymanagementsystem.payload.response.PaymentInitiateResponse;
 import com.zosh.librarymanagementsystem.payload.response.PaymentLinkResponse;
@@ -28,6 +31,7 @@ import org.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -37,6 +41,18 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
+
+    @Value("${payment.vietqr.bank-name:MB}")
+    private String vietQrBankName;
+
+    @Value("${payment.vietqr.account-name:HO MINH TRIET}")
+    private String vietQrAccountName;
+
+    @Value("${payment.vietqr.account-number:0919100938}")
+    private String vietQrAccountNumber;
+
+    @Value("${payment.vietqr.image-url:/payment/mb-vietqr.png}")
+    private String vietQrImageUrl;
 
     private final UserRepository userRepository;
     private final SubscriptionRepository subscriptionRepository;
@@ -65,7 +81,7 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setGateway(request.getGateway());
         payment.setAmount(request.getAmount());
         String currency = request.getCurrency() == null || request.getCurrency().isBlank()
-                ? "INR"
+                ? "VND"
                 : request.getCurrency().trim().toUpperCase(Locale.ROOT);
         payment.setCurrency(currency);
         payment.setDescription(request.getDescription());
@@ -125,16 +141,18 @@ public class PaymentServiceImpl implements PaymentService {
                     .transactionId(payment.getTransactionId())
                     .razorpayOrderId(paymentLinkResponse.getPayment_link_id())
                     .amount(payment.getAmount())
+                    .currency(payment.getCurrency())
                     .description(payment.getDescription())
                     .success(true)
                     .message("Đã khởi tạo thanh toán")
                     .build();
+            payment.setStatus(PaymentStatus.PROCESSING);
+            paymentRepository.save(payment);
+        } else if (request.getGateway() == PaymentGateway.VIETQR) {
+            response = buildVietQrResponse(payment);
         } else {
             throw new IllegalArgumentException("Cổng thanh toán chưa được hỗ trợ: " + request.getGateway());
         }
-        payment.setStatus(PaymentStatus.PROCESSING);
-        paymentRepository.save(payment);
-        // Bản ghi chuyển sang PROCESSING sau khi cổng thanh toán trả liên kết hợp lệ.
         return response;
     }
 
@@ -189,10 +207,134 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Page<PaymentDTO> getAllPayments(Pageable pageable) {
-        Page<Payment> payments = paymentRepository.findAll(pageable);
+    @Transactional
+    public PaymentDTO submitBankTransfer(Long paymentId, PaymentSubmitRequest req) {
+        Payment payment = getVietQrPayment(paymentId);
+        User currentUser = userService.getCurrentUser();
+        if (!payment.getUser().getId().equals(currentUser.getId())) {
+            throw new IllegalArgumentException("Bạn không thể gửi đối soát cho giao dịch của người dùng khác");
+        }
+        if (payment.getStatus() != PaymentStatus.PENDING) {
+            throw new IllegalStateException("Giao dịch không còn ở trạng thái chờ chuyển khoản");
+        }
 
-        return payments.map(paymentMapper::toDTO);
+        payment.setPayerReference(normalizeOptional(req.getPayerReference()));
+        payment.setSubmittedAt(LocalDateTime.now());
+        payment.setStatus(PaymentStatus.PROCESSING);
+        payment.setFailureReason(null);
+        return paymentMapper.toDTO(paymentRepository.save(payment));
+    }
+
+    @Override
+    public PaymentInitiateResponse getPaymentInstructions(Long paymentId) {
+        Payment payment = getVietQrPayment(paymentId);
+        User currentUser = userService.getCurrentUser();
+        if (!payment.getUser().getId().equals(currentUser.getId())) {
+            throw new IllegalArgumentException("Bạn không thể xem giao dịch của người dùng khác");
+        }
+        if (payment.getStatus() != PaymentStatus.PENDING) {
+            throw new IllegalStateException("Giao dịch không còn chờ chuyển khoản");
+        }
+        return buildVietQrResponse(payment);
+    }
+
+    @Override
+    @Transactional
+    public PaymentDTO confirmBankTransfer(Long paymentId, PaymentConfirmRequest req) {
+        Payment payment = getVietQrPayment(paymentId);
+        if (payment.getStatus() == PaymentStatus.SUCCESS) {
+            return paymentMapper.toDTO(payment);
+        }
+        if (payment.getStatus() != PaymentStatus.PROCESSING) {
+            throw new IllegalStateException("Chỉ có thể xác nhận giao dịch đang chờ đối soát");
+        }
+
+        String bankTransactionId = req.getBankTransactionId().trim();
+        paymentRepository.findByGatewayPaymentId(bankTransactionId)
+                .filter(existing -> !existing.getId().equals(paymentId))
+                .ifPresent(existing -> {
+                    throw new IllegalArgumentException("Mã giao dịch ngân hàng đã được dùng cho thanh toán khác");
+                });
+
+        payment.setGatewayPaymentId(bankTransactionId);
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setCompletedAt(LocalDateTime.now());
+        payment.setReviewedAt(LocalDateTime.now());
+        payment.setReviewedBy(userService.getCurrentUser());
+        payment.setFailureReason(null);
+        Payment savedPayment = paymentRepository.save(payment);
+
+        // Chỉ sau khi quản trị viên đối chiếu ngân hàng thì mới kích hoạt gói hoặc đóng khoản phạt.
+        paymentEventPublisher.publishPaymentSuccessEvent(savedPayment);
+        return paymentMapper.toDTO(savedPayment);
+    }
+
+    @Override
+    @Transactional
+    public PaymentDTO rejectBankTransfer(Long paymentId, PaymentRejectRequest req) {
+        Payment payment = getVietQrPayment(paymentId);
+        if (payment.getStatus() != PaymentStatus.PROCESSING) {
+            throw new IllegalStateException("Chỉ có thể từ chối giao dịch đang chờ đối soát");
+        }
+
+        payment.setStatus(PaymentStatus.FAILED);
+        payment.setFailureReason(req.getReason().trim());
+        payment.setReviewedAt(LocalDateTime.now());
+        payment.setReviewedBy(userService.getCurrentUser());
+        if (payment.getSubscription() != null) {
+            payment.getSubscription().setIsActive(false);
+            payment.getSubscription().setCancelledAt(LocalDateTime.now());
+            payment.getSubscription().setCancellationReason(
+                    "Thanh toán bị từ chối: " + req.getReason().trim());
+            subscriptionRepository.save(payment.getSubscription());
+        }
+        return paymentMapper.toDTO(paymentRepository.save(payment));
+    }
+
+    @Override
+    public Page<PaymentDTO> getMyPayments(Pageable pageable) {
+        Long userId = userService.getCurrentUser().getId();
+        return paymentRepository.findByUserId(userId, pageable).map(paymentMapper::toDTO);
+    }
+
+    @Override
+    public Page<PaymentDTO> getAllPayments(
+            PaymentStatus status, PaymentType paymentType, Pageable pageable) {
+        return paymentRepository.findAllWithFilters(status, paymentType, pageable)
+                .map(paymentMapper::toDTO);
+    }
+
+    private Payment getVietQrPayment(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy giao dịch thanh toán"));
+        if (payment.getGateway() != PaymentGateway.VIETQR) {
+            throw new IllegalArgumentException("Giao dịch này không sử dụng VietQR");
+        }
+        return payment;
+    }
+
+    private PaymentInitiateResponse buildVietQrResponse(Payment payment) {
+        return PaymentInitiateResponse.builder()
+                .paymentId(payment.getId())
+                .subscriptionId(payment.getSubscription() == null ? null : payment.getSubscription().getId())
+                .fineId(payment.getFine() == null ? null : payment.getFine().getId())
+                .gateway(payment.getGateway())
+                .transactionId(payment.getTransactionId())
+                .amount(payment.getAmount())
+                .currency(payment.getCurrency())
+                .description(payment.getDescription())
+                .qrImageUrl(vietQrImageUrl)
+                .bankName(vietQrBankName)
+                .accountName(vietQrAccountName)
+                .accountNumber(vietQrAccountNumber)
+                .transferContent(payment.getTransactionId())
+                .message("Quét mã VietQR và ghi đúng nội dung chuyển khoản")
+                .success(true)
+                .build();
+    }
+
+    private String normalizeOptional(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     private void validatePaymentContext(Payment payment) {

@@ -4,6 +4,7 @@ import com.zosh.librarymanagementsystem.domain.FineStatus;
 import com.zosh.librarymanagementsystem.domain.FineType;
 import com.zosh.librarymanagementsystem.domain.PaymentGateway;
 import com.zosh.librarymanagementsystem.domain.PaymentType;
+import com.zosh.librarymanagementsystem.domain.PaymentStatus;
 import com.zosh.librarymanagementsystem.exception.LibraryOperationException;
 import com.zosh.librarymanagementsystem.mapper.FineMapper;
 import com.zosh.librarymanagementsystem.modal.BookLoan;
@@ -17,6 +18,7 @@ import com.zosh.librarymanagementsystem.payload.response.PageResponse;
 import com.zosh.librarymanagementsystem.payload.response.PaymentInitiateResponse;
 import com.zosh.librarymanagementsystem.repository.BookLoanRepository;
 import com.zosh.librarymanagementsystem.repository.FineRepository;
+import com.zosh.librarymanagementsystem.repository.PaymentRepository;
 import com.zosh.librarymanagementsystem.service.FineService;
 import com.zosh.librarymanagementsystem.service.PaymentService;
 import com.zosh.librarymanagementsystem.service.UserService;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +42,7 @@ public class FineServiceImpl  implements FineService {
     private final FineMapper fineMapper;
     private final UserService userService;
     private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     @Override
     @Transactional
@@ -91,13 +95,26 @@ public class FineServiceImpl  implements FineService {
             throw new LibraryOperationException("Bạn không thể thanh toán khoản phạt của người dùng khác");
         }
 
+        // Dùng lại giao dịch đang chờ để tránh tạo nhiều mã cho cùng một khoản phạt.
+        var existingPayment = paymentRepository.findFirstByFineIdAndStatusInOrderByCreatedAtDesc(
+                fineId, Set.of(PaymentStatus.PENDING, PaymentStatus.PROCESSING));
+        if (existingPayment.isPresent()) {
+            if (existingPayment.get().getStatus()
+                    == PaymentStatus.PROCESSING) {
+                throw new LibraryOperationException(
+                        "Khoản phạt đã có giao dịch đang chờ quản trị viên đối soát");
+            }
+            return paymentService.getPaymentInstructions(existingPayment.get().getId());
+        }
+
         PaymentInitiateRequest request = PaymentInitiateRequest
                 .builder()
                 .userId(user.getId())
                 .fineId(fine.getId())
                 .paymentType(PaymentType.FINE)
-                .gateway(PaymentGateway.RAZORPAY)
+                .gateway(PaymentGateway.VIETQR)
                 .amount(fine.getAmountOutstanding())
+                .currency("VND")
                 .description("Thanh toán tiền phạt thư viện")
                 .build();
 

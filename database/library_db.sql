@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS subscription_plans (
     description VARCHAR(500),
     duration_days INT NOT NULL,
     price BIGINT NOT NULL,
-    currency VARCHAR(3) NOT NULL DEFAULT 'INR',
+    currency VARCHAR(3) NOT NULL DEFAULT 'VND',
     max_books_allowed INT NOT NULL,
     max_days_per_book INT NOT NULL,
     display_order INT NOT NULL DEFAULT 0,
@@ -250,15 +250,19 @@ CREATE TABLE IF NOT EXISTS payments (
     status VARCHAR(20) NOT NULL,
     gateway VARCHAR(20) NOT NULL,
     amount BIGINT NOT NULL,
-    currency VARCHAR(3) NOT NULL DEFAULT 'INR',
+    currency VARCHAR(3) NOT NULL DEFAULT 'VND',
     transaction_id VARCHAR(50) NOT NULL,
     gateway_payment_id VARCHAR(100) NULL,
+    payer_reference VARCHAR(100) NULL,
     gateway_order_id VARCHAR(100),
     gateway_signature VARCHAR(500),
     description VARCHAR(500),
     failure_reason VARCHAR(1000),
     initiated_at DATETIME NOT NULL,
     completed_at DATETIME NULL,
+    submitted_at DATETIME NULL,
+    reviewed_by_id BIGINT NULL,
+    reviewed_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT uk_payment_transaction_id UNIQUE (transaction_id),
@@ -269,5 +273,7 @@ CREATE TABLE IF NOT EXISTS payments (
     CONSTRAINT fk_payments_subscription FOREIGN KEY (subscription_id) REFERENCES subscriptions(id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_payments_fine FOREIGN KEY (fine_id) REFERENCES fines(id)
-        ON DELETE RESTRICT ON UPDATE CASCADE
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_payments_reviewed_by FOREIGN KEY (reviewed_by_id) REFERENCES users(id)
+        ON DELETE SET NULL ON UPDATE CASCADE
 );

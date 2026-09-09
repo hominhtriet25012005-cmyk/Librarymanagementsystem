@@ -40,7 +40,7 @@ public class SubscriptionPlan {
 
     @Column(nullable = false, length = 3)
     @Builder.Default
-    private String currency="INR";
+    private String currency="VND";
 
     @Column(nullable = false)
     @Positive(message = "Số sách tối đa phải lớn hơn 0")

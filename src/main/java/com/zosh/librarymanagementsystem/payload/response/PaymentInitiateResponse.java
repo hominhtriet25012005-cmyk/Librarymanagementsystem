@@ -28,9 +28,18 @@ public class PaymentInitiateResponse {
 
     private Long amount;
 
+    private String currency;
+
     private String description;
 
     private String checkoutUrl;
+
+    /** Thông tin chuyển khoản dành cho cổng VietQR. */
+    private String qrImageUrl;
+    private String bankName;
+    private String accountName;
+    private String accountNumber;
+    private String transferContent;
 
     private String message;
 

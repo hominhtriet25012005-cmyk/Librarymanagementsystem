@@ -95,19 +95,19 @@ INSERT INTO subscription_plans (
     plan_code, name, description, duration_days, price, currency,
     max_books_allowed, max_days_per_book, display_order, is_active, is_featured, badge_text
 )
-SELECT 'BASIC_30', 'Bạn đọc cơ bản', 'Gói dùng thử trong 30 ngày.', 30, 99000, 'INR', 2, 14, 1, TRUE, FALSE, NULL
+SELECT 'BASIC_30', 'Bạn đọc cơ bản', 'Gói dùng thử trong 30 ngày.', 30, 99000, 'VND', 2, 14, 1, TRUE, FALSE, NULL
 WHERE NOT EXISTS (SELECT 1 FROM subscription_plans WHERE plan_code = 'BASIC_30');
 
 INSERT INTO subscription_plans (
     plan_code, name, description, duration_days, price, currency,
     max_books_allowed, max_days_per_book, display_order, is_active, is_featured, badge_text
 )
-SELECT 'STANDARD_90', 'Bạn đọc tiêu chuẩn', 'Gói 90 ngày cho người đọc thường xuyên.', 90, 249000, 'INR', 5, 21, 2, TRUE, TRUE, 'Phổ biến'
+SELECT 'STANDARD_90', 'Bạn đọc tiêu chuẩn', 'Gói 90 ngày cho người đọc thường xuyên.', 90, 249000, 'VND', 5, 21, 2, TRUE, TRUE, 'Phổ biến'
 WHERE NOT EXISTS (SELECT 1 FROM subscription_plans WHERE plan_code = 'STANDARD_90');
 
 INSERT INTO subscription_plans (
     plan_code, name, description, duration_days, price, currency,
     max_books_allowed, max_days_per_book, display_order, is_active, is_featured, badge_text
 )
-SELECT 'PREMIUM_365', 'Bạn đọc nâng cao', 'Gói một năm với hạn mức mượn cao.', 365, 799000, 'INR', 10, 30, 3, TRUE, FALSE, 'Tiết kiệm'
+SELECT 'PREMIUM_365', 'Bạn đọc nâng cao', 'Gói một năm với hạn mức mượn cao.', 365, 799000, 'VND', 10, 30, 3, TRUE, FALSE, 'Tiết kiệm'
 WHERE NOT EXISTS (SELECT 1 FROM subscription_plans WHERE plan_code = 'PREMIUM_365');

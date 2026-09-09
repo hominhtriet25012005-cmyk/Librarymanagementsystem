@@ -55,13 +55,17 @@ public class Payment {
 
     @Column(nullable = false, length = 3)
     @Builder.Default
-    private String currency = "INR";
+    private String currency = "VND";
 
     @Column(name = "transaction_id", nullable = false, length = 50)
     private String transactionId;
 
     @Column(name = "gateway_payment_id", length = 100)
     private String gatewayPaymentId;
+
+    /** Mã tham chiếu do người chuyển khoản cung cấp. */
+    @Column(name = "payer_reference", length = 100)
+    private String payerReference;
 
     @Column(length = 100)
     private String gatewayOrderId;
@@ -79,6 +83,14 @@ public class Payment {
     private LocalDateTime initiatedAt;
 
     private LocalDateTime completedAt;
+
+    private LocalDateTime submittedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "reviewed_by_id")
+    private User reviewedBy;
+
+    private LocalDateTime reviewedAt;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

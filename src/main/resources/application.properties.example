@@ -33,3 +33,9 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 razorpay.key.id=${RAZORPAY_KEY_ID:}
 razorpay.key.secret=${RAZORPAY_KEY_SECRET:}
 razorpay.callback.base-url=${RAZORPAY_CALLBACK_BASE_URL:http://localhost:5173}
+
+# Tài khoản nhận chuyển khoản VietQR. Ảnh QR nằm trong static/payment.
+payment.vietqr.bank-name=${VIETQR_BANK_NAME:MB}
+payment.vietqr.account-name=${VIETQR_ACCOUNT_NAME:HO MINH TRIET}
+payment.vietqr.account-number=${VIETQR_ACCOUNT_NUMBER:0919100938}
+payment.vietqr.image-url=${VIETQR_IMAGE_URL:/payment/mb-vietqr.png}
