@@ -47,6 +47,7 @@ Library-Management-System/
 - Quản lý mượn, trả và gia hạn tại `/admin/loans`.
 - Quản lý đặt trước và hàng chờ tại `/admin/reservations`.
 - Quản lý tiền phạt tại `/admin/fines`.
+- Quản lý người dùng và phân quyền tại `/admin/users`.
 
 ## Chuẩn bị MySQL
 
@@ -133,7 +134,7 @@ Nếu danh sách sách báo “Chưa có sách phù hợp”, hãy kiểm tra:
 - Backend có chạy tại cổng `5000` hay không.
 - Frontend có dùng đúng `VITE_API_BASE_URL` hay không.
 
-## Các màn hình quản trị giai đoạn 0–6
+## Các màn hình quản trị giai đoạn 0–7
 
 ### Tổng quan quản trị
 
@@ -190,6 +191,17 @@ Frontend sử dụng các API `/api/reservations`, `/api/reservations/user/{user
 
 Frontend sử dụng các API `/api/fines` và `/api/fines/waive`. Người dùng thanh toán khoản phạt của mình qua `/api/fines/{id}/pay`; phần giao diện đối soát Razorpay dành cho giai đoạn 9.
 
+### Quản lý người dùng
+
+- Tìm tài khoản theo họ tên, email hoặc số điện thoại.
+- Lọc theo vai trò bạn đọc, quản trị viên và trạng thái xác minh.
+- Sắp xếp, phân trang và xem thời điểm đăng ký, đăng nhập gần nhất.
+- Cấp hoặc thu hồi vai trò quản trị cho tài khoản khác.
+- Xác nhận hoặc bỏ xác nhận tài khoản.
+- Không cho quản trị viên tự hạ quyền của chính mình.
+
+Frontend sử dụng các API quản trị `/api/user/admin`, `/api/user/admin/stats` và `/api/user/admin/{userId}`. API `/api/user/list` cũ vẫn được giữ để chọn bạn đọc ở các nghiệp vụ mượn trả, đặt trước và tiền phạt.
+
 ## Kiểm tra thủ công
 
 1. Khởi động MySQL, backend và frontend.
@@ -206,7 +218,10 @@ Frontend sử dụng các API `/api/fines` và `/api/fines/waive`. Người dùn
 12. Thử giao sách, hủy yêu cầu và cập nhật các lượt hết hạn.
 13. Vào `/admin/fines`, tạo khoản phạt bằng mã phiếu mượn.
 14. Kiểm tra các bộ lọc, số tiền còn lại và thao tác miễn phạt.
-15. Đăng nhập bằng tài khoản người dùng để xác nhận không truy cập được route admin.
+15. Vào `/admin/users`, thử tìm kiếm, lọc và thay đổi trạng thái xác minh.
+16. Dùng một tài khoản phụ để thử cấp rồi thu hồi quyền quản trị.
+17. Xác nhận tài khoản quản trị đang đăng nhập không thể tự hạ quyền.
+18. Đăng nhập bằng tài khoản người dùng để xác nhận không truy cập được route admin.
 
 ## Tài liệu liên quan
 
@@ -218,7 +233,6 @@ Frontend sử dụng các API `/api/fines` và `/api/fines/waive`. Người dùn
 
 ## Các giai đoạn tiếp theo
 
-- Giai đoạn 7: quản lý người dùng.
 - Giai đoạn 8: quản lý gói thành viên và đăng ký.
 - Giai đoạn 9: thanh toán và xác minh Razorpay.
 - Giai đoạn 10 trở đi: hoàn thiện cổng bạn đọc, email, bảo mật, migration database và triển khai.

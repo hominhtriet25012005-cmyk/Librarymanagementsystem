@@ -12,6 +12,7 @@ import {
     Category as CategoryIcon,
     Storefront as StorefrontIcon,
     AssignmentTurnedIn as AssignmentTurnedInIcon,
+    ManageAccounts as ManageAccountsIcon,
 } from "@mui/icons-material";
 
 import React from "react";
@@ -115,6 +116,12 @@ export const adminNavigationItems = [
         path: '/admin/fines',
         icon: <ReceiptIcon />,
         description: 'Tạo, theo dõi và miễn phạt',
+    },
+    {
+        title: 'Quản lý người dùng',
+        path: '/admin/users',
+        icon: <ManageAccountsIcon />,
+        description: 'Phân quyền và xác minh tài khoản',
     },
     {
         title: 'Khu vực bạn đọc',

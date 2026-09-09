@@ -58,7 +58,7 @@ export default function AdminDashboardPage() {
     { label: "Sách đang hoạt động", value: dashboard.bookStats.totalActiveBooks, hint: "Đầu sách trong kho", icon: <MenuBook className="text-indigo-700" />, color: "bg-indigo-100" },
     { label: "Sách còn có thể mượn", value: dashboard.bookStats.totalAvailableBooks, hint: "Đầu sách còn ít nhất một bản", icon: <AutoStories className="text-emerald-700" />, color: "bg-emerald-100" },
     { label: "Thể loại", value: dashboard.genreCount, hint: "Danh mục đang hoạt động", icon: <Category className="text-violet-700" />, color: "bg-violet-100" },
-    { label: "Bạn đọc", value: dashboard.users.length, hint: "Tài khoản trong hệ thống", icon: <Group className="text-sky-700" />, color: "bg-sky-100" },
+    { label: "Người dùng", value: dashboard.userStats.totalUsers, hint: "Tài khoản trong hệ thống", icon: <Group className="text-sky-700" />, color: "bg-sky-100" },
     { label: "Phiếu đang quá hạn", value: dashboard.overdueLoans.totalElements, hint: "Cần được xử lý", icon: <EventBusy className="text-rose-700" />, color: "bg-rose-100" },
     { label: "Tiền phạt chưa xử lý", value: dashboard.fines.totalElements, hint: "Khoản phạt đang chờ", icon: <ReceiptLong className="text-amber-700" />, color: "bg-amber-100" },
   ];
@@ -87,6 +87,7 @@ export default function AdminDashboardPage() {
           <Button component={Link} to="/admin/books" variant="outlined" fullWidth>Thêm sách mới</Button>
           <Button component={Link} to="/admin/reservations" variant="outlined" fullWidth>Xử lý hàng chờ đặt trước</Button>
           <Button component={Link} to="/admin/fines" variant="outlined" fullWidth>Xử lý tiền phạt</Button>
+          <Button component={Link} to="/admin/users" variant="outlined" fullWidth>Quản lý người dùng</Button>
           <div className="rounded-lg bg-indigo-50 p-4 text-sm text-indigo-900"><p className="font-semibold">Đặt trước đang hoạt động</p><p className="mt-1 text-2xl font-bold">{dashboard.reservations.totalElements ?? 0}</p></div>
         </div>
       </Card>

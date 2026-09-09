@@ -5,7 +5,7 @@ export const adminApi = {
     const requests = [
       httpClient.get("/api/books/stats"),
       httpClient.get("/api/genres/count"),
-      httpClient.get("/api/user/list"),
+      httpClient.get("/api/user/admin/stats"),
       httpClient.post("/api/book-loans/search", { page: 0, size: 6, sortBy: "createdAt", sortDirection: "DESC" }),
       httpClient.post("/api/book-loans/search", { status: "OVERDUE", page: 0, size: 1 }),
       httpClient.get("/api/reservations", { params: { activeOnly: true, page: 0, size: 1 } }),
@@ -18,7 +18,7 @@ export const adminApi = {
     return {
       bookStats: dataAt(0, { totalActiveBooks: 0, totalAvailableBooks: 0 }),
       genreCount: Number(dataAt(1, 0)) || 0,
-      users: dataAt(2, []),
+      userStats: dataAt(2, { totalUsers: 0 }),
       recentLoans: dataAt(3, { content: [], totalElements: 0 }),
       overdueLoans: dataAt(4, { totalElements: 0 }),
       reservations: dataAt(5, { totalElements: 0 }),

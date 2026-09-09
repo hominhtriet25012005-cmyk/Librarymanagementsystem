@@ -3,6 +3,7 @@ export { adminApi } from "./adminApi";
 export { adminLoansApi } from "./adminLoansApi";
 export { adminReservationsApi } from "./adminReservationsApi";
 export { adminFinesApi } from "./adminFinesApi";
+export { adminUsersApi } from "./adminUsersApi";
 export { booksApi } from "./booksApi";
 export { genresApi } from "./genresApi";
 export { finesApi, loansApi, reservationsApi, reviewsApi, wishlistApi } from "./libraryApi";
