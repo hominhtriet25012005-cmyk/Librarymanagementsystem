@@ -44,6 +44,7 @@ Library-Management-System/
 - Tổng quan quản trị tại `/admin/dashboard`.
 - Quản lý thể loại tại `/admin/genres`.
 - Quản lý sách tại `/admin/books`.
+- Quản lý mượn, trả và gia hạn tại `/admin/loans`.
 
 ## Chuẩn bị MySQL
 
@@ -130,7 +131,7 @@ Nếu danh sách sách báo “Chưa có sách phù hợp”, hãy kiểm tra:
 - Backend có chạy tại cổng `5000` hay không.
 - Frontend có dùng đúng `VITE_API_BASE_URL` hay không.
 
-## Các màn hình quản trị giai đoạn 0–3
+## Các màn hình quản trị giai đoạn 0–4
 
 ### Tổng quan quản trị
 
@@ -155,6 +156,16 @@ Nếu danh sách sách báo “Chưa có sách phù hợp”, hãy kiểm tra:
 - Tạo, cập nhật và ẩn sách.
 - Kiểm tra ISBN, số lượng, giá và dữ liệu biểu mẫu.
 
+### Quản lý mượn và trả
+
+- Tìm phiếu mượn theo bạn đọc, sách, trạng thái và khoảng ngày.
+- Kết hợp nhiều bộ lọc, gồm phiếu quá hạn và phiếu có tiền phạt chưa thanh toán.
+- Tạo phiếu mượn cho bạn đọc bằng danh sách sách còn sẵn.
+- Nhận sách trả với tình trạng bình thường, hư hỏng hoặc bị mất.
+- Gia hạn phiếu đang mượn và cập nhật đồng loạt các phiếu quá hạn.
+
+Frontend gọi trực tiếp các API `/api/book-loans/search`, `/api/book-loans/checkout/user/{userId}`, `/api/book-loans/checkin`, `/api/book-loans/renew` và `/api/book-loans/admin/update-overdue`. Axios tự gắn JWT vào từng yêu cầu. Các API quản trị yêu cầu tài khoản có `ROLE_ADMIN`.
+
 ## Kiểm tra thủ công
 
 1. Khởi động MySQL, backend và frontend.
@@ -164,7 +175,9 @@ Nếu danh sách sách báo “Chưa có sách phù hợp”, hãy kiểm tra:
 5. Tạo một cuốn sách tại `/admin/books`.
 6. Kiểm tra sách xuất hiện trong `/books`.
 7. Thử tìm kiếm, lọc, sửa và ẩn sách.
-8. Đăng nhập bằng tài khoản người dùng để xác nhận không truy cập được route admin.
+8. Vào `/admin/loans`, thử kết hợp nhiều bộ lọc và tạo một phiếu mượn.
+9. Thử gia hạn, nhận trả sách và cập nhật phiếu quá hạn.
+10. Đăng nhập bằng tài khoản người dùng để xác nhận không truy cập được route admin.
 
 ## Tài liệu liên quan
 
@@ -176,7 +189,6 @@ Nếu danh sách sách báo “Chưa có sách phù hợp”, hãy kiểm tra:
 
 ## Các giai đoạn tiếp theo
 
-- Giai đoạn 4: quản lý mượn và trả sách cho admin.
 - Giai đoạn 5: quản lý đặt trước và hàng chờ.
 - Giai đoạn 6: quản lý tiền phạt.
 - Giai đoạn 7: quản lý người dùng.

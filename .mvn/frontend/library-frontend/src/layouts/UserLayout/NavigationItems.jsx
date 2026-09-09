@@ -11,6 +11,7 @@ import {
     AdminPanelSettings as AdminPanelSettingsIcon,
     Category as CategoryIcon,
     Storefront as StorefrontIcon,
+    AssignmentTurnedIn as AssignmentTurnedInIcon,
 } from "@mui/icons-material";
 
 import React from "react";
@@ -96,6 +97,12 @@ export const adminNavigationItems = [
         path: '/admin/genres',
         icon: <CategoryIcon />,
         description: 'Sắp xếp danh mục sách',
+    },
+    {
+        title: 'Quản lý mượn trả',
+        path: '/admin/loans',
+        icon: <AssignmentTurnedInIcon />,
+        description: 'Cho mượn, nhận trả và gia hạn',
     },
     {
         title: 'Khu vực bạn đọc',
