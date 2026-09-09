@@ -1,5 +1,6 @@
 package com.zosh.librarymanagementsystem.payload.dto;
 
+import com.zosh.librarymanagementsystem.domain.AuthProvider;
 import com.zosh.librarymanagementsystem.domain.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -32,10 +33,9 @@ public class UserDTO {
     private String fullName;
     private String username;
     private UserRole role;
-
+    private AuthProvider authProvider;
+    private Boolean verified;
     private LocalDateTime lastLogin;
-
-
-
-
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

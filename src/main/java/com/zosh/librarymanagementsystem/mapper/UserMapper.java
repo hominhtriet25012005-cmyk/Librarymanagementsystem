@@ -19,7 +19,11 @@ public class UserMapper {
         userDTO.setFullName(user.getFullName());
         userDTO.setPhone(user.getPhone());
         userDTO.setRole(user.getRole());
+        userDTO.setAuthProvider(user.getAuthProvider());
+        userDTO.setVerified(user.getVerified());
         userDTO.setLastLogin(user.getLastLogin());
+        userDTO.setCreatedAt(user.getCreatedAt());
+        userDTO.setUpdatedAt(user.getUpdatedAt());
         return userDTO;
     }
 

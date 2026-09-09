@@ -42,6 +42,7 @@ public class DataInitializationComponent implements CommandLineRunner {
                      .email(adminEmail)
                      .fullName(adminFullName)
                      .role(UserRole.ROLE_ADMIN)
+                     .verified(true)
                      .build();
 
              userRepository.save(user);
