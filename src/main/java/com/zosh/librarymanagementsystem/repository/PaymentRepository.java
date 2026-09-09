@@ -20,6 +20,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Optional<Payment> findFirstByFineIdAndStatusInOrderByCreatedAtDesc(
             Long fineId, Collection<PaymentStatus> statuses);
 
+    Optional<Payment> findFirstBySubscriptionIdOrderByCreatedAtDesc(Long subscriptionId);
+
     @Query("""
             SELECT p FROM Payment p
             WHERE (:status IS NULL OR p.status = :status)

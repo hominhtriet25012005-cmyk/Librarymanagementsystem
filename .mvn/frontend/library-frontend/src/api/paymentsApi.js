@@ -32,6 +32,13 @@ export const adminPaymentsApi = {
     });
     return data;
   },
+  async confirmSubscription(subscriptionId, bankTransactionId) {
+    const { data } = await httpClient.post(
+      `/api/payments/admin/subscription/${subscriptionId}/confirm`,
+      { bankTransactionId: bankTransactionId.trim() },
+    );
+    return data;
+  },
   async reject(paymentId, reason) {
     const { data } = await httpClient.post(`/api/payments/admin/${paymentId}/reject`, {
       reason: reason.trim(),

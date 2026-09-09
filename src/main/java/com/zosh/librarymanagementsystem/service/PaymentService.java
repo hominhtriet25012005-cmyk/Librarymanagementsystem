@@ -24,6 +24,8 @@ public interface PaymentService {
 
     PaymentDTO confirmBankTransfer(Long paymentId, PaymentConfirmRequest req);
 
+    PaymentDTO confirmSubscriptionPayment(Long subscriptionId, PaymentConfirmRequest req);
+
     PaymentDTO rejectBankTransfer(Long paymentId, PaymentRejectRequest req);
 
     Page<PaymentDTO> getMyPayments(Pageable pageable);

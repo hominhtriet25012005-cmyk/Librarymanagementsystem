@@ -245,8 +245,9 @@ public class PaymentServiceImpl implements PaymentService {
         if (payment.getStatus() == PaymentStatus.SUCCESS) {
             return paymentMapper.toDTO(payment);
         }
-        if (payment.getStatus() != PaymentStatus.PROCESSING) {
-            throw new IllegalStateException("Chỉ có thể xác nhận giao dịch đang chờ đối soát");
+        if (payment.getStatus() != PaymentStatus.PENDING
+                && payment.getStatus() != PaymentStatus.PROCESSING) {
+            throw new IllegalStateException("Chỉ có thể xác nhận giao dịch đang chờ thanh toán hoặc đối soát");
         }
 
         String bankTransactionId = req.getBankTransactionId().trim();
@@ -257,6 +258,9 @@ public class PaymentServiceImpl implements PaymentService {
                 });
 
         payment.setGatewayPaymentId(bankTransactionId);
+        if (payment.getSubmittedAt() == null) {
+            payment.setSubmittedAt(LocalDateTime.now());
+        }
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setCompletedAt(LocalDateTime.now());
         payment.setReviewedAt(LocalDateTime.now());
@@ -267,6 +271,16 @@ public class PaymentServiceImpl implements PaymentService {
         // Chỉ sau khi quản trị viên đối chiếu ngân hàng thì mới kích hoạt gói hoặc đóng khoản phạt.
         paymentEventPublisher.publishPaymentSuccessEvent(savedPayment);
         return paymentMapper.toDTO(savedPayment);
+    }
+
+    @Override
+    @Transactional
+    public PaymentDTO confirmSubscriptionPayment(Long subscriptionId, PaymentConfirmRequest req) {
+        // Trang quản lý thành viên chỉ biết mã đăng ký, nên lấy giao dịch mới nhất của đăng ký đó.
+        Payment payment = paymentRepository.findFirstBySubscriptionIdOrderByCreatedAtDesc(subscriptionId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Không tìm thấy giao dịch thanh toán cho đăng ký thành viên"));
+        return confirmBankTransfer(payment.getId(), req);
     }
 
     @Override

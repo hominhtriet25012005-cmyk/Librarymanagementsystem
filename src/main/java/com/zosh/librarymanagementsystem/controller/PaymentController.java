@@ -56,6 +56,14 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.confirmBankTransfer(paymentId, request));
     }
 
+    /** Xác nhận thanh toán ngay từ dòng đăng ký thành viên trong trang quản trị. */
+    @PostMapping("/admin/subscription/{subscriptionId}/confirm")
+    public ResponseEntity<PaymentDTO> confirmSubscriptionPayment(
+            @PathVariable Long subscriptionId,
+            @Valid @RequestBody PaymentConfirmRequest request) {
+        return ResponseEntity.ok(paymentService.confirmSubscriptionPayment(subscriptionId, request));
+    }
+
     /** Quản trị viên từ chối giao dịch không thể đối chiếu. */
     @PostMapping("/admin/{paymentId}/reject")
     public ResponseEntity<PaymentDTO> rejectBankTransfer(
