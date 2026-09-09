@@ -71,6 +71,9 @@ public class ReservationServiceImpl implements ReservationService {
         // 2. Kiểm tra sách tồn tại.
         Book book = bookRepository.findByIdForUpdate(reservationRequest.getBookId())
                 .orElseThrow(() -> new LibraryOperationException("Không tìm thấy sách"));
+        if (!Boolean.TRUE.equals(book.getActive())) {
+            throw new LibraryOperationException("Sách đang ngừng hoạt động nên không thể đặt trước");
+        }
 
         // 3. Không tạo hai đặt chỗ đang hoạt động cho cùng một sách.
         if (reservationRepository.hasActiveReservation(userId, book.getId())) {
@@ -151,6 +154,10 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new LibraryOperationException("Không tìm thấy đặt chỗ có ID " + reservationId));
 
+        if (reservation.hasExpired()) {
+            throw new LibraryOperationException(
+                    "Đặt chỗ đã quá hạn nhận sách; hãy cập nhật danh sách hết hạn trước khi giao sách");
+        }
         if (reservation.getStatus() != ReservationStatus.AVAILABLE
                 || reservation.getBook().getAvailableCopies() <= 0) {
             throw new LibraryOperationException("Đặt chỗ chưa sẵn sàng để nhận sách; trạng thái hiện tại: " + reservation.getStatus());
