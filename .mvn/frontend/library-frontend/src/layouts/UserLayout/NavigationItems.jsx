@@ -66,6 +66,12 @@ export const navigationItems = [
         badge: 'fines',
     },
     {
+        title: 'Lịch sử thanh toán',
+        path: '/my-payments',
+        icon: <PaymentsIcon />,
+        description: 'Theo dõi chuyển khoản và trạng thái đối soát',
+    },
+    {
         title: 'Gói thành viên',
         path: '/subscriptions',
         icon: <CardMembershipIcon />,
@@ -87,12 +93,6 @@ export const adminNavigationItems = [
         path: '/admin/dashboard',
         icon: <AdminPanelSettingsIcon />,
         description: 'Số liệu vận hành thư viện',
-    },
-    {
-        title: 'Thanh toán',
-        path: '/my-payments',
-        icon: <PaymentsIcon />,
-        description: 'Lịch sử và trạng thái đối soát',
     },
     {
         title: 'Quản lý sách',
