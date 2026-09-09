@@ -13,6 +13,7 @@ import {
     Storefront as StorefrontIcon,
     AssignmentTurnedIn as AssignmentTurnedInIcon,
     ManageAccounts as ManageAccountsIcon,
+    Payments as PaymentsIcon,
 } from "@mui/icons-material";
 
 import React from "react";
@@ -88,6 +89,12 @@ export const adminNavigationItems = [
         description: 'Số liệu vận hành thư viện',
     },
     {
+        title: 'Thanh toán',
+        path: '/my-payments',
+        icon: <PaymentsIcon />,
+        description: 'Lịch sử và trạng thái đối soát',
+    },
+    {
         title: 'Quản lý sách',
         path: '/admin/books',
         icon: <MenuBookIcon />,
@@ -128,6 +135,12 @@ export const adminNavigationItems = [
         path: '/admin/subscriptions',
         icon: <CardMembershipIcon />,
         description: 'Gói thành viên và đăng ký',
+    },
+    {
+        title: 'Đối soát thanh toán',
+        path: '/admin/payments',
+        icon: <PaymentsIcon />,
+        description: 'Xác nhận chuyển khoản VietQR',
     },
     {
         title: 'Khu vực bạn đọc',

@@ -10,7 +10,7 @@ export function formatDateTime(value) {
     hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric",
   });
 }
-export function formatMoney(value, currency = "INR") {
+export function formatMoney(value, currency = "VND") {
   const amount = Number(value) || 0;
   try {
     return new Intl.NumberFormat("vi-VN", { style: "currency", currency }).format(amount);

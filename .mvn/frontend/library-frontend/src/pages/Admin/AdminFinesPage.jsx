@@ -143,7 +143,7 @@ export default function AdminFinesPage() {
       <Button variant="contained" startIcon={<Add />} onClick={() => { setForm(EMPTY_FORM); setCreateOpen(true); }}>Tạo khoản phạt</Button>
     </div>
 
-    <Alert severity="info" className="mb-5">Đơn vị tiền của backend hiện tại là INR. Thanh toán trực tuyến và đối soát Razorpay được hoàn thiện ở giai đoạn 9.</Alert>
+    <Alert severity="info" className="mb-5">Đơn vị tiền là đồng Việt Nam. Giao dịch VietQR được xác nhận tại trang Đối soát thanh toán.</Alert>
     {notice && <Alert severity={notice.severity} className="mb-5" onClose={() => setNotice(null)}>{notice.text}</Alert>}
 
     <div className="mb-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -180,7 +180,7 @@ export default function AdminFinesPage() {
     <Dialog open={createOpen} onClose={() => { if (!saving) setCreateOpen(false); }} fullWidth maxWidth="sm"><DialogTitle>Tạo khoản phạt</DialogTitle><DialogContent><form id="create-fine-form" onSubmit={createFine} className="grid gap-4 pt-2 sm:grid-cols-2">
       <TextField required label="Mã phiếu mượn" type="number" value={form.bookLoanId} onChange={(event) => setForm((current) => ({ ...current, bookLoanId: event.target.value }))} slotProps={{ htmlInput: { min: 1 } }} helperText="Xem mã tại trang Quản lý mượn trả" />
       <FormControl required><InputLabel id="create-fine-type">Loại phạt</InputLabel><Select labelId="create-fine-type" label="Loại phạt" value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: event.target.value }))}>{TYPES.map((type) => <MenuItem key={type} value={type}>{fineTypeLabel(type)}</MenuItem>)}</Select></FormControl>
-      <TextField required label="Số tiền phạt" type="number" value={form.amount} onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))} slotProps={{ htmlInput: { min: 1, step: 1 } }} helperText="Đơn vị INR" />
+      <TextField required label="Số tiền phạt" type="number" value={form.amount} onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))} slotProps={{ htmlInput: { min: 1, step: 1 } }} helperText="Đơn vị VND" />
       <TextField label="Lý do" value={form.reason} onChange={(event) => setForm((current) => ({ ...current, reason: event.target.value }))} />
       <TextField className="sm:col-span-2" label="Ghi chú" multiline minRows={3} value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} />
       <Alert severity="info" className="sm:col-span-2">Mỗi phiếu mượn chỉ có một khoản phạt cho từng loại. Tiền phạt quá hạn thường được tạo tự động khi nhận trả sách.</Alert>

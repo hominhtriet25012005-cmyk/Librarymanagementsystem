@@ -15,6 +15,7 @@ const MyReservations = lazy(() => import("./pages/Reservations/MyReservations"))
 const MyFines = lazy(() => import("./pages/Fines/MyFines"));
 const WishlistPage = lazy(() => import("./pages/Wishlist/WishlistPage"));
 const SubscriptionsPage = lazy(() => import("./pages/Subscriptions/SubscriptionsPage"));
+const MyPaymentsPage = lazy(() => import("./pages/Payments/MyPaymentsPage"));
 const AdminDashboardPage = lazy(() => import("./pages/Admin/AdminDashboardPage"));
 const AdminBooksPage = lazy(() => import("./pages/Admin/AdminBooksPage"));
 const AdminGenresPage = lazy(() => import("./pages/Admin/AdminGenresPage"));
@@ -23,6 +24,7 @@ const AdminReservationsPage = lazy(() => import("./pages/Admin/AdminReservations
 const AdminFinesPage = lazy(() => import("./pages/Admin/AdminFinesPage"));
 const AdminUsersPage = lazy(() => import("./pages/Admin/AdminUsersPage"));
 const AdminMembershipPage = lazy(() => import("./pages/Admin/AdminMembershipPage"));
+const AdminPaymentsPage = lazy(() => import("./pages/Admin/AdminPaymentsPage"));
 
 export default function App() {
   return <Suspense fallback={<div role="status" className="p-8 text-center">Đang tải giao diện...</div>}>
@@ -42,6 +44,7 @@ export default function App() {
           <Route path="my-reservations" element={<MyReservations />} />
           <Route path="my-fines" element={<MyFines />} />
           <Route path="subscriptions" element={<SubscriptionsPage />} />
+          <Route path="my-payments" element={<MyPaymentsPage />} />
           <Route path="wishlist" element={<WishlistPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="settings" element={<ModulePlaceholder title="Cài đặt" />} />
@@ -56,6 +59,7 @@ export default function App() {
             <Route path="admin/fines" element={<AdminFinesPage />} />
             <Route path="admin/users" element={<AdminUsersPage />} />
             <Route path="admin/subscriptions" element={<AdminMembershipPage />} />
+            <Route path="admin/payments" element={<AdminPaymentsPage />} />
           </Route>
         </Route>
         <Route path="*" element={<ModulePlaceholder title="Không tìm thấy trang" description="Đường dẫn không tồn tại. Hãy chọn một mục trong thanh điều hướng." />} />
