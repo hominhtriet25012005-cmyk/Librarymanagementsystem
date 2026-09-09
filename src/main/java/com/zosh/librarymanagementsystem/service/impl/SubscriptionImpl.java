@@ -113,6 +113,14 @@ public class SubscriptionImpl implements SubscriptionService {
     }
 
     @Override
+    public SubscriptionDTO getUsersPendingSubscription() {
+        List<Subscription> pending = subscriptionRepository.findPendingSubscriptionsByUserId(
+                userService.getCurrentUser().getId(), LocalDate.now(), PageRequest.of(0, 1)
+        );
+        return pending.isEmpty() ? null : subscriptionMapper.toDTO(pending.get(0));
+    }
+
+    @Override
     @Transactional
     public SubscriptionDTO cancelSubscription(Long subscriptionId, String reason) {
         Subscription subscription = subscriptionRepository.findById(subscriptionId)

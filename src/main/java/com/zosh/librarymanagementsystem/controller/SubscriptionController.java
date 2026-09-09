@@ -36,6 +36,11 @@ public class SubscriptionController {
         return ResponseEntity.ok(dto);
     }
 
+    @GetMapping("/user/pending")
+    public ResponseEntity<SubscriptionDTO> getUsersPendingSubscription() {
+        return ResponseEntity.ok(subscriptionService.getUsersPendingSubscription());
+    }
+
     @GetMapping("/my")
     public ResponseEntity<PageResponse<SubscriptionDTO>> getMySubscriptions(
             @RequestParam(defaultValue = "0") int page,
